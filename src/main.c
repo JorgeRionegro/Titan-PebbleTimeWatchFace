@@ -22,7 +22,7 @@ TextLayer *date, *BN12, *BN3, *BN6, *BN9;
 static GPoint hc, hs;
 static GRect rDate, next, rBattery, nextBattery, rBluetooth, nextBluetooth, rBNumbers, nextBN12, nextBN3, nextBN6, nextBN9;
 static BatteryChargeState c_state;
-static int mTicks = 60, Radio = 90, a = 1, cType = 1, hType = 2, numbType = 2;
+static int mTicks = 60, Radio = 90, a = 1, cType = 12, hType = 2, numbType = 2;
 bool UseSeconds = true, UseShadows = true, DrawInside =false, viewBluetooth = true;
 #ifdef PBL_COLOR
   static GColor8 ColorSphere,BackColor,ColorSeconds,ColorMinutes,ColorHours,ColorMMarks,ColorHMarks,ColorQMarks,ColorInside,ColorShadow;
@@ -78,7 +78,7 @@ static void setColors (int clockType){
     ColorFont = COLOR_FALLBACK(GColorYellow,GColorWhite);
     ColorBattery = COLOR_FALLBACK(GColorYellow,GColorWhite);
     ColorSNumbers = COLOR_FALLBACK(GColorYellow,GColorWhite);
-    ColorBNumbers = COLOR_FALLBACK(GColorYellow,GColorWhite);
+    ColorBNumbers = COLOR_FALLBACK(GColorWhite,GColorWhite);
     break;
     case 3: //PinkPanter lovers
     BackColor = COLOR_FALLBACK(GColorBulgarianRose,GColorWhite);
@@ -91,7 +91,7 @@ static void setColors (int clockType){
     ColorSeconds = COLOR_FALLBACK(GColorLightGray,GColorWhite);
     ColorInside = COLOR_FALLBACK(GColorWhite,GColorBlack);
     ColorShadow = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);  
-    ColorFont = COLOR_FALLBACK(GColorYellow,GColorWhite);
+    ColorFont = COLOR_FALLBACK(GColorWhite,GColorWhite);
     ColorBattery = COLOR_FALLBACK(GColorYellow,GColorWhite);
     ColorSNumbers = COLOR_FALLBACK(GColorYellow,GColorWhite);
     ColorBNumbers = COLOR_FALLBACK(GColorYellow,GColorWhite);
@@ -107,7 +107,7 @@ static void setColors (int clockType){
     ColorSeconds = COLOR_FALLBACK(GColorLightGray,GColorWhite);
     ColorInside = COLOR_FALLBACK(GColorDarkGray,GColorBlack);
     ColorShadow = COLOR_FALLBACK(GColorBlack,GColorBlack);  
-    ColorFont = COLOR_FALLBACK(GColorYellow,GColorWhite);
+    ColorFont = COLOR_FALLBACK(GColorChromeYellow,GColorWhite);
     ColorBattery = COLOR_FALLBACK(GColorYellow,GColorWhite);
     ColorSNumbers = COLOR_FALLBACK(GColorYellow,GColorWhite);
     ColorBNumbers = COLOR_FALLBACK(GColorYellow,GColorWhite);
@@ -132,7 +132,7 @@ static void setColors (int clockType){
     DrawInside = true;
     BackColor = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorWhite);
     ColorSphere = COLOR_FALLBACK(GColorFolly, GColorBlack);
-    ColorQMarks = COLOR_FALLBACK(GColorDarkGreen,GColorWhite); 
+    ColorQMarks = COLOR_FALLBACK(GColorRichBrilliantLavender,GColorWhite); 
     ColorHMarks = COLOR_FALLBACK(GColorPastelYellow,GColorWhite); 
     ColorMMarks = COLOR_FALLBACK(GColorPastelYellow,GColorWhite);
     ColorHours = COLOR_FALLBACK(GColorElectricBlue,GColorWhite);
@@ -159,7 +159,7 @@ static void setColors (int clockType){
     ColorFont = COLOR_FALLBACK(GColorYellow,GColorWhite);
     ColorBattery = COLOR_FALLBACK(GColorYellow,GColorWhite);
     ColorSNumbers = COLOR_FALLBACK(GColorYellow,GColorWhite);
-    ColorBNumbers = COLOR_FALLBACK(GColorYellow,GColorWhite);
+    ColorBNumbers = COLOR_FALLBACK(GColorWhite,GColorWhite);
     break;
     case 8: //Bottle clock
     BackColor = COLOR_FALLBACK(GColorDarkGreen,GColorBlack);
@@ -175,7 +175,7 @@ static void setColors (int clockType){
     ColorFont = COLOR_FALLBACK(GColorYellow,GColorWhite);
     ColorBattery = COLOR_FALLBACK(GColorYellow,GColorWhite);
     ColorSNumbers = COLOR_FALLBACK(GColorYellow,GColorWhite);
-    ColorBNumbers = COLOR_FALLBACK(GColorYellow,GColorWhite);
+    ColorBNumbers = COLOR_FALLBACK(GColorWhite,GColorWhite);
     break;
     case 9: //Navy man
     BackColor = COLOR_FALLBACK(GColorDukeBlue,GColorWhite);
@@ -191,7 +191,7 @@ static void setColors (int clockType){
     ColorFont = COLOR_FALLBACK(GColorWhite,GColorWhite);
     ColorBattery = COLOR_FALLBACK(GColorWhite,GColorWhite);
     ColorSNumbers = COLOR_FALLBACK(GColorWhite,GColorWhite);
-    ColorBNumbers = COLOR_FALLBACK(GColorWhite,GColorWhite);
+    ColorBNumbers = COLOR_FALLBACK(GColorRed,GColorWhite);
     break;
     case 10: //Rainbow Warrior
     BackColor = COLOR_FALLBACK(GColorYellow,GColorWhite);
@@ -212,7 +212,7 @@ static void setColors (int clockType){
     case 11: //Papyrus
     DrawInside = true;
     BackColor = COLOR_FALLBACK(GColorPastelYellow,GColorWhite);
-    ColorSphere = COLOR_FALLBACK(GColorPastelYellow, GColorWhite);
+    ColorSphere = COLOR_FALLBACK(GColorPastelYellow,GColorWhite);
     ColorQMarks = COLOR_FALLBACK(GColorOxfordBlue,GColorBlack); 
     ColorHMarks = COLOR_FALLBACK(GColorDarkGray,GColorBlack); 
     ColorMMarks = COLOR_FALLBACK(GColorDarkGray,GColorBlack);
@@ -224,7 +224,7 @@ static void setColors (int clockType){
     ColorFont = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);
     ColorBattery = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);
     ColorSNumbers = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);
-    ColorBNumbers = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);
+    ColorBNumbers = COLOR_FALLBACK(GColorOxfordBlue,GColorBlack);
     break;
     case 12: //Classic Taste
     DrawInside = true;
@@ -241,7 +241,7 @@ static void setColors (int clockType){
     ColorFont = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);
     ColorBattery = COLOR_FALLBACK(GColorWindsorTan,GColorBlack);
     ColorSNumbers = COLOR_FALLBACK(GColorWindsorTan,GColorBlack);
-    ColorBNumbers = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);
+    ColorBNumbers = COLOR_FALLBACK(GColorDarkGray,GColorBlack);
     break;
   }
 }
