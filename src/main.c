@@ -22,7 +22,7 @@ TextLayer *date, *BN12, *BN3, *BN6, *BN9;
 static GPoint hc, hs;
 static GRect rDate, next, rBattery, nextBattery, rBluetooth, nextBluetooth, rBNumbers, nextBN12, nextBN3, nextBN6, nextBN9;
 static BatteryChargeState c_state;
-static int mTicks = 60, Radio = 100, a = 1, cType = 1, hType = 2, numbType = 2;
+static int mTicks = 60, Radio = 90, a = 1, cType = 1, hType = 2, numbType = 2;
 bool UseSeconds = true, UseShadows = true, DrawInside =false, viewBluetooth = true;
 #ifdef PBL_COLOR
   static GColor8 ColorSphere,BackColor,ColorSeconds,ColorMinutes,ColorHours,ColorMMarks,ColorHMarks,ColorQMarks,ColorInside,ColorShadow;
@@ -61,7 +61,7 @@ static void setColors (int clockType){
     ColorFont = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
     ColorBattery = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
     ColorSNumbers = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
-    ColorBNumbers = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
+    ColorBNumbers = COLOR_FALLBACK(GColorDukeBlue,GColorBlack);
     break;
     case 2: //Fluor Classic
     DrawInside = true;
@@ -501,12 +501,12 @@ void time_layer_update(Layer *me, GContext *ctx) {
 		  (int32_t)Radio*0.9 / TRIG_MAX_RATIO) + hs.y;
       ss.x = ((int16_t)(sin_lookup(ss_angle) *
 		  (int32_t)Radio*0.9 / TRIG_MAX_RATIO) + hs.x);
-    //#ifdef PBL_COLOR
-    //  graphics_draw_line_antialiased(ctx, hc, ss, ColorShadow);
-    //#else
+    #ifdef PBL_COLOR
+      graphics_draw_line_antialiased(ctx, hs, ss, ColorShadow);
+    #else
       graphics_context_set_stroke_color(ctx, ColorShadow);
-      graphics_draw_line(ctx, hc, ss);
-    //#endif
+      graphics_draw_line(ctx, hs, ss);
+    #endif
   }
 
   // Draw minute hand
@@ -579,12 +579,12 @@ void time_layer_update(Layer *me, GContext *ctx) {
 		  (int32_t)Radio*0.9 / TRIG_MAX_RATIO) + hc.y;
       sc.x = ((int16_t)(sin_lookup(sec_angle) *
 		  (int32_t)Radio*0.9 / TRIG_MAX_RATIO) + hc.x);
-    //#ifdef PBL_COLOR
-    //  graphics_draw_line_antialiased(ctx, hc, sc, ColorSeconds);
-    //#else
+    #ifdef PBL_COLOR
+      graphics_draw_line_antialiased(ctx, hc, sc, ColorSeconds);
+    #else
       graphics_context_set_stroke_color(ctx, ColorSeconds);
       graphics_draw_line(ctx, hc, sc);
-    //#endif
+    #endif
   }
   
   //draw centre circles
