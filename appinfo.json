@@ -1,0 +1,32 @@
+{
+    "appKeys": {
+        "Key_Bluetooth": 5,
+        "Key_ClockType": 3,
+        "Key_HandType": 4,
+        "Key_Numbers": 6,
+        "Key_Radio": 2,
+        "Key_UseSeconds": 0,
+        "Key_UseShadows": 1
+    },
+    "capabilities": [
+        "configurable"
+    ],
+    "companyName": "UKUYU",
+    "longName": "TITAN",
+    "projectType": "native",
+    "resources": {
+        "media": []
+    },
+    "sdkVersion": "3",
+    "shortName": "TITAN",
+    "targetPlatforms": [
+        "aplite",
+        "basalt"
+    ],
+    "uuid": "7d599476-d3c8-4f7d-9fb0-5b56d050b1de",
+    "versionCode": 1,
+    "versionLabel": "1.0",
+    "watchapp": {
+        "watchface": true
+    }
+}
