@@ -6,7 +6,7 @@
 #define dBFont fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD)
 #define sFont fonts_get_system_font(FONT_KEY_GOTHIC_14) 
 #define sBFont fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD)
-#define nBFont fonts_get_system_font(FONT_KEY_BITHAM_34_MEDIUM_NUMBERS)
+#define nBFont fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD)
   
 #define Key_UseSeconds 0
 #define Key_UseShadows 1  
@@ -18,12 +18,11 @@
  
 Window *w;
 Layer *dial_layer, *time_layer, *battery, *bluetooth;
-TextLayer *date;
-static GFont s_date_font;
+TextLayer *date, *BN12, *BN3, *BN6, *BN9;
 static GPoint hc, hs;
-static GRect rDate, next, rBattery, nextBattery, rBluetooth, nextBluetooth;
+static GRect rDate, next, rBattery, nextBattery, rBluetooth, nextBluetooth, rBNumbers, nextBN12, nextBN3, nextBN6, nextBN9;
 static BatteryChargeState c_state;
-static int mTicks = 60, Radio = 95, a = 1, cType = 1, hType = 2, numbType = 0;
+static int mTicks = 60, Radio = 100, a = 1, cType = 1, hType = 2, numbType = 2;
 bool UseSeconds = true, UseShadows = true, DrawInside =false, viewBluetooth = true;
 #ifdef PBL_COLOR
   static GColor8 ColorSphere,BackColor,ColorSeconds,ColorMinutes,ColorHours,ColorMMarks,ColorHMarks,ColorQMarks,ColorInside,ColorShadow;
@@ -38,7 +37,7 @@ static GPathInfo HOUR_POINTS = { 4, (GPoint []) { { -1, 1 }, { 1, 1}, { 1, -14},
 static GPathInfo MINUTE_POINTS = { 4, (GPoint []) { { -1, 1 }, { 1, 1}, { 1, -5}, { -1, -5} } };
 static GPathInfo HOUR_QUARTERS = { 4, (GPoint []) { { -3, 3 }, { 3, 3}, { 3, -14}, { -3, -14} } };
 static GPathInfo HAND_POINTS = { 4, (GPoint []) { { -3, 3}, { 3, 3}, { 3, -30}, { -3, -30} } };
-static GPathInfo HOUR_HAND = { 5, (GPoint []) { { -3,0}, {3,0}, {8, -18}, {0, -37}, {-7,-18} } };
+static GPathInfo HOUR_HAND = { 5, (GPoint []) { { -3,0}, {3,0}, {7, -18}, {0, -37}, {-7,-18} } };
 static GPathInfo MINUTE_HAND = { 5, (GPoint []) { { -3,0}, {3,0}, {7, -20}, {0, -40}, {-6,-20} } };
 static GPathInfo HOUR_HAND2 = { 5, (GPoint []) { { -4,0}, {4,0}, {4, -26}, {0, -33}, {-4,-26} } };
 static GPathInfo MINUTE_HAND2 = { 5, (GPoint []) { { -4,0}, {4,0}, {4, -43}, {0, -50}, {-4,-43} } };
@@ -606,6 +605,11 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
   layer_mark_dirty(dial_layer);
   layer_mark_dirty(time_layer);
   layer_mark_dirty((Layer *)date);
+  layer_mark_dirty((Layer *)BN12);
+  layer_mark_dirty((Layer *)BN3);
+  layer_mark_dirty((Layer *)BN6);
+  layer_mark_dirty((Layer *)BN9);
+  
   static char date_buf[] = "Mon.  1";
   // Set Centre, date and Battery every 5 minutes
   if (UseSeconds == false) {
@@ -614,21 +618,46 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
       strftime(date_buf, sizeof("Mon.  1"), "%a. %e", now);
       text_layer_set_text(date, date_buf);
       hc = GPoint((int16_t)(-sin_lookup(TRIG_MAX_ANGLE / 60 * (now->tm_min)) *
-  		   (int32_t)(Radio-72) / TRIG_MAX_RATIO) + 144 / 2, 
-         (int16_t)(cos_lookup(TRIG_MAX_ANGLE / 60 * (now->tm_min)) *
-  		   (int32_t)(Radio-72) / TRIG_MAX_RATIO) +  168 / 2);
+  		     (int32_t)(Radio-72) / TRIG_MAX_RATIO) + 144 / 2, 
+           (int16_t)(cos_lookup(TRIG_MAX_ANGLE / 60 * (now->tm_min)) *
+  		     (int32_t)(Radio-72) / TRIG_MAX_RATIO) +  168 / 2);
       hs.x=hc.x+2;
       hs.y=hc.y+4;
       a = 0;
+        
       next = GRect(hc.x-45,hc.y+15,90,90);
       nextBattery = GRect(hc.x-7,hc.y-33,15,15);
+      nextBluetooth = GRect(hc.x-15,hc.y-41,30,30);
       layer_set_frame(text_layer_get_layer(date), next);
       layer_set_frame(battery, nextBattery);
       layer_set_update_proc(battery, battery_update_proc);
-      nextBluetooth = GRect(hc.x-15,hc.y-41,30,30);
       layer_set_frame(bluetooth, nextBluetooth);
       layer_set_update_proc(bluetooth, bluetooth_update_proc); 
-      } 
+         
+      if (numbType != 0) {
+        nextBN12 = GRect(hc.x-15,hc.y-15-Radio*0.65,30,30);
+        nextBN3 = GRect(hc.x-15+Radio*0.65,hc.y-20,30,30);
+        nextBN6 = GRect(hc.x-15,hc.y-20+Radio*0.65,30,30);
+        nextBN9 = GRect(hc.x-13-Radio*0.65,hc.y-20,30,30);
+        if (numbType == 2 || numbType == 4) {
+          text_layer_set_text(BN12, "12");
+          text_layer_set_text(BN3, "3");
+          text_layer_set_text(BN6, "6");
+          text_layer_set_text(BN9, "9");
+        }
+        if (numbType == 1 || numbType == 1) {
+          text_layer_set_text(BN12, "XII");
+          text_layer_set_text(BN3, "III");
+          text_layer_set_text(BN6, "VI");
+          text_layer_set_text(BN9, "IX");
+        }        
+        layer_set_frame(text_layer_get_layer(BN12), nextBN12);
+        layer_set_frame(text_layer_get_layer(BN3), nextBN3);
+        layer_set_frame(text_layer_get_layer(BN6), nextBN6);
+        layer_set_frame(text_layer_get_layer(BN9), nextBN9);
+      }
+        
+     } 
   } else {
     if (((now->tm_min) % 5 == 0  && (now->tm_sec) == 0) || a==1) {
       c_state = battery_state_service_peek();
@@ -643,13 +672,36 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
       a = 0;
       next = GRect(hc.x-45,hc.y+15,90,90);
       nextBattery = GRect(hc.x-7,hc.y-33,15,15);
+      nextBluetooth = GRect(hc.x-15,hc.y-41,30,30);
       layer_set_frame(text_layer_get_layer(date), next);
       layer_set_frame(battery, nextBattery);
       layer_set_update_proc(battery, battery_update_proc);
-      nextBluetooth = GRect(hc.x-15,hc.y-41,30,30);
       layer_set_frame(bluetooth, nextBluetooth);
       layer_set_update_proc(bluetooth, bluetooth_update_proc); 
-    }
+      
+      if (numbType != 0) {
+        nextBN12 = GRect(hc.x-15,hc.y-15-Radio*0.65,30,30);
+        nextBN3 = GRect(hc.x-15+Radio*0.65,hc.y-20,30,30);
+        nextBN6 = GRect(hc.x-15,hc.y-20+Radio*0.65,30,30);
+        nextBN9 = GRect(hc.x-13-Radio*0.65,hc.y-20,30,30);
+        if (numbType == 2 || numbType == 4) {
+          text_layer_set_text(BN12, "12");
+          text_layer_set_text(BN3, "3");
+          text_layer_set_text(BN6, "6");
+          text_layer_set_text(BN9, "9");
+        }
+        if (numbType == 1 || numbType == 1) {
+          text_layer_set_text(BN12, "XII");
+          text_layer_set_text(BN3, "III");
+          text_layer_set_text(BN6, "VI");
+          text_layer_set_text(BN9, "IX");
+        }        
+        layer_set_frame(text_layer_get_layer(BN12), nextBN12);
+        layer_set_frame(text_layer_get_layer(BN3), nextBN3);
+        layer_set_frame(text_layer_get_layer(BN6), nextBN6);
+        layer_set_frame(text_layer_get_layer(BN9), nextBN9);
+      }
+   }
   }
 }
 
@@ -722,15 +774,43 @@ void handle_init(void) {
   hour_quarters = gpath_create(&HOUR_QUARTERS);
   dial_layer = layer_create(bounds);
   time_layer = layer_create(bounds);
+  
   //date
   rDate = GRect(hc.x-45,hc.y+15,90,90);
-  s_date_font = dFont;
   date = text_layer_create(rDate);
   text_layer_set_background_color(date, GColorClear);
   text_layer_set_text_color(date, ColorFont);
   text_layer_set_text(date, "");
   text_layer_set_text_alignment(date, GTextAlignmentCenter);
-  text_layer_set_font(date, s_date_font); 
+  text_layer_set_font(date, dBFont); 
+  
+  //BigNumbers
+  rBNumbers = GRect(hc.x,hc.y,30,30);
+  BN12 = text_layer_create(rBNumbers);
+  text_layer_set_background_color(BN12, GColorClear);
+  text_layer_set_text_color(BN12, ColorBNumbers);
+  text_layer_set_text(BN12, "");
+  text_layer_set_text_alignment(BN12, GTextAlignmentCenter);
+  text_layer_set_font(BN12, nBFont);
+  BN3 = text_layer_create(rBNumbers);
+  text_layer_set_background_color(BN3, GColorClear);
+  text_layer_set_text_color(BN3, ColorBNumbers);
+  text_layer_set_text(BN3, "");
+  text_layer_set_text_alignment(BN3, GTextAlignmentCenter);
+  text_layer_set_font(BN3, nBFont);
+  BN6 = text_layer_create(rBNumbers);
+  text_layer_set_background_color(BN6, GColorClear);
+  text_layer_set_text_color(BN6, ColorBNumbers);
+  text_layer_set_text(BN6, "");
+  text_layer_set_text_alignment(BN6, GTextAlignmentCenter);
+  text_layer_set_font(BN6, nBFont);
+  BN9 = text_layer_create(rBNumbers);
+  text_layer_set_background_color(BN9, GColorClear);
+  text_layer_set_text_color(BN9, ColorBNumbers);
+  text_layer_set_text(BN9, "");
+  text_layer_set_text_alignment(BN9, GTextAlignmentCenter);
+  text_layer_set_font(BN9, nBFont);
+  
   // battery
   rBattery = GRect(hc.x-7,hc.y-33,15,15);
   battery = layer_create(rBattery);
@@ -745,6 +825,10 @@ void handle_init(void) {
   layer_set_update_proc(bluetooth, bluetooth_update_proc);
   layer_add_child(window_get_root_layer(w), dial_layer);
   layer_add_child(window_get_root_layer(w), (Layer *)date);
+  layer_add_child(window_get_root_layer(w), (Layer *)BN12);
+  layer_add_child(window_get_root_layer(w), (Layer *)BN3);
+  layer_add_child(window_get_root_layer(w), (Layer *)BN6);
+  layer_add_child(window_get_root_layer(w), (Layer *)BN9);
   layer_add_child(window_get_root_layer(w), (Layer *)battery);
   layer_add_child(window_get_root_layer(w), (Layer *)bluetooth);
   layer_add_child(window_get_root_layer(w), time_layer);
@@ -763,6 +847,10 @@ void handle_deinit(void) {
   layer_destroy(time_layer);
   layer_destroy(dial_layer);
   layer_destroy((Layer *)date);
+  layer_destroy((Layer *)BN12);
+  layer_destroy((Layer *)BN3);
+  layer_destroy((Layer *)BN6);
+  layer_destroy((Layer *)BN9);
   layer_destroy(battery);
   layer_destroy(bluetooth);
 
