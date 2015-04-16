@@ -2,6 +2,7 @@
     "appKeys": {
         "Key_Bluetooth": 5,
         "Key_ClockType": 3,
+        "Key_DateBox": 7,
         "Key_HandType": 4,
         "Key_Numbers": 6,
         "Key_Radio": 2,
