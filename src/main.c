@@ -16,6 +16,7 @@
 
 static int mTicks = 60, Radio = 97, a = 1, cType = 1, hType = 1, numbType = 5, grosor = 4;
 bool UseSeconds = true, UseShadows = true, viewBluetooth = true, DateBox = true;
+int32_t hh_angle, mi_angle, ss_angle;
 
 Window *w;
 Layer *dial_layer, *marks_layer, *time_layer, *shadow_layer, *battery, *bluetooth;
@@ -462,9 +463,7 @@ void marks_layer_update(Layer *me, GContext *ctx) {
 }
 
 void shadow_layer_update(Layer *me, GContext *ctx) {
-  struct tm *now;
-  time_t t = time(NULL);
-  now = localtime(&t);
+
   int end = grosor;
   int start = -1*grosor;
   int x;
@@ -489,10 +488,6 @@ void shadow_layer_update(Layer *me, GContext *ctx) {
     }
   #endif
     
-  int32_t hh_angle = (TRIG_MAX_ANGLE*(((now->tm_hour%12)*6)+(now->tm_min/10)))/(12*6);
-  int32_t mi_angle = TRIG_MAX_ANGLE * (now->tm_min) / 60;
-  int32_t ss_angle = TRIG_MAX_ANGLE / 60 * (now->tm_sec);
-
   //center shadow
   if (UseShadows==true){
     graphics_context_set_fill_color(ctx, ColorShadow);
@@ -604,9 +599,7 @@ void shadow_layer_update(Layer *me, GContext *ctx) {
 }
 
 void time_layer_update(Layer *me, GContext *ctx) {
-  struct tm *now;
-  time_t t = time(NULL);
-  now = localtime(&t);
+
   int end = grosor;
   int start = -1*grosor;
   int x;
@@ -630,11 +623,7 @@ void time_layer_update(Layer *me, GContext *ctx) {
     }
   #endif
     
-  int32_t hh_angle = (TRIG_MAX_ANGLE*(((now->tm_hour%12)*6)+(now->tm_min/10)))/(12*6);
-  int32_t mi_angle = TRIG_MAX_ANGLE * (now->tm_min) / 60;
-  int32_t ss_angle = TRIG_MAX_ANGLE / 60 * (now->tm_sec);
- 
-  // Draw minute hand
+ // Draw minute hand
   graphics_context_set_fill_color(ctx, ColorMinutes);
   graphics_context_set_stroke_color(ctx, ColorMinutes);
   GPoint mHb, mHt;
@@ -772,7 +761,6 @@ void time_layer_update(Layer *me, GContext *ctx) {
 
 void handle_tick(struct tm *now, TimeUnits units_changed) {
   setlocale(LC_TIME, ""); 
-  setColors (cType);
   layer_mark_dirty(marks_layer);
   layer_mark_dirty(dial_layer);
   layer_mark_dirty(shadow_layer);
@@ -790,6 +778,12 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
   layer_mark_dirty((Layer *)SN10);
   layer_mark_dirty((Layer *)SN11);
   layer_mark_dirty((Layer *)BN12);
+
+  hh_angle = (TRIG_MAX_ANGLE*(((now->tm_hour%12)*6)+(now->tm_min/10)))/(12*6);
+  mi_angle = TRIG_MAX_ANGLE * (now->tm_min) / 60;
+  if (UseSeconds == true){
+      ss_angle = TRIG_MAX_ANGLE / 60 * (now->tm_sec);
+  }
   
   static char date_buf[] = "Mon.  1";
   int key = 0;
@@ -828,10 +822,11 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
     }
       hs.x=hc.x+1;
       hs.y=hc.y+4;
-       
+      
       next = GRect(hc.x-30,hc.y+15,60,25);
       nextBattery = GRect(hc.x-7,hc.y-33,15,15);
       nextBluetooth = GRect(hc.x-15,hc.y-41,30,30);
+      text_layer_set_text_color(date, ColorFont);
       layer_set_frame(text_layer_get_layer(date), next);
       layer_set_frame(battery, nextBattery);
       layer_set_update_proc(battery, battery_update_proc);
@@ -839,11 +834,23 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
       layer_set_update_proc(bluetooth, bluetooth_update_proc);
     
       if (numbType != 1) {
+        text_layer_set_text_color(BN3, ColorBNumbers);
+        text_layer_set_text_color(BN6, ColorBNumbers);
+        text_layer_set_text_color(BN9, ColorBNumbers);
+        text_layer_set_text_color(BN12, ColorBNumbers);
         nextBN3 = GRect(hc.x-13+Radio*0.65,hc.y-18,28,28);
         nextBN6 = GRect(hc.x-13,hc.y-18+Radio*0.65,28,28);
         nextBN9 = GRect(hc.x-13-Radio*0.65,hc.y-18,28,28);
         nextBN12 = GRect(hc.x-13,hc.y-18-Radio*0.65,28,28);
         if (numbType == 4 || numbType ==5) {
+          text_layer_set_text_color(SN1, ColorBNumbers);
+          text_layer_set_text_color(SN2, ColorBNumbers);
+          text_layer_set_text_color(SN4, ColorBNumbers);
+          text_layer_set_text_color(SN5, ColorBNumbers);
+          text_layer_set_text_color(SN7, ColorBNumbers);
+          text_layer_set_text_color(SN8, ColorBNumbers);
+          text_layer_set_text_color(SN10, ColorBNumbers);
+          text_layer_set_text_color(SN11, ColorBNumbers);
           nextSN1 = GRect((hc.x-12)+Radio*0.62*( sin_lookup( 5*TRIG_MAX_ANGLE / 60))/ TRIG_MAX_RATIO,
                           (hc.y-12)+Radio*0.62*(-cos_lookup( 5*TRIG_MAX_ANGLE / 60))/ TRIG_MAX_RATIO,
                           28,28);
