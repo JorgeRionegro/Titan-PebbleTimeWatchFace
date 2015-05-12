@@ -14,7 +14,7 @@
 #define Key_Numbers 6
 #define Key_DateBox 7
 
-static int mTicks = 60, Radio = 97, a = 1, cType = 1, hType = 1, numbType = 5, grosor = 4;
+static int mTicks = 60, Radio = 94, a = 1, cType = 0, hType = 3, numbType = 5, grosor = 4;
 bool UseSeconds = true, UseShadows = true, viewBluetooth = true, DateBox = true;
 int32_t hh_angle, mi_angle, ss_angle;
 
@@ -41,7 +41,7 @@ static GPath *minute_square, *hour_square, *hour_quarters;
 
 static void setColors (int clockType){
   switch(clockType){
-    case 1: //Sport Man
+    case 0: //Sport Man
     BackColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
     ColorSphere = COLOR_FALLBACK(GColorWhite, GColorWhite);
     ColorQMarks = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack); 
@@ -50,7 +50,7 @@ static void setColors (int clockType){
     ColorHours = COLOR_FALLBACK(GColorFolly,GColorBlack);
     ColorMinutes = COLOR_FALLBACK(GColorBlueMoon,GColorBlack);
     ColorSeconds = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
-    ColorShadow = COLOR_FALLBACK(GColorDarkGray,GColorBlack);  
+    ColorShadow = COLOR_FALLBACK(GColorLightGray,GColorBlack);  
     ColorFont = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
     ColorBattery = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
     ColorSNumbers = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
@@ -58,13 +58,13 @@ static void setColors (int clockType){
     ColorDBox = COLOR_FALLBACK(GColorPastelYellow,GColorWhite);
     ColorCrown = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorWhite);
     break;
-    case 2: //Fluor Classic
+    case 1: //Fluor Classic
     BackColor = COLOR_FALLBACK(GColorRed,GColorBlack);
     ColorSphere = COLOR_FALLBACK(GColorBlack, GColorBlack);
     ColorQMarks = COLOR_FALLBACK(GColorWhite,GColorWhite); 
     ColorHMarks = COLOR_FALLBACK(GColorWhite,GColorWhite); 
     ColorMMarks = COLOR_FALLBACK(GColorYellow,GColorWhite);
-    ColorHours = COLOR_FALLBACK(GColorInchworm,GColorWhite);
+    ColorHours = COLOR_FALLBACK(GColorMagenta,GColorWhite);
     ColorMinutes = COLOR_FALLBACK(GColorElectricBlue,GColorWhite);
     ColorSeconds = COLOR_FALLBACK(GColorWhite,GColorWhite);
     ColorShadow = COLOR_FALLBACK(GColorBlack,GColorBlack);  
@@ -75,30 +75,30 @@ static void setColors (int clockType){
     ColorDBox = COLOR_FALLBACK( GColorDarkCandyAppleRed,GColorWhite);
     ColorCrown = COLOR_FALLBACK(GColorYellow,GColorWhite);
     break;
-    case 3: //PinkPanter lovers
-    BackColor = COLOR_FALLBACK(GColorBulgarianRose,GColorWhite);
-    ColorSphere = COLOR_FALLBACK(GColorMelon, GColorBlack);
+    case 2: //PinkPanter lovers
+    BackColor = COLOR_FALLBACK(GColorBlack,GColorWhite);
+    ColorSphere = COLOR_FALLBACK(GColorFashionMagenta, GColorBlack);
     ColorQMarks = COLOR_FALLBACK(GColorImperialPurple,GColorWhite); 
     ColorHMarks = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorWhite); 
     ColorMMarks = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorWhite);
-    ColorHours = COLOR_FALLBACK(GColorMagenta,GColorWhite);
-    ColorMinutes = COLOR_FALLBACK(GColorFolly,GColorWhite);
-    ColorSeconds = COLOR_FALLBACK(GColorIslamicGreen,GColorWhite);
-    ColorShadow = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);  
+    ColorHours = COLOR_FALLBACK(GColorGreen,GColorWhite);
+    ColorMinutes = COLOR_FALLBACK(GColorYellow,GColorWhite);
+    ColorSeconds = COLOR_FALLBACK(GColorWhite,GColorWhite);
+    ColorShadow = COLOR_FALLBACK(GColorDarkGray,GColorBlack);  
     ColorFont = COLOR_FALLBACK(GColorWhite,GColorWhite);
-    ColorBattery = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorWhite);
-    ColorSNumbers = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorWhite);
-    ColorBNumbers = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorWhite);
-    ColorDBox = COLOR_FALLBACK(GColorFolly,GColorWhite);
+    ColorBattery = COLOR_FALLBACK(GColorWhite,GColorWhite);
+    ColorSNumbers = COLOR_FALLBACK(GColorWhite,GColorWhite);
+    ColorBNumbers = COLOR_FALLBACK(GColorWhite,GColorWhite);
+    ColorDBox = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorWhite);
     ColorCrown = COLOR_FALLBACK(GColorFolly,GColorWhite);
     break;
-    case 4: //Welcome to the Future
+    case 3: //Welcome to the Future
     BackColor = COLOR_FALLBACK(GColorPastelYellow,GColorWhite);
-    ColorSphere = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    ColorSphere = COLOR_FALLBACK(GColorDukeBlue,GColorBlack);
     ColorQMarks = COLOR_FALLBACK(GColorWhite,GColorWhite); 
     ColorHMarks = COLOR_FALLBACK(GColorWhite,GColorWhite); 
     ColorMMarks = COLOR_FALLBACK(GColorYellow,GColorWhite);
-    ColorHours = COLOR_FALLBACK(GColorChromeYellow,GColorWhite);
+    ColorHours = COLOR_FALLBACK(GColorShockingPink,GColorWhite);
     ColorMinutes = COLOR_FALLBACK(GColorCyan,GColorWhite);
     ColorSeconds = COLOR_FALLBACK(GColorWhite,GColorWhite);
     ColorShadow = COLOR_FALLBACK(GColorBlack,GColorWhite);  
@@ -109,14 +109,14 @@ static void setColors (int clockType){
     ColorDBox = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
     ColorCrown = COLOR_FALLBACK(GColorMelon,GColorWhite);
     break;
-    case 5: //Green Man
+    case 4: //Green Man
     BackColor = COLOR_FALLBACK(GColorBlack,GColorWhite);
-    ColorSphere = COLOR_FALLBACK(GColorPastelYellow, GColorBlack);
+    ColorSphere = COLOR_FALLBACK(GColorBrightGreen, GColorBlack);
     ColorQMarks = COLOR_FALLBACK(GColorDarkGreen,GColorWhite); 
     ColorHMarks = COLOR_FALLBACK(GColorDarkGray,GColorWhite); 
     ColorMMarks = COLOR_FALLBACK(GColorBlack,GColorWhite);
     ColorHours = COLOR_FALLBACK(GColorWindsorTan,GColorWhite);
-    ColorMinutes = COLOR_FALLBACK(GColorJaegerGreen,GColorWhite);
+    ColorMinutes = COLOR_FALLBACK(GColorBulgarianRose,GColorWhite);
     ColorSeconds = COLOR_FALLBACK(GColorRed,GColorWhite);
     ColorShadow = COLOR_FALLBACK(GColorDarkGray,GColorBlack);  
     ColorFont = COLOR_FALLBACK(GColorDarkGreen,GColorWhite);
@@ -126,9 +126,9 @@ static void setColors (int clockType){
     ColorDBox = COLOR_FALLBACK(GColorWhite,GColorWhite);
     ColorCrown = COLOR_FALLBACK(GColorWindsorTan,GColorWhite);
     break;
-    case 6: //Passion o'clock
+    case 5: //Passion o'clock
     BackColor = COLOR_FALLBACK(GColorBlack,GColorWhite);
-    ColorSphere = COLOR_FALLBACK(GColorFolly, GColorBlack);
+    ColorSphere = COLOR_FALLBACK(GColorRed, GColorBlack);
     ColorQMarks = COLOR_FALLBACK(GColorRichBrilliantLavender,GColorWhite); 
     ColorHMarks = COLOR_FALLBACK(GColorPastelYellow,GColorWhite); 
     ColorMMarks = COLOR_FALLBACK(GColorPastelYellow,GColorWhite);
@@ -139,11 +139,11 @@ static void setColors (int clockType){
     ColorFont = COLOR_FALLBACK(GColorWhite,GColorWhite);
     ColorBattery = COLOR_FALLBACK(GColorRichBrilliantLavender,GColorWhite);
     ColorSNumbers = COLOR_FALLBACK(GColorWhite,GColorWhite);
-    ColorBNumbers = COLOR_FALLBACK(GColorRichBrilliantLavender,GColorWhite);
+    ColorBNumbers = COLOR_FALLBACK(GColorWhite,GColorWhite);
     ColorDBox = COLOR_FALLBACK(GColorImperialPurple,GColorWhite);
     ColorCrown = COLOR_FALLBACK(GColorChromeYellow,GColorWhite);
     break;
-    case 7: //Wine Taste
+    case 6: //Wine Taste
     BackColor = COLOR_FALLBACK(GColorWhite,GColorBlack);
     ColorSphere = COLOR_FALLBACK(GColorBulgarianRose, GColorBlack);
     ColorQMarks = COLOR_FALLBACK(GColorWhite,GColorWhite); 
@@ -160,7 +160,7 @@ static void setColors (int clockType){
     ColorDBox = COLOR_FALLBACK(GColorMidnightGreen,GColorWhite);
     ColorCrown = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorWhite);
     break;
-    case 8: //Bottle clock
+    case 7: //Bottle clock
     BackColor = COLOR_FALLBACK(GColorWhite,GColorBlack);
     ColorSphere = COLOR_FALLBACK(GColorDarkGreen, GColorBlack);
     ColorQMarks = COLOR_FALLBACK(GColorWhite,GColorWhite); 
@@ -168,7 +168,7 @@ static void setColors (int clockType){
     ColorMMarks = COLOR_FALLBACK(GColorYellow,GColorWhite);
     ColorHours = COLOR_FALLBACK(GColorRed,GColorWhite);
     ColorMinutes = COLOR_FALLBACK(GColorInchworm,GColorWhite);
-    ColorSeconds = COLOR_FALLBACK(GColorLightGray,GColorWhite);
+    ColorSeconds = COLOR_FALLBACK(GColorYellow,GColorWhite);
     ColorShadow = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);  
     ColorFont = COLOR_FALLBACK(GColorYellow,GColorWhite);
     ColorBattery = COLOR_FALLBACK(GColorYellow,GColorWhite);
@@ -177,15 +177,15 @@ static void setColors (int clockType){
     ColorDBox = COLOR_FALLBACK(GColorArmyGreen,GColorWhite);
     ColorCrown = COLOR_FALLBACK(GColorOrange,GColorWhite);
     break;
-    case 9: //Navy man
+    case 8: //Navy man
     BackColor = COLOR_FALLBACK(GColorBlack,GColorWhite);
     ColorSphere = COLOR_FALLBACK(GColorCeleste, GColorBlack);
     ColorQMarks = COLOR_FALLBACK(GColorDukeBlue,GColorWhite); 
     ColorHMarks = COLOR_FALLBACK(GColorDukeBlue,GColorWhite); 
     ColorMMarks = COLOR_FALLBACK(GColorDukeBlue,GColorWhite);
     ColorHours = COLOR_FALLBACK(GColorIslamicGreen,GColorWhite);
-    ColorMinutes = COLOR_FALLBACK(GColorRed,GColorWhite);
-    ColorSeconds = COLOR_FALLBACK(GColorBlue,GColorWhite);
+    ColorMinutes = COLOR_FALLBACK(GColorBlue,GColorWhite);
+    ColorSeconds = COLOR_FALLBACK(GColorRed,GColorWhite);
     ColorShadow = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);  
     ColorFont = COLOR_FALLBACK(GColorWhite,GColorWhite);
     ColorBattery = COLOR_FALLBACK(GColorDukeBlue,GColorWhite);
@@ -194,24 +194,24 @@ static void setColors (int clockType){
     ColorDBox = COLOR_FALLBACK(GColorDukeBlue,GColorWhite);
     ColorCrown = COLOR_FALLBACK(GColorWindsorTan,GColorWhite);
     break;
-    case 10: //Rainbow Warrior
-    BackColor = COLOR_FALLBACK(GColorYellow,GColorWhite);
-    ColorSphere = COLOR_FALLBACK(GColorDarkGreen, GColorBlack);
-    ColorQMarks = COLOR_FALLBACK(GColorChromeYellow,GColorWhite); 
-    ColorHMarks = COLOR_FALLBACK(GColorElectricBlue,GColorWhite); 
-    ColorMMarks = COLOR_FALLBACK(GColorCeleste,GColorWhite);
+    case 9: //Rainbow Warrior
+    BackColor = COLOR_FALLBACK(GColorDarkGreen,GColorWhite);
+    ColorSphere = COLOR_FALLBACK(GColorYellow, GColorBlack);
+    ColorQMarks = COLOR_FALLBACK(GColorBulgarianRose,GColorWhite); 
+    ColorHMarks = COLOR_FALLBACK(GColorDarkGreen,GColorWhite); 
+    ColorMMarks = COLOR_FALLBACK(GColorBlue,GColorWhite);
     ColorHours = COLOR_FALLBACK(GColorMagenta,GColorWhite);
-    ColorMinutes = COLOR_FALLBACK(GColorElectricBlue,GColorWhite);
-    ColorSeconds = COLOR_FALLBACK(GColorRichBrilliantLavender,GColorWhite);
-    ColorShadow = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);  
-    ColorFont = COLOR_FALLBACK(GColorRed,GColorWhite);
-    ColorBattery = COLOR_FALLBACK(GColorMintGreen,GColorWhite);
+    ColorMinutes = COLOR_FALLBACK(GColorBlue,GColorWhite);
+    ColorSeconds = COLOR_FALLBACK(GColorRed,GColorWhite);
+    ColorShadow = COLOR_FALLBACK(GColorDarkGray,GColorBlack);  
+    ColorFont = COLOR_FALLBACK(GColorDarkGreen,GColorWhite);
+    ColorBattery = COLOR_FALLBACK(GColorOrange,GColorWhite);
     ColorSNumbers = COLOR_FALLBACK(GColorMintGreen,GColorWhite);
-    ColorBNumbers = COLOR_FALLBACK(GColorWhite,GColorWhite);
+    ColorBNumbers = COLOR_FALLBACK(GColorDarkGreen,GColorWhite);
     ColorDBox = COLOR_FALLBACK(GColorPastelYellow,GColorWhite);
     ColorCrown = COLOR_FALLBACK(GColorWindsorTan,GColorWhite);
     break;
-    case 11: //Papyrus
+    case 10: //Papyrus
     BackColor = COLOR_FALLBACK(GColorBlack,GColorWhite);
     ColorSphere = COLOR_FALLBACK(GColorPastelYellow,GColorWhite);
     ColorQMarks = COLOR_FALLBACK(GColorOxfordBlue,GColorBlack); 
@@ -228,9 +228,9 @@ static void setColors (int clockType){
     ColorDBox = COLOR_FALLBACK(GColorWhite,GColorWhite);
     ColorCrown = COLOR_FALLBACK(GColorWindsorTan,GColorBlack);
     break;
-    case 12: //Classic Taste
+    case 11: //Classic Taste
     BackColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
-    ColorSphere = COLOR_FALLBACK(GColorPastelYellow, GColorWhite);
+    ColorSphere = COLOR_FALLBACK(GColorWhite, GColorWhite);
     ColorQMarks = COLOR_FALLBACK(GColorDarkGray,GColorBlack); 
     ColorHMarks = COLOR_FALLBACK(GColorWindsorTan,GColorBlack); 
     ColorMMarks = COLOR_FALLBACK(GColorWindsorTan,GColorBlack);
@@ -242,7 +242,7 @@ static void setColors (int clockType){
     ColorBattery = COLOR_FALLBACK(GColorWindsorTan,GColorBlack);
     ColorSNumbers = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
     ColorBNumbers = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
-    ColorDBox = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    ColorDBox = COLOR_FALLBACK(GColorPastelYellow,GColorBlack);
     ColorCrown = COLOR_FALLBACK(GColorWindsorTan,GColorWhite);
     break;
   }
@@ -262,24 +262,24 @@ static void in_recv_handler(DictionaryIterator *iterator, void *context)
     switch(t->key)
     {
     case Key_UseSeconds:
-      if(strcmp(t->value->cstring, "on") == 0)
+      if(strcmp(t->value->cstring, "0") == 0)
       {
         UseSeconds = true;
         persist_write_bool(Key_UseSeconds, true);
       }
-      else if(strcmp(t->value->cstring, "off") == 0)
+      else if(strcmp(t->value->cstring, "1") == 0)
       {
         UseSeconds = false;
         persist_write_bool(Key_UseSeconds, false);
       };
       break;
     case Key_UseShadows:
-      if(strcmp(t->value->cstring, "on") == 1)
+      if(strcmp(t->value->cstring, "0") == 1)
       {
         UseShadows = true;
         persist_write_bool(Key_UseShadows, true);
       }
-      else if(strcmp(t->value->cstring, "off") == 1)
+      else if(strcmp(t->value->cstring, "1") == 1)
       {
         UseShadows = false;
         persist_write_bool(Key_UseShadows, false);
@@ -303,12 +303,12 @@ static void in_recv_handler(DictionaryIterator *iterator, void *context)
        //APP_LOG(APP_LOG_LEVEL_INFO, "HandType %d", hType);
        break;
     case Key_Bluetooth:
-      if(strcmp(t->value->cstring, "on") == 0)
+      if(strcmp(t->value->cstring, "0") == 0)
       {
         viewBluetooth = true;
         persist_write_bool(Key_Bluetooth, true);
       }
-      else if(strcmp(t->value->cstring, "off") == 0)
+      else if(strcmp(t->value->cstring, "1") == 0)
       {
         viewBluetooth = false;
         persist_write_bool(Key_Bluetooth, false);
@@ -319,12 +319,12 @@ static void in_recv_handler(DictionaryIterator *iterator, void *context)
        persist_write_int(Key_Numbers, numbType);
        break;
     case Key_DateBox:
-      if(strcmp(t->value->cstring, "on") == 0)
+      if(strcmp(t->value->cstring, "0") == 0)
       {
         DateBox = true;
         persist_write_bool(Key_DateBox, true);
       }
-      else if(strcmp(t->value->cstring, "off") == 0)
+      else if(strcmp(t->value->cstring, "1") == 0)
       {
         DateBox = false;
         persist_write_bool(Key_DateBox, false);
@@ -406,8 +406,10 @@ void dial_layer_update(Layer *me, GContext *ctx) {
   graphics_draw_circle(ctx, hc, Radio);
 
   if (DateBox == true){
-    graphics_context_set_fill_color(ctx, ColorShadow);
-    graphics_fill_rect(ctx, next, 6, GCornersAll);
+    if (UseShadows == true){
+      graphics_context_set_fill_color(ctx, ColorShadow);
+      graphics_fill_rect(ctx, next, 6, GCornersAll);
+    }
     GRect sDBox = GRect(hc.x-28,hc.y+16,58,24);
     graphics_context_set_fill_color(ctx, ColorDBox);
     graphics_fill_rect(ctx, sDBox, 6, GCornersAll);
