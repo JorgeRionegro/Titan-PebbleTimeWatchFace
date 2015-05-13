@@ -15,6 +15,4 @@ You can configure:
  - Zoom ratio (bigger or smaller watch)
  - Numers display type (not developed yet)
  
-
-Trying also to develop some antialiasing solution but still does´nt works correctly...
  
