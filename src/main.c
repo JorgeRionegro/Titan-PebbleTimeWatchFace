@@ -13,9 +13,11 @@
 #define Key_Bluetooth 5
 #define Key_Numbers 6
 #define Key_DateBox 7
+#define Key_UseCrown 8
+#define Key_HandleTicks 9
 
-static int mTicks = 60, Radio = 94, a = 1, cType = 0, hType = 3, numbType = 5, grosor = 4;
-bool UseSeconds = true, UseShadows = true, viewBluetooth = true, DateBox = true;
+static int mTicks = 60, Radio = 96, a = 1, cType = 0, hType = 1, numbType = 5, grosor = 4, hTicks = 3;
+bool UseSeconds = true, UseShadows = true, viewBluetooth = true, DateBox = true, UseCrown = true;
 int32_t hh_angle, mi_angle, ss_angle;
 
 Window *w;
@@ -33,7 +35,7 @@ static BatteryChargeState c_state;
   static GColor ColorFont,ColorBattery,ColorBNumbers,ColorSNumbers,ColorDBox,ColorCrown;
 #endif
   
-static GPathInfo HOUR_POINTS = { 4, (GPoint []) { { -1, 1 }, { 1, 1}, { 1, -14}, { -1, -14} } };
+static GPathInfo HOUR_POINTS = { 4, (GPoint []) { { -2, 1 }, { 2, 1}, { 2, -14}, { -2, -14} } };
 static GPathInfo MINUTE_POINTS = { 4, (GPoint []) { { -1, 1 }, { 1, 1}, { 1, -6}, { -1, -6} } };
 static GPathInfo HOUR_QUARTERS = { 4, (GPoint []) { { -3, 3 }, { 3, 3}, { 3, -17}, { -3, -17} } };
 
@@ -41,6 +43,23 @@ static GPath *minute_square, *hour_square, *hour_quarters;
 
 static void setColors (int clockType){
   switch(clockType){
+    case -1: //Only test
+    BackColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    ColorSphere = COLOR_FALLBACK(GColorWhite, GColorWhite);
+    ColorQMarks = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack); 
+    ColorHMarks = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack); 
+    ColorMMarks = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
+    ColorHours = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    ColorMinutes = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    ColorSeconds = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    ColorShadow = COLOR_FALLBACK(GColorWhite,GColorBlack);  
+    ColorFont = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    ColorBattery = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    ColorSNumbers = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    ColorBNumbers = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    ColorDBox = COLOR_FALLBACK(GColorWhite,GColorWhite);
+    ColorCrown = COLOR_FALLBACK(GColorRed,GColorWhite);
+    break;
     case 0: //Sport Man
     BackColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
     ColorSphere = COLOR_FALLBACK(GColorWhite, GColorWhite);
@@ -78,9 +97,9 @@ static void setColors (int clockType){
     case 2: //PinkPanter lovers
     BackColor = COLOR_FALLBACK(GColorBlack,GColorWhite);
     ColorSphere = COLOR_FALLBACK(GColorFashionMagenta, GColorBlack);
-    ColorQMarks = COLOR_FALLBACK(GColorImperialPurple,GColorWhite); 
-    ColorHMarks = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorWhite); 
-    ColorMMarks = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorWhite);
+    ColorQMarks = COLOR_FALLBACK(GColorWhite,GColorWhite); 
+    ColorHMarks = COLOR_FALLBACK(GColorWhite,GColorWhite); 
+    ColorMMarks = COLOR_FALLBACK(GColorYellow,GColorWhite);
     ColorHours = COLOR_FALLBACK(GColorGreen,GColorWhite);
     ColorMinutes = COLOR_FALLBACK(GColorYellow,GColorWhite);
     ColorSeconds = COLOR_FALLBACK(GColorWhite,GColorWhite);
@@ -245,95 +264,24 @@ static void setColors (int clockType){
     ColorDBox = COLOR_FALLBACK(GColorPastelYellow,GColorBlack);
     ColorCrown = COLOR_FALLBACK(GColorWindsorTan,GColorWhite);
     break;
+    case 12: //Orange Obsesion
+    BackColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    ColorSphere = COLOR_FALLBACK(GColorOrange, GColorWhite);
+    ColorQMarks = COLOR_FALLBACK(GColorYellow,GColorBlack); 
+    ColorHMarks = COLOR_FALLBACK(GColorYellow,GColorBlack); 
+    ColorMMarks = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    ColorHours = COLOR_FALLBACK(GColorYellow,GColorBlack);
+    ColorMinutes = COLOR_FALLBACK( GColorGreen,GColorBlack);
+    ColorSeconds = COLOR_FALLBACK(GColorCyan,GColorBlack);
+    ColorShadow = COLOR_FALLBACK(GColorArmyGreen,GColorWhite);  
+    ColorFont = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    ColorBattery = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    ColorSNumbers = COLOR_FALLBACK(GColorYellow,GColorBlack);
+    ColorBNumbers = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    ColorDBox = COLOR_FALLBACK(GColorArmyGreen,GColorBlack);
+    ColorCrown = COLOR_FALLBACK(GColorWindsorTan,GColorWhite);
+    break;
   }
-}
-
-static void in_recv_handler(DictionaryIterator *iterator, void *context)
-{
-  APP_LOG(APP_LOG_LEVEL_INFO, "Enter in_recv_handler");
-  //Get Tuple
-  Tuple *t = dict_read_first(iterator);
-  a = 1;
-  //Process all pairs present
-  while(t != NULL) {
-    APP_LOG(APP_LOG_LEVEL_INFO, "Iterator %d", (int)t->key);
-    APP_LOG(APP_LOG_LEVEL_INFO, "Iterator received with value %s", t->value->cstring);
-    // Process this pair's key
-    switch(t->key)
-    {
-    case Key_UseSeconds:
-      if(strcmp(t->value->cstring, "0") == 0)
-      {
-        UseSeconds = true;
-        persist_write_bool(Key_UseSeconds, true);
-      }
-      else if(strcmp(t->value->cstring, "1") == 0)
-      {
-        UseSeconds = false;
-        persist_write_bool(Key_UseSeconds, false);
-      };
-      break;
-    case Key_UseShadows:
-      if(strcmp(t->value->cstring, "0") == 1)
-      {
-        UseShadows = true;
-        persist_write_bool(Key_UseShadows, true);
-      }
-      else if(strcmp(t->value->cstring, "1") == 1)
-      {
-        UseShadows = false;
-        persist_write_bool(Key_UseShadows, false);
-      };
-      break;
-    case Key_Radio:
-       Radio = atoi(t->value->cstring);
-       persist_write_int(Key_Radio, Radio);
-       //APP_LOG(APP_LOG_LEVEL_INFO, "Radio %d", Radio);
-       break;
-    case Key_ClockType:
-       cType = atoi(t->value->cstring);
-       //seteo colores
-       setColors (cType);
-       persist_write_int(Key_ClockType, cType);
-       //APP_LOG(APP_LOG_LEVEL_INFO, "ClockType %d", cType);
-       break;
-    case Key_HandType:
-       hType = atoi(t->value->cstring);
-       persist_write_int(Key_HandType, hType);
-       //APP_LOG(APP_LOG_LEVEL_INFO, "HandType %d", hType);
-       break;
-    case Key_Bluetooth:
-      if(strcmp(t->value->cstring, "0") == 0)
-      {
-        viewBluetooth = true;
-        persist_write_bool(Key_Bluetooth, true);
-      }
-      else if(strcmp(t->value->cstring, "1") == 0)
-      {
-        viewBluetooth = false;
-        persist_write_bool(Key_Bluetooth, false);
-      };
-      break;
-    case Key_Numbers:
-       numbType = atoi(t->value->cstring);
-       persist_write_int(Key_Numbers, numbType);
-       break;
-    case Key_DateBox:
-      if(strcmp(t->value->cstring, "0") == 0)
-      {
-        DateBox = true;
-        persist_write_bool(Key_DateBox, true);
-      }
-      else if(strcmp(t->value->cstring, "1") == 0)
-      {
-        DateBox = false;
-        persist_write_bool(Key_DateBox, false);
-      };
-      break;
-    }
-   // Get next pair, if any
-   t = dict_read_next(iterator);
- }
 }
 
 static void handle_battery(BatteryChargeState c_state) {
@@ -390,20 +338,22 @@ void dial_layer_update(Layer *me, GContext *ctx) {
   //Clock Sphere
   graphics_context_set_fill_color(ctx, ColorSphere);
   graphics_fill_circle(ctx, hc, Radio);
-  #ifdef PBL_COLOR
-    if (UseShadows==true){
-       graphics_context_set_stroke_width(ctx, 4);
-       graphics_context_set_stroke_color(ctx, ColorShadow);
-       graphics_draw_circle(ctx, hs, Radio); 
-       graphics_context_set_stroke_color(ctx, BackColor);
-       graphics_draw_circle(ctx, hc, Radio+5);
-    }
-    graphics_context_set_stroke_width(ctx, 5);
-    graphics_context_set_stroke_color(ctx, ColorCrown);
-  #else
-    graphics_context_set_stroke_color(ctx, ColorCrown);
-  #endif 
-  graphics_draw_circle(ctx, hc, Radio);
+  if (UseCrown==true){
+    #ifdef PBL_COLOR
+      if (UseShadows==true){
+         graphics_context_set_stroke_width(ctx, 4);
+         graphics_context_set_stroke_color(ctx, ColorShadow);
+         graphics_draw_circle(ctx, hs, Radio); 
+         graphics_context_set_stroke_color(ctx, BackColor);
+         graphics_draw_circle(ctx, hc, Radio+5);
+      }
+      graphics_context_set_stroke_width(ctx, 5);
+      graphics_context_set_stroke_color(ctx, ColorCrown);
+    #else
+      graphics_context_set_stroke_color(ctx, ColorCrown);
+    #endif
+    graphics_draw_circle(ctx, hc, Radio);
+  }
 
   if (DateBox == true){
     if (UseShadows == true){
@@ -417,10 +367,9 @@ void dial_layer_update(Layer *me, GContext *ctx) {
 }
 
 void marks_layer_update(Layer *me, GContext *ctx) {
-  
-  #ifdef PBL_COLOR
-    graphics_context_set_antialiased(ctx, true);
-  #endif 
+   #ifdef PBL_COLOR
+     graphics_context_set_antialiased(ctx, true);
+   #endif 
 
 // draw hour dial points
   GPoint ray;
@@ -437,31 +386,37 @@ void marks_layer_update(Layer *me, GContext *ctx) {
 	      (int32_t)(Radio-10) / TRIG_MAX_RATIO) + hc.x;
     
     if (x % 5 != 0) {
-      graphics_context_set_stroke_color(ctx, ColorMMarks);
-      graphics_context_set_fill_color(ctx, ColorMMarks);
-      gpath_move_to(minute_square, ray);
-      gpath_rotate_to(minute_square, angle);
-      gpath_draw_filled(ctx, minute_square);
-      gpath_draw_outline(ctx, minute_square);
+      if (hTicks>2){
+        graphics_context_set_stroke_color(ctx, ColorMMarks);
+        graphics_context_set_fill_color(ctx, ColorMMarks);
+        gpath_move_to(minute_square, ray);
+        gpath_rotate_to(minute_square, angle);
+        gpath_draw_filled(ctx, minute_square);
+        gpath_draw_outline(ctx, minute_square);
+      }
     } else if (x % 15 != 0) {
-      graphics_context_set_stroke_color(ctx, ColorHMarks);
-      graphics_context_set_fill_color(ctx, ColorHMarks);
-      gpath_move_to(hour_square, ray);
-      gpath_rotate_to(hour_square, angle);
-      gpath_draw_filled(ctx, hour_square);
-      gpath_draw_outline(ctx, hour_square);
+      if (hTicks>1){ 
+        graphics_context_set_stroke_color(ctx, ColorHMarks);
+        graphics_context_set_fill_color(ctx, ColorHMarks);
+        gpath_move_to(hour_square, ray);
+        gpath_rotate_to(hour_square, angle);
+        gpath_draw_filled(ctx, hour_square);
+        gpath_draw_outline(ctx, hour_square);
+      }
     }
     else{
-      graphics_context_set_stroke_color(ctx, ColorQMarks);
-      graphics_context_set_fill_color(ctx, ColorQMarks);
-      gpath_move_to(hour_quarters, ray);
-      gpath_rotate_to(hour_quarters, angle);
-      gpath_draw_filled(ctx, hour_quarters);
-      gpath_draw_outline(ctx, hour_quarters);
-      graphics_context_set_stroke_color(ctx, ColorSphere);
-      graphics_draw_line(ctx, ray, sEnd);
+      if (hTicks>0){      
+        graphics_context_set_stroke_color(ctx, ColorQMarks);
+        graphics_context_set_fill_color(ctx, ColorQMarks);
+        gpath_move_to(hour_quarters, ray);
+        gpath_rotate_to(hour_quarters, angle);
+        gpath_draw_filled(ctx, hour_quarters);
+        gpath_draw_outline(ctx, hour_quarters);
+        graphics_context_set_stroke_color(ctx, ColorSphere);
+        graphics_draw_line(ctx, ray, sEnd);
+      }
     }
-  } 
+  }
 }
 
 void shadow_layer_update(Layer *me, GContext *ctx) {
@@ -780,7 +735,7 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
   layer_mark_dirty((Layer *)SN10);
   layer_mark_dirty((Layer *)SN11);
   layer_mark_dirty((Layer *)BN12);
-
+            
   hh_angle = (TRIG_MAX_ANGLE*(((now->tm_hour%12)*6)+(now->tm_min/10)))/(12*6);
   mi_angle = TRIG_MAX_ANGLE * (now->tm_min) / 60;
   if (UseSeconds == true){
@@ -845,14 +800,14 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
         nextBN9 = GRect(hc.x-13-Radio*0.65,hc.y-18,28,28);
         nextBN12 = GRect(hc.x-13,hc.y-18-Radio*0.65,28,28);
         if (numbType == 4 || numbType ==5) {
-          text_layer_set_text_color(SN1, ColorBNumbers);
-          text_layer_set_text_color(SN2, ColorBNumbers);
-          text_layer_set_text_color(SN4, ColorBNumbers);
-          text_layer_set_text_color(SN5, ColorBNumbers);
-          text_layer_set_text_color(SN7, ColorBNumbers);
-          text_layer_set_text_color(SN8, ColorBNumbers);
-          text_layer_set_text_color(SN10, ColorBNumbers);
-          text_layer_set_text_color(SN11, ColorBNumbers);
+          text_layer_set_text_color(SN1, ColorSNumbers);
+          text_layer_set_text_color(SN2, ColorSNumbers);
+          text_layer_set_text_color(SN4, ColorSNumbers);
+          text_layer_set_text_color(SN5, ColorSNumbers);
+          text_layer_set_text_color(SN7, ColorSNumbers);
+          text_layer_set_text_color(SN8, ColorSNumbers);
+          text_layer_set_text_color(SN10, ColorSNumbers);
+          text_layer_set_text_color(SN11, ColorSNumbers);
           nextSN1 = GRect((hc.x-12)+Radio*0.62*( sin_lookup( 5*TRIG_MAX_ANGLE / 60))/ TRIG_MAX_RATIO,
                           (hc.y-12)+Radio*0.62*(-cos_lookup( 5*TRIG_MAX_ANGLE / 60))/ TRIG_MAX_RATIO,
                           28,28);
@@ -928,6 +883,125 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
   }  
 }
 
+static void in_recv_handler(DictionaryIterator *iterator, void *context)
+{
+  APP_LOG(APP_LOG_LEVEL_INFO, "Enter in_recv_handler");
+  //Get Tuple
+  Tuple *t = dict_read_first(iterator);
+  a = 1;
+  //Process all pairs present
+  while(t != NULL) {
+    APP_LOG(APP_LOG_LEVEL_INFO, "Iterator %d", (int)t->key);
+    APP_LOG(APP_LOG_LEVEL_INFO, "Iterator received with value %s", t->value->cstring);
+    // Process this pair's key
+    switch(t->key)
+    {
+    case Key_UseSeconds:
+      if(strcmp(t->value->cstring, "0") == 0)
+      {
+        UseSeconds = true;
+        persist_write_bool(Key_UseSeconds, true);
+      }
+      else if(strcmp(t->value->cstring, "1") == 0)
+      {
+        UseSeconds = false;
+        persist_write_bool(Key_UseSeconds, false);
+      };
+      break;
+    case Key_UseShadows:
+      if(strcmp(t->value->cstring, "0") == 1)
+      {
+        UseShadows = true;
+        persist_write_bool(Key_UseShadows, true);
+      }
+      else if(strcmp(t->value->cstring, "1") == 1)
+      {
+        UseShadows = false;
+        persist_write_bool(Key_UseShadows, false);
+      };
+      break;
+    case Key_Radio:
+       Radio = atoi(t->value->cstring);
+       persist_write_int(Key_Radio, Radio);
+       //APP_LOG(APP_LOG_LEVEL_INFO, "Radio %d", Radio);
+       break;
+    case Key_ClockType:
+       cType = atoi(t->value->cstring);
+       //seteo colores
+       setColors (cType);
+       persist_write_int(Key_ClockType, cType);
+       //APP_LOG(APP_LOG_LEVEL_INFO, "ClockType %d", cType);
+       break;
+    case Key_HandType:
+       hType = atoi(t->value->cstring);
+       persist_write_int(Key_HandType, hType);
+       //APP_LOG(APP_LOG_LEVEL_INFO, "HandType %d", hType);
+       break;
+    case Key_Bluetooth:
+      if(strcmp(t->value->cstring, "0") == 0)
+      {
+        viewBluetooth = true;
+        persist_write_bool(Key_Bluetooth, true);
+      }
+      else if(strcmp(t->value->cstring, "1") == 0)
+      {
+        viewBluetooth = false;
+        persist_write_bool(Key_Bluetooth, false);
+      };
+      break;
+    case Key_Numbers:
+       numbType = atoi(t->value->cstring);
+       persist_write_int(Key_Numbers, numbType);
+       break;
+    case Key_DateBox:
+      if(strcmp(t->value->cstring, "0") == 0)
+      {
+        DateBox = true;
+        persist_write_bool(Key_DateBox, true);
+      }
+      else if(strcmp(t->value->cstring, "1") == 0)
+      {
+        DateBox = false;
+        persist_write_bool(Key_DateBox, false);
+      };
+      break;
+    case Key_UseCrown:
+      if(strcmp(t->value->cstring, "0") == 0)
+      {
+        UseCrown = true;
+        persist_write_bool(UseCrown, true);
+      }
+      else if(strcmp(t->value->cstring, "1") == 0)
+      {
+        UseCrown = false;
+        persist_write_bool(UseCrown, false);
+      };
+      break;      
+    case Key_HandleTicks:
+       hTicks = atoi(t->value->cstring);
+       persist_write_int(Key_HandleTicks, hTicks);
+       break;
+    }
+   // Get next pair, if any
+   t = dict_read_next(iterator);
+ }
+  //Empty sphere numbers to recalculate
+  text_layer_set_text(BN3, "");
+  text_layer_set_text(BN6, "");
+  text_layer_set_text(BN9, "");
+  text_layer_set_text(BN12, "");
+  text_layer_set_text(SN1, "");
+  text_layer_set_text(SN2, "");
+  text_layer_set_text(SN4, "");
+  text_layer_set_text(SN5, "");            
+  text_layer_set_text(SN7, "");
+  text_layer_set_text(SN8, "");
+  text_layer_set_text(SN10, "");
+  text_layer_set_text(SN11, ""); 
+  if (UseSeconds == true) { tick_timer_service_subscribe(SECOND_UNIT, handle_tick); }
+                   else  { tick_timer_service_subscribe(MINUTE_UNIT, handle_tick); }
+}
+
 void handle_init(void) {
   w = window_create();
   
@@ -962,7 +1036,13 @@ void handle_init(void) {
   if (persist_exists(Key_DateBox)) {
     DateBox = persist_read_bool(Key_DateBox);
   }  
-
+  if (persist_exists(Key_UseCrown)) {
+    UseCrown = persist_read_bool(Key_UseCrown);
+  }  
+  if (persist_exists(Key_HandleTicks)) {
+    hTicks = persist_read_int(Key_HandleTicks);
+  }
+  
   //set colors
   setColors (cType);
   
