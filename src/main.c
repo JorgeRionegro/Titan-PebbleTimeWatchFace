@@ -16,9 +16,9 @@
 #define Key_UseCrown 8
 #define Key_HandleTicks 9
 
-static int mTicks = 60, Radio = 96, a = 1, cType = 0, hType = 1, numbType = 5, grosor = 4, hTicks = 3;
+static int mTicks = 60, Radio = 96, a = 1, cType = 19, hType = 4, numbType = 5, grosor = 4, hTicks = 3;
 bool UseSeconds = true, UseShadows = true, viewBluetooth = true, DateBox = true, UseCrown = true;
-int32_t hh_angle, mi_angle, ss_angle;
+int32_t hh_angle, mi_angle, ss_angle, a_angle;
 
 Window *w;
 Layer *dial_layer, *marks_layer, *time_layer, *shadow_layer, *battery, *bluetooth;
@@ -43,22 +43,22 @@ static GPath *minute_square, *hour_square, *hour_quarters;
 
 static void setColors (int clockType){
   switch(clockType){
-    case -1: //Only test
+    case -1: //Only For taking ScrenShots
     BackColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
     ColorSphere = COLOR_FALLBACK(GColorWhite, GColorWhite);
-    ColorQMarks = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack); 
-    ColorHMarks = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack); 
-    ColorMMarks = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
-    ColorHours = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorMinutes = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorSeconds = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    ColorQMarks = COLOR_FALLBACK(GColorWhite,GColorBlack); 
+    ColorHMarks = COLOR_FALLBACK(GColorWhite,GColorBlack); 
+    ColorMMarks = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    ColorHours = COLOR_FALLBACK(GColorFolly,GColorBlack);
+    ColorMinutes = COLOR_FALLBACK(GColorBlueMoon,GColorBlack);
+    ColorSeconds = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
     ColorShadow = COLOR_FALLBACK(GColorWhite,GColorBlack);  
     ColorFont = COLOR_FALLBACK(GColorWhite,GColorBlack);
     ColorBattery = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorSNumbers = COLOR_FALLBACK(GColorBlack,GColorBlack);
-    ColorBNumbers = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    ColorSNumbers = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    ColorBNumbers = COLOR_FALLBACK(GColorWhite,GColorBlack);
     ColorDBox = COLOR_FALLBACK(GColorWhite,GColorWhite);
-    ColorCrown = COLOR_FALLBACK(GColorRed,GColorWhite);
+    ColorCrown = COLOR_FALLBACK(GColorWhite,GColorWhite);
     break;
     case 0: //Sport Man
     BackColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
@@ -128,7 +128,7 @@ static void setColors (int clockType){
     ColorDBox = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
     ColorCrown = COLOR_FALLBACK(GColorMelon,GColorWhite);
     break;
-    case 4: //Green Man
+    case 4: //Green Grass
     BackColor = COLOR_FALLBACK(GColorBlack,GColorWhite);
     ColorSphere = COLOR_FALLBACK(GColorBrightGreen, GColorBlack);
     ColorQMarks = COLOR_FALLBACK(GColorDarkGreen,GColorWhite); 
@@ -225,7 +225,7 @@ static void setColors (int clockType){
     ColorShadow = COLOR_FALLBACK(GColorDarkGray,GColorBlack);  
     ColorFont = COLOR_FALLBACK(GColorDarkGreen,GColorWhite);
     ColorBattery = COLOR_FALLBACK(GColorOrange,GColorWhite);
-    ColorSNumbers = COLOR_FALLBACK(GColorMintGreen,GColorWhite);
+    ColorSNumbers = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorWhite);
     ColorBNumbers = COLOR_FALLBACK(GColorDarkGreen,GColorWhite);
     ColorDBox = COLOR_FALLBACK(GColorPastelYellow,GColorWhite);
     ColorCrown = COLOR_FALLBACK(GColorWindsorTan,GColorWhite);
@@ -281,6 +281,126 @@ static void setColors (int clockType){
     ColorDBox = COLOR_FALLBACK(GColorArmyGreen,GColorBlack);
     ColorCrown = COLOR_FALLBACK(GColorWindsorTan,GColorWhite);
     break;
+    case 13: //Simply Red
+    BackColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    ColorSphere = COLOR_FALLBACK(GColorWhite, GColorWhite);
+    ColorQMarks = COLOR_FALLBACK(GColorRed,GColorBlack); 
+    ColorHMarks = COLOR_FALLBACK(GColorRed,GColorBlack); 
+    ColorMMarks = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    ColorHours = COLOR_FALLBACK(GColorRed,GColorBlack);
+    ColorMinutes = COLOR_FALLBACK( GColorRed,GColorBlack);
+    ColorSeconds = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    ColorShadow = COLOR_FALLBACK(GColorLightGray,GColorWhite);  
+    ColorFont = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    ColorBattery = COLOR_FALLBACK(GColorRed,GColorBlack);
+    ColorSNumbers = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    ColorBNumbers = COLOR_FALLBACK(GColorRed,GColorBlack);
+    ColorDBox = COLOR_FALLBACK(GColorMelon,GColorBlack);
+    ColorCrown = COLOR_FALLBACK(GColorRed,GColorWhite);
+    break;
+    case 14: //Basic Green
+    BackColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    ColorSphere = COLOR_FALLBACK(GColorWhite, GColorWhite);
+    ColorQMarks = COLOR_FALLBACK(GColorIslamicGreen,GColorBlack); 
+    ColorHMarks = COLOR_FALLBACK(GColorIslamicGreen,GColorBlack); 
+    ColorMMarks = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    ColorHours = COLOR_FALLBACK(GColorIslamicGreen,GColorBlack);
+    ColorMinutes = COLOR_FALLBACK(GColorIslamicGreen,GColorBlack);
+    ColorSeconds = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    ColorShadow = COLOR_FALLBACK(GColorLightGray,GColorWhite);  
+    ColorFont = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    ColorBattery = COLOR_FALLBACK(GColorIslamicGreen,GColorBlack);
+    ColorSNumbers = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    ColorBNumbers = COLOR_FALLBACK(GColorIslamicGreen,GColorBlack);
+    ColorDBox = COLOR_FALLBACK(GColorMintGreen,GColorBlack);
+    ColorCrown = COLOR_FALLBACK(GColorIslamicGreen,GColorWhite);
+    break;
+    case 15: //Blue Base
+    BackColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    ColorSphere = COLOR_FALLBACK(GColorWhite, GColorWhite);
+    ColorQMarks = COLOR_FALLBACK(GColorDukeBlue,GColorBlack); 
+    ColorHMarks = COLOR_FALLBACK(GColorDukeBlue,GColorBlack); 
+    ColorMMarks = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    ColorHours = COLOR_FALLBACK(GColorDukeBlue,GColorBlack);
+    ColorMinutes = COLOR_FALLBACK(GColorDukeBlue,GColorBlack);
+    ColorSeconds = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    ColorShadow = COLOR_FALLBACK(GColorLightGray,GColorWhite);  
+    ColorFont = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    ColorBattery = COLOR_FALLBACK(GColorDukeBlue,GColorBlack);
+    ColorSNumbers = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    ColorBNumbers = COLOR_FALLBACK(GColorDukeBlue,GColorBlack);
+    ColorDBox = COLOR_FALLBACK(GColorBabyBlueEyes,GColorBlack);
+    ColorCrown = COLOR_FALLBACK(GColorDukeBlue,GColorWhite);
+    break;
+    case 16: //Yellow moon
+    BackColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    ColorSphere = COLOR_FALLBACK(GColorDarkGray, GColorWhite);
+    ColorQMarks = COLOR_FALLBACK(GColorYellow,GColorBlack); 
+    ColorHMarks = COLOR_FALLBACK(GColorYellow,GColorBlack); 
+    ColorMMarks = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    ColorHours = COLOR_FALLBACK(GColorYellow,GColorBlack);
+    ColorMinutes = COLOR_FALLBACK(GColorYellow,GColorBlack);
+    ColorSeconds = COLOR_FALLBACK(GColorRed,GColorBlack);
+    ColorShadow = COLOR_FALLBACK(GColorBlack,GColorWhite);  
+    ColorFont = COLOR_FALLBACK(GColorYellow,GColorBlack);
+    ColorBattery = COLOR_FALLBACK(GColorYellow,GColorBlack);
+    ColorSNumbers = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    ColorBNumbers = COLOR_FALLBACK(GColorYellow,GColorBlack);
+    ColorDBox = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
+    ColorCrown = COLOR_FALLBACK(GColorYellow,GColorWhite);
+    break;
+    case 17: //Folly day
+    BackColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    ColorSphere = COLOR_FALLBACK(GColorPastelYellow, GColorWhite);
+    ColorQMarks = COLOR_FALLBACK(GColorFolly,GColorBlack); 
+    ColorHMarks = COLOR_FALLBACK(GColorFolly,GColorBlack); 
+    ColorMMarks = COLOR_FALLBACK(GColorRed,GColorBlack);
+    ColorHours = COLOR_FALLBACK(GColorFolly,GColorBlack);
+    ColorMinutes = COLOR_FALLBACK(GColorFolly,GColorBlack);
+    ColorSeconds = COLOR_FALLBACK(GColorBlue,GColorBlack);
+    ColorShadow = COLOR_FALLBACK(GColorDarkGray,GColorWhite);  
+    ColorFont = COLOR_FALLBACK(GColorFolly,GColorBlack);
+    ColorBattery = COLOR_FALLBACK(GColorFolly,GColorBlack);
+    ColorSNumbers = COLOR_FALLBACK(GColorRed,GColorBlack);
+    ColorBNumbers = COLOR_FALLBACK(GColorFolly,GColorBlack);
+    ColorDBox = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    ColorCrown = COLOR_FALLBACK(GColorFolly,GColorWhite);
+    break;
+    case 18: //Clear White
+    BackColor = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    ColorSphere = COLOR_FALLBACK(GColorWhite, GColorWhite);
+    ColorQMarks = COLOR_FALLBACK(GColorRed,GColorBlack); 
+    ColorHMarks = COLOR_FALLBACK(GColorIslamicGreen,GColorBlack); 
+    ColorMMarks = COLOR_FALLBACK(GColorBlue,GColorBlack);
+    ColorHours = COLOR_FALLBACK(GColorFolly,GColorBlack);
+    ColorMinutes = COLOR_FALLBACK(GColorIslamicGreen,GColorBlack);
+    ColorSeconds = COLOR_FALLBACK(GColorBlue,GColorBlack);
+    ColorShadow = COLOR_FALLBACK(GColorLightGray,GColorWhite);  
+    ColorFont = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    ColorBattery = COLOR_FALLBACK(GColorFolly,GColorBlack);
+    ColorSNumbers = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    ColorBNumbers = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    ColorDBox = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    ColorCrown = COLOR_FALLBACK(GColorBlue,GColorWhite);
+    break;
+    case 19: //Platinum Edition
+    BackColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    ColorSphere = COLOR_FALLBACK(GColorDarkGray, GColorWhite);
+    ColorQMarks = COLOR_FALLBACK(GColorCeleste,GColorBlack); 
+    ColorHMarks = COLOR_FALLBACK(GColorCeleste,GColorBlack); 
+    ColorMMarks = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    ColorHours = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    ColorMinutes = COLOR_FALLBACK(GColorCyan,GColorBlack);
+    ColorSeconds = COLOR_FALLBACK(GColorRed,GColorBlack);
+    ColorShadow = COLOR_FALLBACK(GColorBlack,GColorWhite);  
+    ColorFont = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    ColorBattery = COLOR_FALLBACK(GColorSunsetOrange,GColorBlack);
+    ColorSNumbers = COLOR_FALLBACK(GColorSunsetOrange,GColorBlack);
+    ColorBNumbers = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    ColorDBox = COLOR_FALLBACK(GColorLiberty,GColorBlack);
+    ColorCrown = COLOR_FALLBACK(GColorYellow,GColorWhite);
+    break;
+
   }
 }
 
@@ -436,8 +556,12 @@ void shadow_layer_update(Layer *me, GContext *ctx) {
   
   #ifdef PBL_COLOR
     graphics_context_set_antialiased(ctx, true);
-    if (hType == 2){
-      graphics_context_set_stroke_width(ctx, 2);
+    if (hType == 2||hType > 3){
+      if (hType == 2) {
+        graphics_context_set_stroke_width(ctx, 2);
+      } else {
+        graphics_context_set_stroke_width(ctx, 3);
+      }
     } else {
       graphics_context_set_stroke_width(ctx, grosor*2);
       start = 0;
@@ -454,6 +578,11 @@ void shadow_layer_update(Layer *me, GContext *ctx) {
   //draw shadows
   if (UseShadows==true){
           GPoint mHb, mHt;
+          GPoint lmH, rmH;
+          GPoint p1,p2,p3,p4;
+          #ifdef PBL_COLOR
+            GPoint p5;
+          #endif
           graphics_context_set_fill_color(ctx, ColorShadow);
           graphics_context_set_stroke_color(ctx, ColorShadow);
       if (cos_lookup(mi_angle)==0||sin_lookup(mi_angle)==0) {
@@ -470,16 +599,33 @@ void shadow_layer_update(Layer *me, GContext *ctx) {
         #endif     
      }
 	        for(x=start; x <= end; x++) {
-            mHb.x = ((int32_t)( sin_lookup(mi_angle) * (int32_t)(-1*Radio*0.15+h_offset) / TRIG_MAX_RATIO) + hs.x 
+            if (hType <= 3) {
+               mHb.x = ((int32_t)( sin_lookup(mi_angle) * (int32_t)(-1*Radio*0.15+h_offset) / TRIG_MAX_RATIO) + hs.x 
                   + (int16_t)(cos_lookup(mi_angle)*x/TRIG_MAX_RATIO));
-            mHb.y = ((int32_t)(-cos_lookup(mi_angle) * (int32_t)(-1*Radio*0.15+h_offset) / TRIG_MAX_RATIO) + hs.y 
+               mHb.y = ((int32_t)(-cos_lookup(mi_angle) * (int32_t)(-1*Radio*0.15+h_offset) / TRIG_MAX_RATIO) + hs.y 
                   + (int16_t)(sin_lookup(mi_angle)*x/TRIG_MAX_RATIO));
+            } else {
+               mHb.x = ((int32_t)( sin_lookup(mi_angle) * (int32_t)(-1*Radio*0.2+h_offset) / TRIG_MAX_RATIO) + hs.x 
+                  + (int16_t)(cos_lookup(mi_angle)*x/TRIG_MAX_RATIO));
+               mHb.y = ((int32_t)(-cos_lookup(mi_angle) * (int32_t)(-1*Radio*0.2+h_offset) / TRIG_MAX_RATIO) + hs.y 
+                  + (int16_t)(sin_lookup(mi_angle)*x/TRIG_MAX_RATIO));           
+           }
             mHt.x = ((int32_t)( sin_lookup(mi_angle) * (int32_t)(Radio*0.8) / TRIG_MAX_RATIO) + hs.x 
                   + (int16_t)(cos_lookup(mi_angle)*x/TRIG_MAX_RATIO));
             mHt.y = ((int32_t)(-cos_lookup(mi_angle) * (int32_t)(Radio*0.8) / TRIG_MAX_RATIO) + hs.y 
                   + (int16_t)(sin_lookup(mi_angle)*x/TRIG_MAX_RATIO));
-
-            if (hType == 2) {
+           if (hType > 3) {
+            lmH.x = ((int32_t)( sin_lookup(mi_angle-a_angle) * (int32_t)(-1*Radio*0.3) / TRIG_MAX_RATIO) + mHt.x 
+                  + (int16_t)(cos_lookup(mi_angle-a_angle)*x/TRIG_MAX_RATIO));
+            lmH.y = ((int32_t)(-cos_lookup(mi_angle-a_angle) * (int32_t)(-1*Radio*0.3) / TRIG_MAX_RATIO) + mHt.y 
+                  + (int16_t)(sin_lookup(mi_angle-a_angle)*x/TRIG_MAX_RATIO));
+            rmH.x = ((int32_t)( sin_lookup(mi_angle+a_angle) * (int32_t)(-1*Radio*0.3) / TRIG_MAX_RATIO) + mHt.x 
+                  + (int16_t)(cos_lookup(mi_angle+a_angle)*x/TRIG_MAX_RATIO));
+            rmH.y = ((int32_t)(-cos_lookup(mi_angle+a_angle) * (int32_t)(-1*Radio*0.3) / TRIG_MAX_RATIO) + mHt.y 
+                  + (int16_t)(sin_lookup(mi_angle+a_angle)*x/TRIG_MAX_RATIO));
+           }
+           if (hType <= 3) {
+             if (hType == 2) {
               #ifdef PBL_COLOR
                 if (x == start || x == end ){
                  graphics_context_set_stroke_width(ctx, 2);
@@ -499,8 +645,55 @@ void shadow_layer_update(Layer *me, GContext *ctx) {
             if (x==0){
               graphics_fill_circle(ctx, mHt, grosor/2+2);
             }
+           } else {
+              #ifdef PBL_COLOR
+                graphics_context_set_stroke_width(ctx, 2);
+                if (x == start ){
+                   p1 = lmH;
+                   p3 = mHt;
+                   graphics_draw_line  (ctx, p1, p3);
+                }
+                if (x == end ){
+                    p2 = rmH;
+                    p4 = mHt;
+                    graphics_draw_line  (ctx, p2, p4);
+                }
+                 if (x==0){
+                   graphics_context_set_stroke_width(ctx, 4);
+                   graphics_draw_line  (ctx, mHb, lmH);
+                   graphics_draw_line  (ctx, mHb, rmH);
+                   graphics_fill_circle(ctx, mHb, grosor/2+2);
+                  }
+              #else
+                if (x == start ){
+                 graphics_draw_line  (ctx, lmH, mHt);
+                 graphics_draw_line  (ctx, hs, lmH);
+                 p1 = lmH;
+                }
+                if (x == end ){
+                 graphics_draw_line  (ctx, rmH, mHt);
+                 graphics_draw_line  (ctx, hs, rmH);
+                 p2 = rmH;
+                }
+                graphics_draw_line  (ctx, hs, mHb);
+                if (x==0){graphics_fill_circle(ctx, mHt, grosor/2+1);}
+              #endif             
+            }
           }
+         if (hType > 3) {
+                  #ifdef PBL_COLOR
+                     graphics_context_set_stroke_width(ctx, 2);
+                     p5.x = (p1.x+p2.x)/2;
+                     p5.y = (p1.y+p2.y)/2;
+                     graphics_draw_line  (ctx, hs, p5);
+                  #endif
+                  graphics_draw_line  (ctx, p1, p2);
+                  graphics_draw_line  (ctx, p3, p4);
+          }
+    
           GPoint hHb, hHt;
+          GPoint lH, rH;
+          GPoint h1,h2,h3;
           graphics_context_set_fill_color(ctx, ColorShadow);
           graphics_context_set_stroke_color(ctx, ColorShadow);
 	        for(x=start; x <= end; x++) {
@@ -512,8 +705,22 @@ void shadow_layer_update(Layer *me, GContext *ctx) {
                   + (int16_t)(cos_lookup(hh_angle)*x/TRIG_MAX_RATIO));
             hHt.y = ((int32_t)(-cos_lookup(hh_angle) * (int32_t)(Radio*0.5) / TRIG_MAX_RATIO) + hs.y 
                   + (int16_t)(sin_lookup(hh_angle)*x/TRIG_MAX_RATIO));
-            
-            if (hType == 2) {
+            if (hType > 3) {
+             hHt.x = ((int32_t)( sin_lookup(hh_angle) * (int32_t)(Radio*0.6) / TRIG_MAX_RATIO) + hs.x 
+                  + (int16_t)(cos_lookup(hh_angle)*x/TRIG_MAX_RATIO));
+             hHt.y = ((int32_t)(-cos_lookup(hh_angle) * (int32_t)(Radio*0.6) / TRIG_MAX_RATIO) + hs.y 
+                  + (int16_t)(sin_lookup(hh_angle)*x/TRIG_MAX_RATIO));
+             lH.x = ((int32_t)( sin_lookup(hh_angle+a_angle/3) * (int32_t)(-1*Radio*0.3) / TRIG_MAX_RATIO) + hHt.x 
+                  + (int16_t)(cos_lookup(hh_angle+a_angle/3)*x/TRIG_MAX_RATIO));
+             lH.y = ((int32_t)(-cos_lookup(hh_angle+a_angle/3) * (int32_t)(-1*Radio*0.3) / TRIG_MAX_RATIO) + hHt.y 
+                  + (int16_t)(sin_lookup(hh_angle+a_angle/3)*x/TRIG_MAX_RATIO));
+             rH.x = ((int32_t)( sin_lookup(hh_angle-a_angle/3) * (int32_t)(-1*Radio*0.3) / TRIG_MAX_RATIO) + hHt.x 
+                  + (int16_t)(cos_lookup(hh_angle-a_angle/3)*x/TRIG_MAX_RATIO));
+             rH.y = ((int32_t)(-cos_lookup(hh_angle-a_angle/3) * (int32_t)(-1*Radio*0.3) / TRIG_MAX_RATIO) + hHt.y 
+                  + (int16_t)(sin_lookup(hh_angle-a_angle/3)*x/TRIG_MAX_RATIO));
+            }
+            if (hType <= 3) {
+             if (hType == 2) {
               #ifdef PBL_COLOR
               if (x == start || x == end ){
                  graphics_context_set_stroke_width(ctx, 2);
@@ -533,7 +740,40 @@ void shadow_layer_update(Layer *me, GContext *ctx) {
             if (x==0){
               graphics_fill_circle(ctx, hHt, grosor/2+2);
             }
+           } else {
+              #ifdef PBL_COLOR
+                if (x == start ){
+                  h1 = lH;
+                }
+                if (x == end ){
+                  h2 = rH;
+                }
+                  if (x==0){h3 = hHt;}
+                  graphics_context_set_stroke_width(ctx, 2);
+                  graphics_draw_line  (ctx, hs, lH);
+                  graphics_draw_line  (ctx, hs, rH);
+              #else
+                if (x == start ){
+                 graphics_draw_line  (ctx, lH, hHt);
+                 graphics_draw_line  (ctx, hs, lH);
+                }
+                if (x == end ){
+                 graphics_draw_line  (ctx, rH, hHt);
+                 graphics_draw_line  (ctx, hs, rH);
+                }
+                 graphics_draw_line  (ctx, hs, hHb);
+                 if (x==0){graphics_fill_circle(ctx, hHt, grosor/2+1);}
+              #endif  
           }
+      }
+     if (hType > 3) {
+       #ifdef PBL_COLOR
+          graphics_context_set_stroke_width(ctx, 2);
+       #endif
+       graphics_draw_line  (ctx, h1, h2);
+       graphics_draw_line  (ctx, h1, h3);
+       graphics_draw_line  (ctx, h2, h3);
+     } 
   }
   // Seconds Shadow
   if (UseSeconds == true&&UseShadows==true) {
@@ -571,8 +811,12 @@ void time_layer_update(Layer *me, GContext *ctx) {
   
   #ifdef PBL_COLOR
     graphics_context_set_antialiased(ctx, true);
-    if (hType == 2){
-      graphics_context_set_stroke_width(ctx, 2);
+    if (hType == 2||hType > 3){
+      if (hType == 2) {
+        graphics_context_set_stroke_width(ctx, 2);
+      } else {
+        graphics_context_set_stroke_width(ctx, 3);
+      }
     } else {
       graphics_context_set_stroke_width(ctx, grosor*2);
       start = 0;
@@ -584,31 +828,55 @@ void time_layer_update(Layer *me, GContext *ctx) {
   graphics_context_set_fill_color(ctx, ColorMinutes);
   graphics_context_set_stroke_color(ctx, ColorMinutes);
   GPoint mHb, mHt;
+  GPoint lmH, rmH;
+  GPoint p1, p2, p3, p4;
+  #ifdef PBL_COLOR
+    GPoint p5;
+  #endif  
   graphics_context_set_fill_color(ctx, ColorMinutes);
   graphics_context_set_stroke_color(ctx, ColorMinutes);
-  if (cos_lookup(mi_angle)==0||sin_lookup(mi_angle)==0) {
+
+   if (cos_lookup(mi_angle)==0||sin_lookup(mi_angle)==0) {
     #ifdef PBL_COLOR
         graphics_context_set_stroke_width(ctx, (grosor-1)*2);
     #else
         end = grosor-1;
     #endif     
-  } else {
+   } else {
     #ifdef PBL_COLOR
         graphics_context_set_stroke_width(ctx, grosor*2);
     #else
         end = grosor;
     #endif     
-  }
+   }
   
-	for(x=start; x <= end; x++) {
+	 for(x=start; x <= end; x++) {
+         if (hType <= 3) {
             mHb.x = ((int32_t)( sin_lookup(mi_angle) * (int32_t)(-1*Radio*0.15+h_offset) / TRIG_MAX_RATIO) + hc.x 
                   + (int16_t)(cos_lookup(mi_angle)*x/TRIG_MAX_RATIO));
             mHb.y = ((int32_t)(-cos_lookup(mi_angle) * (int32_t)(-1*Radio*0.15+h_offset) / TRIG_MAX_RATIO) + hc.y 
                   + (int16_t)(sin_lookup(mi_angle)*x/TRIG_MAX_RATIO));
+          } else {
+            mHb.x = ((int32_t)( sin_lookup(mi_angle) * (int32_t)(-1*Radio*0.2+h_offset) / TRIG_MAX_RATIO) + hc.x 
+                  + (int16_t)(cos_lookup(mi_angle)*x/TRIG_MAX_RATIO));
+            mHb.y = ((int32_t)(-cos_lookup(mi_angle) * (int32_t)(-1*Radio*0.2+h_offset) / TRIG_MAX_RATIO) + hc.y 
+                  + (int16_t)(sin_lookup(mi_angle)*x/TRIG_MAX_RATIO));           
+          }
             mHt.x = ((int32_t)( sin_lookup(mi_angle) * (int32_t)(Radio*0.8) / TRIG_MAX_RATIO) + hc.x 
                   + (int16_t)(cos_lookup(mi_angle)*x/TRIG_MAX_RATIO));
             mHt.y = ((int32_t)(-cos_lookup(mi_angle) * (int32_t)(Radio*0.8) / TRIG_MAX_RATIO) + hc.y 
                   + (int16_t)(sin_lookup(mi_angle)*x/TRIG_MAX_RATIO));
+         if (hType > 3) {
+            lmH.x = ((int32_t)( sin_lookup(mi_angle-a_angle) * (int32_t)(-1*Radio*0.3) / TRIG_MAX_RATIO) + mHt.x 
+                  + (int16_t)(cos_lookup(mi_angle-a_angle)*x/TRIG_MAX_RATIO));
+            lmH.y = ((int32_t)(-cos_lookup(mi_angle-a_angle) * (int32_t)(-1*Radio*0.3) / TRIG_MAX_RATIO) + mHt.y 
+                  + (int16_t)(sin_lookup(mi_angle-a_angle)*x/TRIG_MAX_RATIO));
+            rmH.x = ((int32_t)( sin_lookup(mi_angle+a_angle) * (int32_t)(-1*Radio*0.3) / TRIG_MAX_RATIO) + mHt.x 
+                  + (int16_t)(cos_lookup(mi_angle+a_angle)*x/TRIG_MAX_RATIO));
+            rmH.y = ((int32_t)(-cos_lookup(mi_angle+a_angle) * (int32_t)(-1*Radio*0.3) / TRIG_MAX_RATIO) + mHt.y 
+                  + (int16_t)(sin_lookup(mi_angle+a_angle)*x/TRIG_MAX_RATIO));
+         }
+       if (hType <= 3) {
             if (hType == 2) {
               #ifdef PBL_COLOR
                 if (x == start || x == end ){
@@ -634,11 +902,58 @@ void time_layer_update(Layer *me, GContext *ctx) {
             } else {
               graphics_draw_line  (ctx, mHb, mHt);
               if (x==0){
-                     graphics_fill_circle(ctx, mHt, grosor/2+1);
+                 graphics_fill_circle(ctx, mHt, grosor/2+1);
               }
             }
+      } else {
+              #ifdef PBL_COLOR
+                graphics_context_set_stroke_width(ctx, 2);
+                if (x == start ){
+                   p1 = lmH;
+                   p3 = mHt;
+                   graphics_draw_line  (ctx, p1, p3);
+                }
+                if (x == end ){
+                    p2 = rmH;
+                    p4 = mHt;
+                    graphics_draw_line  (ctx, p2, p4);
+                }
+                 if (x==0){
+                   graphics_context_set_stroke_width(ctx, 4);
+                   graphics_draw_line  (ctx, mHb, lmH);
+                   graphics_draw_line  (ctx, mHb, rmH);
+                   graphics_fill_circle(ctx, mHb, grosor/2+2);
+                  }
+              #else
+                if (x == start ){
+                 graphics_draw_line  (ctx, lmH, mHt);
+                 graphics_draw_line  (ctx, hc, lmH);
+                 p1 = lmH;
+                 p3 = mHt;
+                }
+                if (x == end ){
+                 graphics_draw_line  (ctx, rmH, mHt);
+                 graphics_draw_line  (ctx, hc, rmH);
+                 p2 = rmH;
+                 p4 = mHt;
+                 graphics_draw_line  (ctx, p2, p4);
+                }
+                 graphics_draw_line  (ctx, hc, mHb);
+                 if (x==0){graphics_fill_circle(ctx, mHb, grosor/2+1);}
+              #endif  
+       }
   }
- 
+  if (hType > 3) {
+                  #ifdef PBL_COLOR
+                     graphics_context_set_stroke_width(ctx, 2);
+                     p5.x = (p1.x+p2.x)/2;
+                     p5.y = (p1.y+p2.y)/2;
+                     graphics_draw_line  (ctx, hc, p5);
+                  #endif
+                  graphics_draw_line  (ctx, p1, p2);
+                  graphics_draw_line  (ctx, p3, p4);
+                 }
+  
   //draw seconds hand
   if (UseSeconds == true) {
       GPoint sc;
@@ -665,6 +980,8 @@ void time_layer_update(Layer *me, GContext *ctx) {
   graphics_context_set_fill_color(ctx, ColorHours);
   graphics_context_set_stroke_color(ctx, ColorHours);
   GPoint hHb, hHt;
+  GPoint lH, rH;
+  GPoint h1, h2, h3;
   graphics_context_set_fill_color(ctx, ColorHours);
   graphics_context_set_stroke_color(ctx, ColorHours);
 	for(x=start; x <= end; x++) {
@@ -676,7 +993,22 @@ void time_layer_update(Layer *me, GContext *ctx) {
                   + (int16_t)(cos_lookup(hh_angle)*x/TRIG_MAX_RATIO));
             hHt.y = ((int32_t)(-cos_lookup(hh_angle) * (int32_t)(Radio*0.5) / TRIG_MAX_RATIO) + hc.y 
                   + (int16_t)(sin_lookup(hh_angle)*x/TRIG_MAX_RATIO));
-            if (hType == 2) {
+         if (hType > 3) {
+            hHt.x = ((int32_t)( sin_lookup(hh_angle) * (int32_t)(Radio*0.6) / TRIG_MAX_RATIO) + hc.x 
+                  + (int16_t)(cos_lookup(hh_angle)*x/TRIG_MAX_RATIO));
+            hHt.y = ((int32_t)(-cos_lookup(hh_angle) * (int32_t)(Radio*0.6) / TRIG_MAX_RATIO) + hc.y 
+                  + (int16_t)(sin_lookup(hh_angle)*x/TRIG_MAX_RATIO));
+            lH.x = ((int32_t)( sin_lookup(hh_angle+a_angle/3) * (int32_t)(-1*Radio*0.3) / TRIG_MAX_RATIO) + hHt.x 
+                  + (int16_t)(cos_lookup(hh_angle+a_angle/3)*x/TRIG_MAX_RATIO));
+            lH.y = ((int32_t)(-cos_lookup(hh_angle+a_angle/3) * (int32_t)(-1*Radio*0.3) / TRIG_MAX_RATIO) + hHt.y 
+                  + (int16_t)(sin_lookup(hh_angle+a_angle/3)*x/TRIG_MAX_RATIO));
+            rH.x = ((int32_t)( sin_lookup(hh_angle-a_angle/3) * (int32_t)(-1*Radio*0.3) / TRIG_MAX_RATIO) + hHt.x 
+                  + (int16_t)(cos_lookup(hh_angle-a_angle/3)*x/TRIG_MAX_RATIO));
+            rH.y = ((int32_t)(-cos_lookup(hh_angle-a_angle/3) * (int32_t)(-1*Radio*0.3) / TRIG_MAX_RATIO) + hHt.y 
+                  + (int16_t)(sin_lookup(hh_angle-a_angle/3)*x/TRIG_MAX_RATIO));
+         }
+        if (hType <= 3) {
+           if (hType == 2) {
               #ifdef PBL_COLOR
                 if (x == start || x == end ){
                  graphics_context_set_stroke_width(ctx, 2);
@@ -701,14 +1033,52 @@ void time_layer_update(Layer *me, GContext *ctx) {
               if (x==0){
                  graphics_fill_circle(ctx, hHt, grosor/2+1);
               }
-            }
+           }
+        } else {
+              #ifdef PBL_COLOR
+                if (x == start ){
+                   h1 = lH;
+                }
+                if (x == end ){
+                   h2 = rH;
+                } 
+                if (x==0){
+                   h3 = hHt;
+                }
+                  graphics_context_set_stroke_width(ctx, 2);
+                  graphics_draw_line  (ctx, hc, lH);
+                  graphics_draw_line  (ctx, hc, rH);
+              #else
+                if (x == start ){
+                  graphics_draw_line  (ctx, hc, lH);
+                  h1 = lH;
+                }
+                if (x == end ){
+                  graphics_draw_line  (ctx, hc, rH);
+                  h2 = rH;
+                }
+                if (x==0){h3 = hHt;}
+             #endif  
+         }
   }
- 
+  if (hType > 3) {
+    #ifdef PBL_COLOR
+       graphics_context_set_stroke_width(ctx, 2);
+    #endif
+       graphics_draw_line  (ctx, h1, h2);
+       graphics_draw_line  (ctx, h1, h3);
+       graphics_draw_line  (ctx, h2, h3);
+  }
+                  
   //draw centre circles
   graphics_context_set_fill_color(ctx, ColorHours);
   graphics_fill_circle(ctx, hc, 6);
   #ifdef PBL_COLOR
-    graphics_context_set_fill_color(ctx, ColorMinutes);
+    if (gcolor_equal(ColorHours, ColorMinutes)){
+      graphics_context_set_fill_color(ctx, ColorSeconds);
+    } else {
+      graphics_context_set_fill_color(ctx, ColorMinutes);
+    }
     graphics_context_set_stroke_width(ctx, 1);
   #else
     graphics_context_set_fill_color(ctx, ColorSphere);
@@ -738,6 +1108,7 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
             
   hh_angle = (TRIG_MAX_ANGLE*(((now->tm_hour%12)*6)+(now->tm_min/10)))/(12*6);
   mi_angle = TRIG_MAX_ANGLE * (now->tm_min) / 60;
+  a_angle =  TRIG_MAX_ANGLE * 1 / 60;
   if (UseSeconds == true){
       ss_angle = TRIG_MAX_ANGLE / 60 * (now->tm_sec);
   }
@@ -909,12 +1280,12 @@ static void in_recv_handler(DictionaryIterator *iterator, void *context)
       };
       break;
     case Key_UseShadows:
-      if(strcmp(t->value->cstring, "0") == 1)
+      if(strcmp(t->value->cstring, "0") == 0)
       {
         UseShadows = true;
         persist_write_bool(Key_UseShadows, true);
       }
-      else if(strcmp(t->value->cstring, "1") == 1)
+      else if(strcmp(t->value->cstring, "1") == 0)
       {
         UseShadows = false;
         persist_write_bool(Key_UseShadows, false);

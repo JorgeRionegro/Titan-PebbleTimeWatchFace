@@ -14,7 +14,7 @@ Pebble.addEventListener("showConfiguration",
     url_args = url_args.replace(/___/g,'=');
     url_args = url_args.replace('__','');
     //console.log("url_args: " + url_args);    
-    Pebble.openURL("https://dl.dropboxusercontent.com/u/34982193/Titan_v5_0.html"+url_args);
+    Pebble.openURL("https://dl.dropboxusercontent.com/u/34982193/Titan_v6_0.html"+url_args);
     console.log("Connected to http configuration page!");
 
   }
