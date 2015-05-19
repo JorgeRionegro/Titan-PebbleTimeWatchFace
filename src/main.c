@@ -13,10 +13,10 @@
 #define Key_Bluetooth 5
 #define Key_Numbers 6
 #define Key_DateBox 7
-#define Key_UseCrown 8
-#define Key_HandleTicks 9
+#define Key_Crown 8
+#define Key_Ticks 9
 
-static int mTicks = 60, Radio = 96, a = 1, cType = 19, hType = 4, numbType = 5, grosor = 4, hTicks = 3;
+static int mTicks = 60, Radio = 94, a = 1, cType = 0, hType = 3, numbType = 5, grosor = 4, hTicks = 3;
 bool UseSeconds = true, UseShadows = true, viewBluetooth = true, DateBox = true, UseCrown = true;
 int32_t hh_angle, mi_angle, ss_angle, a_angle;
 
@@ -35,7 +35,7 @@ static BatteryChargeState c_state;
   static GColor ColorFont,ColorBattery,ColorBNumbers,ColorSNumbers,ColorDBox,ColorCrown;
 #endif
   
-static GPathInfo HOUR_POINTS = { 4, (GPoint []) { { -2, 1 }, { 2, 1}, { 2, -14}, { -2, -14} } };
+static GPathInfo HOUR_POINTS = { 4, (GPoint []) { { -1, 1 }, { 1, 1}, { 1, -14}, { -1, -14} } };
 static GPathInfo MINUTE_POINTS = { 4, (GPoint []) { { -1, 1 }, { 1, 1}, { 1, -6}, { -1, -6} } };
 static GPathInfo HOUR_QUARTERS = { 4, (GPoint []) { { -3, 3 }, { 3, 3}, { 3, -17}, { -3, -17} } };
 
@@ -43,23 +43,6 @@ static GPath *minute_square, *hour_square, *hour_quarters;
 
 static void setColors (int clockType){
   switch(clockType){
-    case -1: //Only For taking ScrenShots
-    BackColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
-    ColorSphere = COLOR_FALLBACK(GColorWhite, GColorWhite);
-    ColorQMarks = COLOR_FALLBACK(GColorWhite,GColorBlack); 
-    ColorHMarks = COLOR_FALLBACK(GColorWhite,GColorBlack); 
-    ColorMMarks = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorHours = COLOR_FALLBACK(GColorFolly,GColorBlack);
-    ColorMinutes = COLOR_FALLBACK(GColorBlueMoon,GColorBlack);
-    ColorSeconds = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
-    ColorShadow = COLOR_FALLBACK(GColorWhite,GColorBlack);  
-    ColorFont = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorBattery = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorSNumbers = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorBNumbers = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorDBox = COLOR_FALLBACK(GColorWhite,GColorWhite);
-    ColorCrown = COLOR_FALLBACK(GColorWhite,GColorWhite);
-    break;
     case 0: //Sport Man
     BackColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
     ColorSphere = COLOR_FALLBACK(GColorWhite, GColorWhite);
@@ -87,7 +70,7 @@ static void setColors (int clockType){
     ColorMinutes = COLOR_FALLBACK(GColorElectricBlue,GColorWhite);
     ColorSeconds = COLOR_FALLBACK(GColorWhite,GColorWhite);
     ColorShadow = COLOR_FALLBACK(GColorBlack,GColorBlack);  
-    ColorFont = COLOR_FALLBACK(GColorYellow,GColorWhite);
+    ColorFont = COLOR_FALLBACK(GColorYellow,GColorBlack);
     ColorBattery = COLOR_FALLBACK(GColorYellow,GColorWhite);
     ColorSNumbers = COLOR_FALLBACK(GColorYellow,GColorWhite);
     ColorBNumbers = COLOR_FALLBACK(GColorWhite,GColorWhite);
@@ -104,7 +87,7 @@ static void setColors (int clockType){
     ColorMinutes = COLOR_FALLBACK(GColorYellow,GColorWhite);
     ColorSeconds = COLOR_FALLBACK(GColorWhite,GColorWhite);
     ColorShadow = COLOR_FALLBACK(GColorDarkGray,GColorBlack);  
-    ColorFont = COLOR_FALLBACK(GColorWhite,GColorWhite);
+    ColorFont = COLOR_FALLBACK(GColorWhite,GColorBlack);
     ColorBattery = COLOR_FALLBACK(GColorWhite,GColorWhite);
     ColorSNumbers = COLOR_FALLBACK(GColorWhite,GColorWhite);
     ColorBNumbers = COLOR_FALLBACK(GColorWhite,GColorWhite);
@@ -130,37 +113,37 @@ static void setColors (int clockType){
     break;
     case 4: //Green Grass
     BackColor = COLOR_FALLBACK(GColorBlack,GColorWhite);
-    ColorSphere = COLOR_FALLBACK(GColorBrightGreen, GColorBlack);
-    ColorQMarks = COLOR_FALLBACK(GColorDarkGreen,GColorWhite); 
-    ColorHMarks = COLOR_FALLBACK(GColorDarkGray,GColorWhite); 
-    ColorMMarks = COLOR_FALLBACK(GColorBlack,GColorWhite);
-    ColorHours = COLOR_FALLBACK(GColorWindsorTan,GColorWhite);
-    ColorMinutes = COLOR_FALLBACK(GColorBulgarianRose,GColorWhite);
-    ColorSeconds = COLOR_FALLBACK(GColorRed,GColorWhite);
+    ColorSphere = COLOR_FALLBACK(GColorBrightGreen, GColorWhite);
+    ColorQMarks = COLOR_FALLBACK(GColorDarkGreen,GColorBlack); 
+    ColorHMarks = COLOR_FALLBACK(GColorDarkGray,GColorBlack); 
+    ColorMMarks = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    ColorHours = COLOR_FALLBACK(GColorWindsorTan,GColorBlack);
+    ColorMinutes = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);
+    ColorSeconds = COLOR_FALLBACK(GColorRed,GColorBlack);
     ColorShadow = COLOR_FALLBACK(GColorDarkGray,GColorBlack);  
-    ColorFont = COLOR_FALLBACK(GColorDarkGreen,GColorWhite);
-    ColorBattery = COLOR_FALLBACK(GColorDarkGreen,GColorWhite);
-    ColorSNumbers = COLOR_FALLBACK(GColorDarkGreen,GColorWhite);
-    ColorBNumbers = COLOR_FALLBACK(GColorDarkGreen,GColorWhite);
+    ColorFont = COLOR_FALLBACK(GColorDarkGreen,GColorBlack);
+    ColorBattery = COLOR_FALLBACK(GColorDarkGreen,GColorBlack);
+    ColorSNumbers = COLOR_FALLBACK(GColorDarkGreen,GColorBlack);
+    ColorBNumbers = COLOR_FALLBACK(GColorDarkGreen,GColorBlack);
     ColorDBox = COLOR_FALLBACK(GColorWhite,GColorWhite);
-    ColorCrown = COLOR_FALLBACK(GColorWindsorTan,GColorWhite);
+    ColorCrown = COLOR_FALLBACK(GColorWindsorTan,GColorBlack);
     break;
     case 5: //Passion o'clock
     BackColor = COLOR_FALLBACK(GColorBlack,GColorWhite);
-    ColorSphere = COLOR_FALLBACK(GColorRed, GColorBlack);
-    ColorQMarks = COLOR_FALLBACK(GColorRichBrilliantLavender,GColorWhite); 
-    ColorHMarks = COLOR_FALLBACK(GColorPastelYellow,GColorWhite); 
-    ColorMMarks = COLOR_FALLBACK(GColorPastelYellow,GColorWhite);
-    ColorHours = COLOR_FALLBACK(GColorElectricBlue,GColorWhite);
-    ColorMinutes = COLOR_FALLBACK(GColorYellow,GColorWhite);
-    ColorSeconds = COLOR_FALLBACK(GColorWhite,GColorWhite);
+    ColorSphere = COLOR_FALLBACK(GColorRed, GColorWhite);
+    ColorQMarks = COLOR_FALLBACK(GColorRichBrilliantLavender,GColorBlack); 
+    ColorHMarks = COLOR_FALLBACK(GColorPastelYellow,GColorBlack); 
+    ColorMMarks = COLOR_FALLBACK(GColorPastelYellow,GColorBlack);
+    ColorHours = COLOR_FALLBACK(GColorElectricBlue,GColorBlack);
+    ColorMinutes = COLOR_FALLBACK(GColorYellow,GColorBlack);
+    ColorSeconds = COLOR_FALLBACK(GColorWhite,GColorBlack);
     ColorShadow = COLOR_FALLBACK(GColorBlack,GColorBlack);  
     ColorFont = COLOR_FALLBACK(GColorWhite,GColorWhite);
-    ColorBattery = COLOR_FALLBACK(GColorRichBrilliantLavender,GColorWhite);
-    ColorSNumbers = COLOR_FALLBACK(GColorWhite,GColorWhite);
-    ColorBNumbers = COLOR_FALLBACK(GColorWhite,GColorWhite);
-    ColorDBox = COLOR_FALLBACK(GColorImperialPurple,GColorWhite);
-    ColorCrown = COLOR_FALLBACK(GColorChromeYellow,GColorWhite);
+    ColorBattery = COLOR_FALLBACK(GColorRichBrilliantLavender,GColorBlack);
+    ColorSNumbers = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    ColorBNumbers = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    ColorDBox = COLOR_FALLBACK(GColorImperialPurple,GColorBlack);
+    ColorCrown = COLOR_FALLBACK(GColorChromeYellow,GColorBlack);
     break;
     case 6: //Wine Taste
     BackColor = COLOR_FALLBACK(GColorWhite,GColorBlack);
@@ -176,24 +159,24 @@ static void setColors (int clockType){
     ColorBattery = COLOR_FALLBACK(GColorYellow,GColorWhite);
     ColorSNumbers = COLOR_FALLBACK(GColorYellow,GColorWhite);
     ColorBNumbers = COLOR_FALLBACK(GColorWhite,GColorWhite);
-    ColorDBox = COLOR_FALLBACK(GColorMidnightGreen,GColorWhite);
+    ColorDBox = COLOR_FALLBACK(GColorMidnightGreen,GColorBlack);
     ColorCrown = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorWhite);
     break;
     case 7: //Bottle clock
     BackColor = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorSphere = COLOR_FALLBACK(GColorDarkGreen, GColorBlack);
-    ColorQMarks = COLOR_FALLBACK(GColorWhite,GColorWhite); 
-    ColorHMarks = COLOR_FALLBACK(GColorWhite,GColorWhite); 
-    ColorMMarks = COLOR_FALLBACK(GColorYellow,GColorWhite);
-    ColorHours = COLOR_FALLBACK(GColorRed,GColorWhite);
-    ColorMinutes = COLOR_FALLBACK(GColorInchworm,GColorWhite);
-    ColorSeconds = COLOR_FALLBACK(GColorYellow,GColorWhite);
+    ColorSphere = COLOR_FALLBACK(GColorDarkGreen, GColorWhite);
+    ColorQMarks = COLOR_FALLBACK(GColorWhite,GColorBlack); 
+    ColorHMarks = COLOR_FALLBACK(GColorWhite,GColorBlack); 
+    ColorMMarks = COLOR_FALLBACK(GColorYellow,GColorBlack);
+    ColorHours = COLOR_FALLBACK(GColorRed,GColorBlack);
+    ColorMinutes = COLOR_FALLBACK(GColorInchworm,GColorBlack);
+    ColorSeconds = COLOR_FALLBACK(GColorYellow,GColorBlack);
     ColorShadow = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);  
     ColorFont = COLOR_FALLBACK(GColorYellow,GColorWhite);
-    ColorBattery = COLOR_FALLBACK(GColorYellow,GColorWhite);
-    ColorSNumbers = COLOR_FALLBACK(GColorYellow,GColorWhite);
-    ColorBNumbers = COLOR_FALLBACK(GColorWhite,GColorWhite);
-    ColorDBox = COLOR_FALLBACK(GColorArmyGreen,GColorWhite);
+    ColorBattery = COLOR_FALLBACK(GColorYellow,GColorBlack);
+    ColorSNumbers = COLOR_FALLBACK(GColorYellow,GColorBlack);
+    ColorBNumbers = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    ColorDBox = COLOR_FALLBACK(GColorArmyGreen,GColorBlack);
     ColorCrown = COLOR_FALLBACK(GColorOrange,GColorWhite);
     break;
     case 8: //Navy man
@@ -391,16 +374,15 @@ static void setColors (int clockType){
     ColorMMarks = COLOR_FALLBACK(GColorWhite,GColorBlack);
     ColorHours = COLOR_FALLBACK(GColorWhite,GColorBlack);
     ColorMinutes = COLOR_FALLBACK(GColorCyan,GColorBlack);
-    ColorSeconds = COLOR_FALLBACK(GColorRed,GColorBlack);
+    ColorSeconds = COLOR_FALLBACK(GColorLightGray,GColorBlack);
     ColorShadow = COLOR_FALLBACK(GColorBlack,GColorWhite);  
     ColorFont = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorBattery = COLOR_FALLBACK(GColorSunsetOrange,GColorBlack);
-    ColorSNumbers = COLOR_FALLBACK(GColorSunsetOrange,GColorBlack);
+    ColorBattery = COLOR_FALLBACK(GColorLightGray,GColorBlack);
+    ColorSNumbers = COLOR_FALLBACK(GColorLightGray,GColorBlack);
     ColorBNumbers = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorDBox = COLOR_FALLBACK(GColorLiberty,GColorBlack);
-    ColorCrown = COLOR_FALLBACK(GColorYellow,GColorWhite);
+    ColorDBox = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    ColorCrown = COLOR_FALLBACK(GColorLightGray,GColorWhite);
     break;
-
   }
 }
 
@@ -578,10 +560,9 @@ void shadow_layer_update(Layer *me, GContext *ctx) {
   //draw shadows
   if (UseShadows==true){
           GPoint mHb, mHt;
-          GPoint lmH, rmH;
-          GPoint p1,p2,p3,p4;
           #ifdef PBL_COLOR
-            GPoint p5;
+            GPoint lmH, rmH;
+            GPoint p1,p2,p3,p4,p5;
           #endif
           graphics_context_set_fill_color(ctx, ColorShadow);
           graphics_context_set_stroke_color(ctx, ColorShadow);
@@ -614,6 +595,7 @@ void shadow_layer_update(Layer *me, GContext *ctx) {
                   + (int16_t)(cos_lookup(mi_angle)*x/TRIG_MAX_RATIO));
             mHt.y = ((int32_t)(-cos_lookup(mi_angle) * (int32_t)(Radio*0.8) / TRIG_MAX_RATIO) + hs.y 
                   + (int16_t)(sin_lookup(mi_angle)*x/TRIG_MAX_RATIO));
+          #ifdef PBL_COLOR
            if (hType > 3) {
             lmH.x = ((int32_t)( sin_lookup(mi_angle-a_angle) * (int32_t)(-1*Radio*0.3) / TRIG_MAX_RATIO) + mHt.x 
                   + (int16_t)(cos_lookup(mi_angle-a_angle)*x/TRIG_MAX_RATIO));
@@ -623,7 +605,8 @@ void shadow_layer_update(Layer *me, GContext *ctx) {
                   + (int16_t)(cos_lookup(mi_angle+a_angle)*x/TRIG_MAX_RATIO));
             rmH.y = ((int32_t)(-cos_lookup(mi_angle+a_angle) * (int32_t)(-1*Radio*0.3) / TRIG_MAX_RATIO) + mHt.y 
                   + (int16_t)(sin_lookup(mi_angle+a_angle)*x/TRIG_MAX_RATIO));
-           }
+            }
+          #endif
            if (hType <= 3) {
              if (hType == 2) {
               #ifdef PBL_COLOR
@@ -664,19 +647,6 @@ void shadow_layer_update(Layer *me, GContext *ctx) {
                    graphics_draw_line  (ctx, mHb, rmH);
                    graphics_fill_circle(ctx, mHb, grosor/2+2);
                   }
-              #else
-                if (x == start ){
-                 graphics_draw_line  (ctx, lmH, mHt);
-                 graphics_draw_line  (ctx, hs, lmH);
-                 p1 = lmH;
-                }
-                if (x == end ){
-                 graphics_draw_line  (ctx, rmH, mHt);
-                 graphics_draw_line  (ctx, hs, rmH);
-                 p2 = rmH;
-                }
-                graphics_draw_line  (ctx, hs, mHb);
-                if (x==0){graphics_fill_circle(ctx, mHt, grosor/2+1);}
               #endif             
             }
           }
@@ -686,14 +656,16 @@ void shadow_layer_update(Layer *me, GContext *ctx) {
                      p5.x = (p1.x+p2.x)/2;
                      p5.y = (p1.y+p2.y)/2;
                      graphics_draw_line  (ctx, hs, p5);
+                     graphics_draw_line  (ctx, p1, p2);
+                     graphics_draw_line  (ctx, p3, p4);
                   #endif
-                  graphics_draw_line  (ctx, p1, p2);
-                  graphics_draw_line  (ctx, p3, p4);
           }
     
           GPoint hHb, hHt;
-          GPoint lH, rH;
-          GPoint h1,h2,h3;
+          #ifdef PBL_COLOR
+              GPoint lH, rH;
+              GPoint h1,h2,h3;
+          #endif
           graphics_context_set_fill_color(ctx, ColorShadow);
           graphics_context_set_stroke_color(ctx, ColorShadow);
 	        for(x=start; x <= end; x++) {
@@ -705,6 +677,7 @@ void shadow_layer_update(Layer *me, GContext *ctx) {
                   + (int16_t)(cos_lookup(hh_angle)*x/TRIG_MAX_RATIO));
             hHt.y = ((int32_t)(-cos_lookup(hh_angle) * (int32_t)(Radio*0.5) / TRIG_MAX_RATIO) + hs.y 
                   + (int16_t)(sin_lookup(hh_angle)*x/TRIG_MAX_RATIO));
+           #ifdef PBL_COLOR
             if (hType > 3) {
              hHt.x = ((int32_t)( sin_lookup(hh_angle) * (int32_t)(Radio*0.6) / TRIG_MAX_RATIO) + hs.x 
                   + (int16_t)(cos_lookup(hh_angle)*x/TRIG_MAX_RATIO));
@@ -719,6 +692,7 @@ void shadow_layer_update(Layer *me, GContext *ctx) {
              rH.y = ((int32_t)(-cos_lookup(hh_angle-a_angle/3) * (int32_t)(-1*Radio*0.3) / TRIG_MAX_RATIO) + hHt.y 
                   + (int16_t)(sin_lookup(hh_angle-a_angle/3)*x/TRIG_MAX_RATIO));
             }
+          #endif
             if (hType <= 3) {
              if (hType == 2) {
               #ifdef PBL_COLOR
@@ -752,27 +726,16 @@ void shadow_layer_update(Layer *me, GContext *ctx) {
                   graphics_context_set_stroke_width(ctx, 2);
                   graphics_draw_line  (ctx, hs, lH);
                   graphics_draw_line  (ctx, hs, rH);
-              #else
-                if (x == start ){
-                 graphics_draw_line  (ctx, lH, hHt);
-                 graphics_draw_line  (ctx, hs, lH);
-                }
-                if (x == end ){
-                 graphics_draw_line  (ctx, rH, hHt);
-                 graphics_draw_line  (ctx, hs, rH);
-                }
-                 graphics_draw_line  (ctx, hs, hHb);
-                 if (x==0){graphics_fill_circle(ctx, hHt, grosor/2+1);}
               #endif  
           }
       }
      if (hType > 3) {
        #ifdef PBL_COLOR
-          graphics_context_set_stroke_width(ctx, 2);
-       #endif
-       graphics_draw_line  (ctx, h1, h2);
-       graphics_draw_line  (ctx, h1, h3);
-       graphics_draw_line  (ctx, h2, h3);
+           graphics_context_set_stroke_width(ctx, 2);
+           graphics_draw_line  (ctx, h1, h2);
+           graphics_draw_line  (ctx, h1, h3);
+           graphics_draw_line  (ctx, h2, h3);
+        #endif
      } 
   }
   // Seconds Shadow
@@ -828,9 +791,9 @@ void time_layer_update(Layer *me, GContext *ctx) {
   graphics_context_set_fill_color(ctx, ColorMinutes);
   graphics_context_set_stroke_color(ctx, ColorMinutes);
   GPoint mHb, mHt;
-  GPoint lmH, rmH;
-  GPoint p1, p2, p3, p4;
   #ifdef PBL_COLOR
+    GPoint lmH, rmH;
+    GPoint p1, p2, p3, p4;
     GPoint p5;
   #endif  
   graphics_context_set_fill_color(ctx, ColorMinutes);
@@ -866,6 +829,7 @@ void time_layer_update(Layer *me, GContext *ctx) {
                   + (int16_t)(cos_lookup(mi_angle)*x/TRIG_MAX_RATIO));
             mHt.y = ((int32_t)(-cos_lookup(mi_angle) * (int32_t)(Radio*0.8) / TRIG_MAX_RATIO) + hc.y 
                   + (int16_t)(sin_lookup(mi_angle)*x/TRIG_MAX_RATIO));
+       #ifdef PBL_COLOR
          if (hType > 3) {
             lmH.x = ((int32_t)( sin_lookup(mi_angle-a_angle) * (int32_t)(-1*Radio*0.3) / TRIG_MAX_RATIO) + mHt.x 
                   + (int16_t)(cos_lookup(mi_angle-a_angle)*x/TRIG_MAX_RATIO));
@@ -876,6 +840,7 @@ void time_layer_update(Layer *me, GContext *ctx) {
             rmH.y = ((int32_t)(-cos_lookup(mi_angle+a_angle) * (int32_t)(-1*Radio*0.3) / TRIG_MAX_RATIO) + mHt.y 
                   + (int16_t)(sin_lookup(mi_angle+a_angle)*x/TRIG_MAX_RATIO));
          }
+       #endif
        if (hType <= 3) {
             if (hType == 2) {
               #ifdef PBL_COLOR
@@ -911,12 +876,16 @@ void time_layer_update(Layer *me, GContext *ctx) {
                 if (x == start ){
                    p1 = lmH;
                    p3 = mHt;
+                  if (hType == 4){
                    graphics_draw_line  (ctx, p1, p3);
+                  }
                 }
                 if (x == end ){
                     p2 = rmH;
                     p4 = mHt;
+                  if (hType == 4){
                     graphics_draw_line  (ctx, p2, p4);
+                  }
                 }
                  if (x==0){
                    graphics_context_set_stroke_width(ctx, 4);
@@ -924,34 +893,18 @@ void time_layer_update(Layer *me, GContext *ctx) {
                    graphics_draw_line  (ctx, mHb, rmH);
                    graphics_fill_circle(ctx, mHb, grosor/2+2);
                   }
-              #else
-                if (x == start ){
-                 graphics_draw_line  (ctx, lmH, mHt);
-                 graphics_draw_line  (ctx, hc, lmH);
-                 p1 = lmH;
-                 p3 = mHt;
-                }
-                if (x == end ){
-                 graphics_draw_line  (ctx, rmH, mHt);
-                 graphics_draw_line  (ctx, hc, rmH);
-                 p2 = rmH;
-                 p4 = mHt;
-                 graphics_draw_line  (ctx, p2, p4);
-                }
-                 graphics_draw_line  (ctx, hc, mHb);
-                 if (x==0){graphics_fill_circle(ctx, mHb, grosor/2+1);}
               #endif  
        }
   }
-  if (hType > 3) {
+  if (hType == 4){
                   #ifdef PBL_COLOR
                      graphics_context_set_stroke_width(ctx, 2);
                      p5.x = (p1.x+p2.x)/2;
                      p5.y = (p1.y+p2.y)/2;
                      graphics_draw_line  (ctx, hc, p5);
+                     graphics_draw_line  (ctx, p1, p2);
+                     graphics_draw_line  (ctx, p3, p4);
                   #endif
-                  graphics_draw_line  (ctx, p1, p2);
-                  graphics_draw_line  (ctx, p3, p4);
                  }
   
   //draw seconds hand
@@ -976,12 +929,12 @@ void time_layer_update(Layer *me, GContext *ctx) {
   // Draw hour hand
   #ifdef PBL_COLOR
       graphics_context_set_stroke_width(ctx, grosor*2);
+      GPoint h1, h2, h3;
+      GPoint lH, rH;
   #endif 
+  GPoint hHb, hHt;
   graphics_context_set_fill_color(ctx, ColorHours);
   graphics_context_set_stroke_color(ctx, ColorHours);
-  GPoint hHb, hHt;
-  GPoint lH, rH;
-  GPoint h1, h2, h3;
   graphics_context_set_fill_color(ctx, ColorHours);
   graphics_context_set_stroke_color(ctx, ColorHours);
 	for(x=start; x <= end; x++) {
@@ -993,7 +946,8 @@ void time_layer_update(Layer *me, GContext *ctx) {
                   + (int16_t)(cos_lookup(hh_angle)*x/TRIG_MAX_RATIO));
             hHt.y = ((int32_t)(-cos_lookup(hh_angle) * (int32_t)(Radio*0.5) / TRIG_MAX_RATIO) + hc.y 
                   + (int16_t)(sin_lookup(hh_angle)*x/TRIG_MAX_RATIO));
-         if (hType > 3) {
+  #ifdef PBL_COLOR 
+     if (hType > 3) {
             hHt.x = ((int32_t)( sin_lookup(hh_angle) * (int32_t)(Radio*0.6) / TRIG_MAX_RATIO) + hc.x 
                   + (int16_t)(cos_lookup(hh_angle)*x/TRIG_MAX_RATIO));
             hHt.y = ((int32_t)(-cos_lookup(hh_angle) * (int32_t)(Radio*0.6) / TRIG_MAX_RATIO) + hc.y 
@@ -1007,6 +961,7 @@ void time_layer_update(Layer *me, GContext *ctx) {
             rH.y = ((int32_t)(-cos_lookup(hh_angle-a_angle/3) * (int32_t)(-1*Radio*0.3) / TRIG_MAX_RATIO) + hHt.y 
                   + (int16_t)(sin_lookup(hh_angle-a_angle/3)*x/TRIG_MAX_RATIO));
          }
+    #endif
         if (hType <= 3) {
            if (hType == 2) {
               #ifdef PBL_COLOR
@@ -1046,28 +1001,20 @@ void time_layer_update(Layer *me, GContext *ctx) {
                    h3 = hHt;
                 }
                   graphics_context_set_stroke_width(ctx, 2);
+                if (hType == 4){
                   graphics_draw_line  (ctx, hc, lH);
                   graphics_draw_line  (ctx, hc, rH);
-              #else
-                if (x == start ){
-                  graphics_draw_line  (ctx, hc, lH);
-                  h1 = lH;
                 }
-                if (x == end ){
-                  graphics_draw_line  (ctx, hc, rH);
-                  h2 = rH;
-                }
-                if (x==0){h3 = hHt;}
              #endif  
          }
   }
-  if (hType > 3) {
+    if (hType == 4){
     #ifdef PBL_COLOR
        graphics_context_set_stroke_width(ctx, 2);
-    #endif
        graphics_draw_line  (ctx, h1, h2);
        graphics_draw_line  (ctx, h1, h3);
        graphics_draw_line  (ctx, h2, h3);
+    #endif
   }
                   
   //draw centre circles
@@ -1085,6 +1032,7 @@ void time_layer_update(Layer *me, GContext *ctx) {
   #endif
   graphics_fill_circle(ctx, hc, 2);
 }
+
 
 void handle_tick(struct tm *now, TimeUnits units_changed) {
   setlocale(LC_TIME, ""); 
@@ -1105,7 +1053,7 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
   layer_mark_dirty((Layer *)SN10);
   layer_mark_dirty((Layer *)SN11);
   layer_mark_dirty((Layer *)BN12);
-            
+
   hh_angle = (TRIG_MAX_ANGLE*(((now->tm_hour%12)*6)+(now->tm_min/10)))/(12*6);
   mi_angle = TRIG_MAX_ANGLE * (now->tm_min) / 60;
   a_angle =  TRIG_MAX_ANGLE * 1 / 60;
@@ -1171,14 +1119,14 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
         nextBN9 = GRect(hc.x-13-Radio*0.65,hc.y-18,28,28);
         nextBN12 = GRect(hc.x-13,hc.y-18-Radio*0.65,28,28);
         if (numbType == 4 || numbType ==5) {
-          text_layer_set_text_color(SN1, ColorSNumbers);
-          text_layer_set_text_color(SN2, ColorSNumbers);
-          text_layer_set_text_color(SN4, ColorSNumbers);
-          text_layer_set_text_color(SN5, ColorSNumbers);
-          text_layer_set_text_color(SN7, ColorSNumbers);
-          text_layer_set_text_color(SN8, ColorSNumbers);
-          text_layer_set_text_color(SN10, ColorSNumbers);
-          text_layer_set_text_color(SN11, ColorSNumbers);
+          text_layer_set_text_color(SN1, ColorBNumbers);
+          text_layer_set_text_color(SN2, ColorBNumbers);
+          text_layer_set_text_color(SN4, ColorBNumbers);
+          text_layer_set_text_color(SN5, ColorBNumbers);
+          text_layer_set_text_color(SN7, ColorBNumbers);
+          text_layer_set_text_color(SN8, ColorBNumbers);
+          text_layer_set_text_color(SN10, ColorBNumbers);
+          text_layer_set_text_color(SN11, ColorBNumbers);
           nextSN1 = GRect((hc.x-12)+Radio*0.62*( sin_lookup( 5*TRIG_MAX_ANGLE / 60))/ TRIG_MAX_RATIO,
                           (hc.y-12)+Radio*0.62*(-cos_lookup( 5*TRIG_MAX_ANGLE / 60))/ TRIG_MAX_RATIO,
                           28,28);
@@ -1336,21 +1284,21 @@ static void in_recv_handler(DictionaryIterator *iterator, void *context)
         persist_write_bool(Key_DateBox, false);
       };
       break;
-    case Key_UseCrown:
+    case Key_Crown:
       if(strcmp(t->value->cstring, "0") == 0)
       {
         UseCrown = true;
-        persist_write_bool(UseCrown, true);
+        persist_write_bool(Key_Crown, true);
       }
       else if(strcmp(t->value->cstring, "1") == 0)
       {
         UseCrown = false;
-        persist_write_bool(UseCrown, false);
+        persist_write_bool(Key_Crown, false);
       };
       break;      
-    case Key_HandleTicks:
+    case Key_Ticks:
        hTicks = atoi(t->value->cstring);
-       persist_write_int(Key_HandleTicks, hTicks);
+       persist_write_int(Key_Ticks, hTicks);
        break;
     }
    // Get next pair, if any
@@ -1375,7 +1323,6 @@ static void in_recv_handler(DictionaryIterator *iterator, void *context)
 
 void handle_init(void) {
   w = window_create();
-  
  //Check for saved KEY options
   app_message_register_inbox_received((AppMessageInboxReceived) in_recv_handler);
   app_message_open(app_message_inbox_size_maximum(), app_message_outbox_size_maximum());
@@ -1407,13 +1354,13 @@ void handle_init(void) {
   if (persist_exists(Key_DateBox)) {
     DateBox = persist_read_bool(Key_DateBox);
   }  
-  if (persist_exists(Key_UseCrown)) {
-    UseCrown = persist_read_bool(Key_UseCrown);
+  if (persist_exists(Key_Crown)) {
+    UseCrown = persist_read_bool(Key_Crown);
   }  
-  if (persist_exists(Key_HandleTicks)) {
-    hTicks = persist_read_int(Key_HandleTicks);
+  if (persist_exists(Key_Ticks)) {
+    hTicks = persist_read_int(Key_Ticks);
   }
-  
+
   //set colors
   setColors (cType);
   
@@ -1444,12 +1391,6 @@ void handle_init(void) {
   rDate = GRect(hc.x-30,hc.y+15,60,25);
   date = text_layer_create(rDate);
   text_layer_set_background_color(date, GColorClear);
-  #ifdef PBL_COLOR
-  #else
-  if (DateBox==true){
-    if (ColorFont == ColorDBox){ColorFont=ColorSphere;}
-  }
-  #endif
   text_layer_set_text_color(date, ColorFont);
   text_layer_set_text(date, "");
   text_layer_set_text_alignment(date, GTextAlignmentCenter);
