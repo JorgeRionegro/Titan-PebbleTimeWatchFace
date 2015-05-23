@@ -7,7 +7,9 @@
         "Key_HandType": 4,
         "Key_Numbers": 6,
         "Key_Radio": 2,
+        "Key_SrcSaver": 10,
         "Key_Ticks": 9,
+        "Key_Time": 11,
         "Key_UseSeconds": 0,
         "Key_UseShadows": 1
     },
@@ -18,7 +20,43 @@
     "longName": "TITAN",
     "projectType": "native",
     "resources": {
-        "media": []
+        "media": [
+            {
+                "file": "images/pebblesbw.png",
+                "name": "PIC5",
+                "type": "png"
+            },
+            {
+                "file": "images/picasso4bw.png",
+                "name": "PIC6",
+                "type": "png"
+            },
+            {
+                "file": "images/picasso_bw.png",
+                "name": "PIC4",
+                "type": "png"
+            },
+            {
+                "file": "images/picasso3bw.png",
+                "name": "PIC3",
+                "type": "png"
+            },
+            {
+                "file": "images/jirafa.png",
+                "name": "PIC2",
+                "type": "png"
+            },
+            {
+                "file": "images/zebra.png",
+                "name": "PIC1",
+                "type": "png"
+            },
+            {
+                "file": "images/skully_bw.png",
+                "name": "SKULLY",
+                "type": "png"
+            }
+        ]
     },
     "sdkVersion": "3",
     "shortName": "TITAN",
@@ -27,7 +65,7 @@
         "basalt"
     ],
     "uuid": "7d599476-d3c8-4f7d-9fb0-5b56d050b1de",
-    "versionLabel": "6.5",
+    "versionLabel": "6.7",
     "watchapp": {
         "watchface": true
     }

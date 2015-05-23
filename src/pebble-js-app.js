@@ -26,10 +26,10 @@ Pebble.addEventListener("showConfiguration",
     }
     
     if (platform=='aplite') {
-            Pebble.openURL("https://dl.dropboxusercontent.com/u/34982193/TitanBW_v6_5.html"+url_args);
+            Pebble.openURL("https://dl.dropboxusercontent.com/u/34982193/TitanBW_v6_7.html"+url_args);
             console.log("Connected to http configuration page!");
     } else {
-            Pebble.openURL("https://dl.dropboxusercontent.com/u/34982193/Titan_v6_5.html"+url_args);
+            Pebble.openURL("https://dl.dropboxusercontent.com/u/34982193/Titan_v6_7.html"+url_args);
             console.log("Connected to http configuration page!");
     }
   }
@@ -53,7 +53,9 @@ Pebble.addEventListener("webviewclosed",
        "Key_Numbers": configuration.NumbersType,
        "Key_DateBox": configuration.DateBox,
        "Key_Crown": configuration.UseCrown,
-       "Key_Ticks": configuration.HandleTicks
+       "Key_Ticks": configuration.HandleTicks,
+       "Key_SrcSaver": configuration.SrcSaver,
+       "Key_Time": configuration.Timer
        },
       function(e) {console.log("Settings data received..."); },
       function(e) {
