@@ -5,21 +5,21 @@
 #define nSFont fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD) 
 #define nBFont fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD) 
   
-#define Key_UseSeconds 0
-#define Key_UseShadows 1  
-#define Key_Radio 2
-#define Key_ClockType 3
-#define Key_HandType 4
-#define Key_Bluetooth 5
-#define Key_Numbers 6
-#define Key_DateBox 7
-#define Key_Crown 8
-#define Key_Ticks 9
-#define Key_SrcSaver 10
-#define Key_Time 11
+#define K_UseSeconds 0
+#define K_UseShadows 1  
+#define K_Radio 2
+#define K_ClockType 3
+#define K_HandType 4
+#define K_Bluetooth 5
+#define K_Numbers 6
+#define K_DateBox 7
+#define K_Crown 8
+#define K_Ticks 9
+#define K_SrcSaver 10
+#define K_Time 11
 
 static int mTicks = 60, Radio = 94, a = 1, cType = 0, hType = 1, numbType = 5, grosor = 4, hTicks = 3, control = 1;
-static int SrcSaver = 1, sTime=1, iTimer=0, current = 0;
+static int SrcSaver = 0, sTime=1, iTimer=0, current = 0, maxSaver = 25;
 
 bool UseSeconds = false, UseShadows = true, viewBluetooth = true, DateBox = true, UseCrown = true;
 int32_t hh_angle, mi_angle, ss_angle, a_angle;
@@ -27,421 +27,487 @@ int32_t hh_angle, mi_angle, ss_angle, a_angle;
 Window *w, *s;
 Layer *dial_layer, *SrcSaver_layer, *marks_layer, *time_layer, *time_second, *shadow_layer, *shadow_second, *battery, *bluetooth;
 TextLayer *date, *SN1, *SN2, *BN3, *SN4, *SN5, *BN6, *SN7, *SN8, *BN9, *SN10, *SN11, *BN12;
-static GPoint hc, hs, mHb, mHt, hHb, hHt;
+GPoint hc, hs, mHb, mHt, hHb, hHt;
 #ifdef PBL_COLOR
-  static GPoint smHb,smHt,slmH,srmH,sp1,sp2,sp3,sp4,sp5,sp6,slH,srH,sh1,sh2,sh3,sh4,sh5;
-  static GPoint shHb,shHt,lmH,rmH,p1,p2,p3,p4,p5,p6,lH,rH,h1,h2,h3,h4,h5;
+  GPoint smHb,smHt,slmH,srmH,sp1,sp2,sp3,sp4,sp5,sp6,slH,srH,sh1,sh2,sh3,sh4,sh5;
+  GPoint shHb,shHt,lmH,rmH,p1,p2,p3,p4,p5,p6,lH,rH,h1,h2,h3,h4,h5;
 #endif
 
 static GRect rDate, next, rBattery, nextBattery, rBluetooth, nextBluetooth, rBNumbers, rSNumbers;
 static GRect nextSN1, nextSN2, nextBN3, nextSN4, nextSN5, nextBN6, nextSN7, nextSN8, nextBN9, nextSN10, nextSN11, nextBN12;
 static BatteryChargeState c_state;
 #ifdef PBL_COLOR
-  static GColor8 ColorSphere,BackColor,ColorSeconds,ColorMinutes,ColorHours,ColorMMarks,ColorHMarks,ColorQMarks,ColorShadow;
-  static GColor8 ColorFont,ColorBattery,ColorBNumbers,ColorSNumbers,ColorDBox,ColorCrown;
+  static GColor8 CSphere,BColor,CSeconds,CMinutes,CHours,CMMarks,CHMarks,CQMarks,CShadow;
+  static GColor8 CFont,CBattery,CBNumbers,CSNumbers,CDBox,CCrown;
 #else
-  static GColor ColorSphere,BackColor,ColorSeconds,ColorMinutes,ColorHours,ColorMMarks,ColorHMarks,ColorQMarks,ColorShadow;
-  static GColor ColorFont,ColorBattery,ColorBNumbers,ColorSNumbers,ColorDBox,ColorCrown;
+  static GColor CSphere,BColor,CSeconds,CMinutes,CHours,CMMarks,CHMarks,CQMarks,CShadow;
+  static GColor CFont,CBattery,CBNumbers,CSNumbers,CDBox,CCrown;
 #endif
   
-static GPathInfo HOUR_POINTS = { 4, (GPoint []) { { -1, 1 }, { 1, 1}, { 1, -14}, { -1, -14} } };
-static GPathInfo MINUTE_POINTS = { 4, (GPoint []) { { -1, 1 }, { 1, 1}, { 1, -6}, { -1, -6} } };
-static GPathInfo HOUR_QUARTERS = { 4, (GPoint []) { { -3, 3 }, { 3, 3}, { 3, -17}, { -3, -17} } };
+GPathInfo HOUR_POINTS = { 4, (GPoint []) { { -1, 1 }, { 1, 1}, { 1, -14}, { -1, -14} } };
+GPathInfo MINUTE_POINTS = { 4, (GPoint []) { { -1, 1 }, { 1, 1}, { 1, -6}, { -1, -6} } };
+GPathInfo HOUR_QUARTERS = { 4, (GPoint []) { { -3, 3 }, { 3, 3}, { 3, -17}, { -3, -17} } };
 
 static GPath *minute_square, *hour_square, *hour_quarters;
 
-static BitmapLayer *bitmap_layer;
-static GBitmap *ScreenSvr;
-
-/*
 #ifdef PBL_COLOR
-#else
-  static GBitmap *Skully;
+  BitmapLayer *bitmap_layer;
+  GBitmap *ScreenSvr;
 #endif
-*/
 
 static void setColors (int clockType){
   switch(clockType){
     case 0: //Sport Man
-    BackColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
-    ColorSphere = COLOR_FALLBACK(GColorWhite, GColorWhite);
-    ColorQMarks = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack); 
-    ColorHMarks = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack); 
-    ColorMMarks = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
-    ColorHours = COLOR_FALLBACK(GColorFolly,GColorBlack);
-    ColorMinutes = COLOR_FALLBACK(GColorBlueMoon,GColorBlack);
-    ColorSeconds = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
-    ColorShadow = COLOR_FALLBACK(GColorLightGray,GColorBlack);  
-    ColorFont = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
-    ColorBattery = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
-    ColorSNumbers = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
-    ColorBNumbers = COLOR_FALLBACK(GColorDukeBlue,GColorBlack);
-    ColorDBox = COLOR_FALLBACK(GColorPastelYellow,GColorWhite);
-    ColorCrown = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorWhite);
+    BColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CSphere = COLOR_FALLBACK(GColorWhite, GColorWhite);
+    CQMarks = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack); 
+    CHMarks = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack); 
+    CMMarks = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
+    CHours = COLOR_FALLBACK(GColorFolly,GColorBlack);
+    CMinutes = COLOR_FALLBACK(GColorBlueMoon,GColorBlack);
+    CSeconds = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
+    CShadow = COLOR_FALLBACK(GColorLightGray,GColorBlack);  
+    CFont = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
+    CBattery = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
+    CSNumbers = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
+    CBNumbers = COLOR_FALLBACK(GColorDukeBlue,GColorBlack);
+    CDBox = COLOR_FALLBACK(GColorPastelYellow,GColorWhite);
+    CCrown = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorWhite);
     break;
     case 1: //Fluor Classic
-    BackColor = COLOR_FALLBACK(GColorRed,GColorBlack);
-    ColorSphere = COLOR_FALLBACK(GColorBlack, GColorBlack);
-    ColorQMarks = COLOR_FALLBACK(GColorWhite,GColorWhite); 
-    ColorHMarks = COLOR_FALLBACK(GColorWhite,GColorWhite); 
-    ColorMMarks = COLOR_FALLBACK(GColorYellow,GColorWhite);
-    ColorHours = COLOR_FALLBACK(GColorMagenta,GColorWhite);
-    ColorMinutes = COLOR_FALLBACK(GColorElectricBlue,GColorWhite);
-    ColorSeconds = COLOR_FALLBACK(GColorWhite,GColorWhite);
-    ColorShadow = COLOR_FALLBACK(GColorBlack,GColorBlack);  
-    ColorFont = COLOR_FALLBACK(GColorYellow,GColorBlack);
-    ColorBattery = COLOR_FALLBACK(GColorYellow,GColorWhite);
-    ColorSNumbers = COLOR_FALLBACK(GColorYellow,GColorWhite);
-    ColorBNumbers = COLOR_FALLBACK(GColorWhite,GColorWhite);
-    ColorDBox = COLOR_FALLBACK( GColorDarkCandyAppleRed,GColorWhite);
-    ColorCrown = COLOR_FALLBACK(GColorYellow,GColorWhite);
+    BColor = COLOR_FALLBACK(GColorRed,GColorBlack);
+    CSphere = COLOR_FALLBACK(GColorBlack, GColorBlack);
+    CQMarks = COLOR_FALLBACK(GColorWhite,GColorWhite); 
+    CHMarks = COLOR_FALLBACK(GColorWhite,GColorWhite); 
+    CMMarks = COLOR_FALLBACK(GColorYellow,GColorWhite);
+    CHours = COLOR_FALLBACK(GColorMagenta,GColorWhite);
+    CMinutes = COLOR_FALLBACK(GColorElectricBlue,GColorWhite);
+    CSeconds = COLOR_FALLBACK(GColorWhite,GColorWhite);
+    CShadow = COLOR_FALLBACK(GColorBlack,GColorBlack);  
+    CFont = COLOR_FALLBACK(GColorYellow,GColorBlack);
+    CBattery = COLOR_FALLBACK(GColorYellow,GColorWhite);
+    CSNumbers = COLOR_FALLBACK(GColorYellow,GColorWhite);
+    CBNumbers = COLOR_FALLBACK(GColorWhite,GColorWhite);
+    CDBox = COLOR_FALLBACK( GColorDarkCandyAppleRed,GColorWhite);
+    CCrown = COLOR_FALLBACK(GColorYellow,GColorWhite);
     break;
     case 2: //PinkPanter lovers
-    BackColor = COLOR_FALLBACK(GColorBlack,GColorWhite);
-    ColorSphere = COLOR_FALLBACK(GColorFashionMagenta, GColorBlack);
-    ColorQMarks = COLOR_FALLBACK(GColorWhite,GColorWhite); 
-    ColorHMarks = COLOR_FALLBACK(GColorWhite,GColorWhite); 
-    ColorMMarks = COLOR_FALLBACK(GColorYellow,GColorWhite);
-    ColorHours = COLOR_FALLBACK(GColorGreen,GColorWhite);
-    ColorMinutes = COLOR_FALLBACK(GColorYellow,GColorWhite);
-    ColorSeconds = COLOR_FALLBACK(GColorWhite,GColorWhite);
-    ColorShadow = COLOR_FALLBACK(GColorDarkGray,GColorBlack);  
-    ColorFont = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorBattery = COLOR_FALLBACK(GColorWhite,GColorWhite);
-    ColorSNumbers = COLOR_FALLBACK(GColorWhite,GColorWhite);
-    ColorBNumbers = COLOR_FALLBACK(GColorWhite,GColorWhite);
-    ColorDBox = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorWhite);
-    ColorCrown = COLOR_FALLBACK(GColorFolly,GColorWhite);
+    BColor = COLOR_FALLBACK(GColorBlack,GColorWhite);
+    CSphere = COLOR_FALLBACK(GColorFashionMagenta, GColorBlack);
+    CQMarks = COLOR_FALLBACK(GColorWhite,GColorWhite); 
+    CHMarks = COLOR_FALLBACK(GColorWhite,GColorWhite); 
+    CMMarks = COLOR_FALLBACK(GColorYellow,GColorWhite);
+    CHours = COLOR_FALLBACK(GColorGreen,GColorWhite);
+    CMinutes = COLOR_FALLBACK(GColorYellow,GColorWhite);
+    CSeconds = COLOR_FALLBACK(GColorWhite,GColorWhite);
+    CShadow = COLOR_FALLBACK(GColorDarkGray,GColorBlack);  
+    CFont = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CBattery = COLOR_FALLBACK(GColorWhite,GColorWhite);
+    CSNumbers = COLOR_FALLBACK(GColorWhite,GColorWhite);
+    CBNumbers = COLOR_FALLBACK(GColorWhite,GColorWhite);
+    CDBox = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorWhite);
+    CCrown = COLOR_FALLBACK(GColorFolly,GColorWhite);
     break;
     case 3: //Welcome to the Future
-    BackColor = COLOR_FALLBACK(GColorPastelYellow,GColorWhite);
-    ColorSphere = COLOR_FALLBACK(GColorDukeBlue,GColorBlack);
-    ColorQMarks = COLOR_FALLBACK(GColorWhite,GColorWhite); 
-    ColorHMarks = COLOR_FALLBACK(GColorWhite,GColorWhite); 
-    ColorMMarks = COLOR_FALLBACK(GColorYellow,GColorWhite);
-    ColorHours = COLOR_FALLBACK(GColorShockingPink,GColorWhite);
-    ColorMinutes = COLOR_FALLBACK(GColorCyan,GColorWhite);
-    ColorSeconds = COLOR_FALLBACK(GColorWhite,GColorWhite);
-    ColorShadow = COLOR_FALLBACK(GColorBlack,GColorWhite);  
-    ColorFont = COLOR_FALLBACK(GColorWhite,GColorWhite);
-    ColorBattery = COLOR_FALLBACK(GColorYellow,GColorWhite);
-    ColorSNumbers = COLOR_FALLBACK(GColorYellow,GColorWhite);
-    ColorBNumbers = COLOR_FALLBACK(GColorYellow,GColorWhite);
-    ColorDBox = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
-    ColorCrown = COLOR_FALLBACK(GColorMelon,GColorWhite);
+    BColor = COLOR_FALLBACK(GColorPastelYellow,GColorWhite);
+    CSphere = COLOR_FALLBACK(GColorDukeBlue,GColorBlack);
+    CQMarks = COLOR_FALLBACK(GColorWhite,GColorWhite); 
+    CHMarks = COLOR_FALLBACK(GColorWhite,GColorWhite); 
+    CMMarks = COLOR_FALLBACK(GColorYellow,GColorWhite);
+    CHours = COLOR_FALLBACK(GColorShockingPink,GColorWhite);
+    CMinutes = COLOR_FALLBACK(GColorCyan,GColorWhite);
+    CSeconds = COLOR_FALLBACK(GColorWhite,GColorWhite);
+    CShadow = COLOR_FALLBACK(GColorBlack,GColorWhite);  
+    CFont = COLOR_FALLBACK(GColorWhite,GColorWhite);
+    CBattery = COLOR_FALLBACK(GColorYellow,GColorWhite);
+    CSNumbers = COLOR_FALLBACK(GColorYellow,GColorWhite);
+    CBNumbers = COLOR_FALLBACK(GColorYellow,GColorWhite);
+    CDBox = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
+    CCrown = COLOR_FALLBACK(GColorMelon,GColorWhite);
     break;
     case 4: //Green Grass
-    BackColor = COLOR_FALLBACK(GColorBlack,GColorWhite);
-    ColorSphere = COLOR_FALLBACK(GColorBrightGreen, GColorWhite);
-    ColorQMarks = COLOR_FALLBACK(GColorDarkGreen,GColorBlack); 
-    ColorHMarks = COLOR_FALLBACK(GColorDarkGray,GColorBlack); 
-    ColorMMarks = COLOR_FALLBACK(GColorBlack,GColorBlack);
-    ColorHours = COLOR_FALLBACK(GColorWindsorTan,GColorBlack);
-    ColorMinutes = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);
-    ColorSeconds = COLOR_FALLBACK(GColorRed,GColorBlack);
-    ColorShadow = COLOR_FALLBACK(GColorDarkGray,GColorBlack);  
-    ColorFont = COLOR_FALLBACK(GColorDarkGreen,GColorBlack);
-    ColorBattery = COLOR_FALLBACK(GColorDarkGreen,GColorBlack);
-    ColorSNumbers = COLOR_FALLBACK(GColorDarkGreen,GColorBlack);
-    ColorBNumbers = COLOR_FALLBACK(GColorDarkGreen,GColorBlack);
-    ColorDBox = COLOR_FALLBACK(GColorWhite,GColorWhite);
-    ColorCrown = COLOR_FALLBACK(GColorWindsorTan,GColorBlack);
+    BColor = COLOR_FALLBACK(GColorBlack,GColorWhite);
+    CSphere = COLOR_FALLBACK(GColorBrightGreen, GColorWhite);
+    CQMarks = COLOR_FALLBACK(GColorDarkGreen,GColorBlack); 
+    CHMarks = COLOR_FALLBACK(GColorDarkGray,GColorBlack); 
+    CMMarks = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CHours = COLOR_FALLBACK(GColorWindsorTan,GColorBlack);
+    CMinutes = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);
+    CSeconds = COLOR_FALLBACK(GColorRed,GColorBlack);
+    CShadow = COLOR_FALLBACK(GColorDarkGray,GColorBlack);  
+    CFont = COLOR_FALLBACK(GColorDarkGreen,GColorBlack);
+    CBattery = COLOR_FALLBACK(GColorDarkGreen,GColorBlack);
+    CSNumbers = COLOR_FALLBACK(GColorDarkGreen,GColorBlack);
+    CBNumbers = COLOR_FALLBACK(GColorDarkGreen,GColorBlack);
+    CDBox = COLOR_FALLBACK(GColorWhite,GColorWhite);
+    CCrown = COLOR_FALLBACK(GColorWindsorTan,GColorBlack);
     break;
     case 5: //Passion o'clock
-    BackColor = COLOR_FALLBACK(GColorBlack,GColorWhite);
-    ColorSphere = COLOR_FALLBACK(GColorRed, GColorWhite);
-    ColorQMarks = COLOR_FALLBACK(GColorRichBrilliantLavender,GColorBlack); 
-    ColorHMarks = COLOR_FALLBACK(GColorPastelYellow,GColorBlack); 
-    ColorMMarks = COLOR_FALLBACK(GColorPastelYellow,GColorBlack);
-    ColorHours = COLOR_FALLBACK(GColorElectricBlue,GColorBlack);
-    ColorMinutes = COLOR_FALLBACK(GColorYellow,GColorBlack);
-    ColorSeconds = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorShadow = COLOR_FALLBACK(GColorBlack,GColorBlack);  
-    ColorFont = COLOR_FALLBACK(GColorWhite,GColorWhite);
-    ColorBattery = COLOR_FALLBACK(GColorRichBrilliantLavender,GColorBlack);
-    ColorSNumbers = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorBNumbers = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorDBox = COLOR_FALLBACK(GColorImperialPurple,GColorBlack);
-    ColorCrown = COLOR_FALLBACK(GColorChromeYellow,GColorBlack);
+    BColor = COLOR_FALLBACK(GColorBlack,GColorWhite);
+    CSphere = COLOR_FALLBACK(GColorRed, GColorWhite);
+    CQMarks = COLOR_FALLBACK(GColorRichBrilliantLavender,GColorBlack); 
+    CHMarks = COLOR_FALLBACK(GColorPastelYellow,GColorBlack); 
+    CMMarks = COLOR_FALLBACK(GColorPastelYellow,GColorBlack);
+    CHours = COLOR_FALLBACK(GColorElectricBlue,GColorBlack);
+    CMinutes = COLOR_FALLBACK(GColorYellow,GColorBlack);
+    CSeconds = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CShadow = COLOR_FALLBACK(GColorBlack,GColorBlack);  
+    CFont = COLOR_FALLBACK(GColorWhite,GColorWhite);
+    CBattery = COLOR_FALLBACK(GColorRichBrilliantLavender,GColorBlack);
+    CSNumbers = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CBNumbers = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CDBox = COLOR_FALLBACK(GColorImperialPurple,GColorBlack);
+    CCrown = COLOR_FALLBACK(GColorChromeYellow,GColorBlack);
     break;
     case 6: //Wine Taste
-    BackColor = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorSphere = COLOR_FALLBACK(GColorBulgarianRose, GColorBlack);
-    ColorQMarks = COLOR_FALLBACK(GColorWhite,GColorWhite); 
-    ColorHMarks = COLOR_FALLBACK(GColorWhite,GColorWhite); 
-    ColorMMarks = COLOR_FALLBACK(GColorYellow,GColorWhite);
-    ColorHours = COLOR_FALLBACK(GColorMagenta,GColorWhite);
-    ColorMinutes = COLOR_FALLBACK(GColorPastelYellow,GColorWhite);
-    ColorSeconds = COLOR_FALLBACK(GColorWhite,GColorWhite);
-    ColorShadow = COLOR_FALLBACK(GColorBlack,GColorBlack);  
-    ColorFont = COLOR_FALLBACK(GColorYellow,GColorWhite);
-    ColorBattery = COLOR_FALLBACK(GColorYellow,GColorWhite);
-    ColorSNumbers = COLOR_FALLBACK(GColorYellow,GColorWhite);
-    ColorBNumbers = COLOR_FALLBACK(GColorWhite,GColorWhite);
-    ColorDBox = COLOR_FALLBACK(GColorMidnightGreen,GColorBlack);
-    ColorCrown = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorWhite);
+    BColor = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CSphere = COLOR_FALLBACK(GColorBulgarianRose, GColorBlack);
+    CQMarks = COLOR_FALLBACK(GColorWhite,GColorWhite); 
+    CHMarks = COLOR_FALLBACK(GColorWhite,GColorWhite); 
+    CMMarks = COLOR_FALLBACK(GColorYellow,GColorWhite);
+    CHours = COLOR_FALLBACK(GColorMagenta,GColorWhite);
+    CMinutes = COLOR_FALLBACK(GColorPastelYellow,GColorWhite);
+    CSeconds = COLOR_FALLBACK(GColorWhite,GColorWhite);
+    CShadow = COLOR_FALLBACK(GColorBlack,GColorBlack);  
+    CFont = COLOR_FALLBACK(GColorYellow,GColorWhite);
+    CBattery = COLOR_FALLBACK(GColorYellow,GColorWhite);
+    CSNumbers = COLOR_FALLBACK(GColorYellow,GColorWhite);
+    CBNumbers = COLOR_FALLBACK(GColorWhite,GColorWhite);
+    CDBox = COLOR_FALLBACK(GColorMidnightGreen,GColorBlack);
+    CCrown = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorWhite);
     break;
     case 7: //Bottle clock
-    BackColor = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorSphere = COLOR_FALLBACK(GColorDarkGreen, GColorWhite);
-    ColorQMarks = COLOR_FALLBACK(GColorWhite,GColorBlack); 
-    ColorHMarks = COLOR_FALLBACK(GColorWhite,GColorBlack); 
-    ColorMMarks = COLOR_FALLBACK(GColorYellow,GColorBlack);
-    ColorHours = COLOR_FALLBACK(GColorRed,GColorBlack);
-    ColorMinutes = COLOR_FALLBACK(GColorInchworm,GColorBlack);
-    ColorSeconds = COLOR_FALLBACK(GColorYellow,GColorBlack);
-    ColorShadow = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);  
-    ColorFont = COLOR_FALLBACK(GColorYellow,GColorWhite);
-    ColorBattery = COLOR_FALLBACK(GColorYellow,GColorBlack);
-    ColorSNumbers = COLOR_FALLBACK(GColorYellow,GColorBlack);
-    ColorBNumbers = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorDBox = COLOR_FALLBACK(GColorArmyGreen,GColorBlack);
-    ColorCrown = COLOR_FALLBACK(GColorOrange,GColorWhite);
+    BColor = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CSphere = COLOR_FALLBACK(GColorDarkGreen, GColorWhite);
+    CQMarks = COLOR_FALLBACK(GColorWhite,GColorBlack); 
+    CHMarks = COLOR_FALLBACK(GColorWhite,GColorBlack); 
+    CMMarks = COLOR_FALLBACK(GColorYellow,GColorBlack);
+    CHours = COLOR_FALLBACK(GColorRed,GColorBlack);
+    CMinutes = COLOR_FALLBACK(GColorInchworm,GColorBlack);
+    CSeconds = COLOR_FALLBACK(GColorYellow,GColorBlack);
+    CShadow = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);  
+    CFont = COLOR_FALLBACK(GColorYellow,GColorWhite);
+    CBattery = COLOR_FALLBACK(GColorYellow,GColorBlack);
+    CSNumbers = COLOR_FALLBACK(GColorYellow,GColorBlack);
+    CBNumbers = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CDBox = COLOR_FALLBACK(GColorArmyGreen,GColorBlack);
+    CCrown = COLOR_FALLBACK(GColorOrange,GColorWhite);
     break;
+#ifdef PBL_COLOR
     case 8: //Navy man
-    BackColor = COLOR_FALLBACK(GColorBlack,GColorWhite);
-    ColorSphere = COLOR_FALLBACK(GColorCeleste, GColorBlack);
-    ColorQMarks = COLOR_FALLBACK(GColorDukeBlue,GColorWhite); 
-    ColorHMarks = COLOR_FALLBACK(GColorDukeBlue,GColorWhite); 
-    ColorMMarks = COLOR_FALLBACK(GColorDukeBlue,GColorWhite);
-    ColorHours = COLOR_FALLBACK(GColorIslamicGreen,GColorWhite);
-    ColorMinutes = COLOR_FALLBACK(GColorBlue,GColorWhite);
-    ColorSeconds = COLOR_FALLBACK(GColorRed,GColorWhite);
-    ColorShadow = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);  
-    ColorFont = COLOR_FALLBACK(GColorWhite,GColorWhite);
-    ColorBattery = COLOR_FALLBACK(GColorDukeBlue,GColorWhite);
-    ColorSNumbers = COLOR_FALLBACK(GColorDukeBlue,GColorWhite);
-    ColorBNumbers = COLOR_FALLBACK(GColorDukeBlue,GColorWhite);
-    ColorDBox = COLOR_FALLBACK(GColorDukeBlue,GColorWhite);
-    ColorCrown = COLOR_FALLBACK(GColorWindsorTan,GColorWhite);
+    BColor = COLOR_FALLBACK(GColorBlack,GColorWhite);
+    CSphere = COLOR_FALLBACK(GColorCeleste, GColorBlack);
+    CQMarks = COLOR_FALLBACK(GColorDukeBlue,GColorWhite); 
+    CHMarks = COLOR_FALLBACK(GColorDukeBlue,GColorWhite); 
+    CMMarks = COLOR_FALLBACK(GColorDukeBlue,GColorWhite);
+    CHours = COLOR_FALLBACK(GColorIslamicGreen,GColorWhite);
+    CMinutes = COLOR_FALLBACK(GColorBlue,GColorWhite);
+    CSeconds = COLOR_FALLBACK(GColorRed,GColorWhite);
+    CShadow = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);  
+    CFont = COLOR_FALLBACK(GColorWhite,GColorWhite);
+    CBattery = COLOR_FALLBACK(GColorDukeBlue,GColorWhite);
+    CSNumbers = COLOR_FALLBACK(GColorDukeBlue,GColorWhite);
+    CBNumbers = COLOR_FALLBACK(GColorDukeBlue,GColorWhite);
+    CDBox = COLOR_FALLBACK(GColorDukeBlue,GColorWhite);
+    CCrown = COLOR_FALLBACK(GColorWindsorTan,GColorWhite);
     break;
     case 9: //Rainbow Warrior
-    BackColor = COLOR_FALLBACK(GColorDarkGreen,GColorWhite);
-    ColorSphere = COLOR_FALLBACK(GColorYellow, GColorBlack);
-    ColorQMarks = COLOR_FALLBACK(GColorBulgarianRose,GColorWhite); 
-    ColorHMarks = COLOR_FALLBACK(GColorDarkGreen,GColorWhite); 
-    ColorMMarks = COLOR_FALLBACK(GColorBlue,GColorWhite);
-    ColorHours = COLOR_FALLBACK(GColorMagenta,GColorWhite);
-    ColorMinutes = COLOR_FALLBACK(GColorBlue,GColorWhite);
-    ColorSeconds = COLOR_FALLBACK(GColorRed,GColorWhite);
-    ColorShadow = COLOR_FALLBACK(GColorDarkGray,GColorBlack);  
-    ColorFont = COLOR_FALLBACK(GColorDarkGreen,GColorWhite);
-    ColorBattery = COLOR_FALLBACK(GColorOrange,GColorWhite);
-    ColorSNumbers = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorWhite);
-    ColorBNumbers = COLOR_FALLBACK(GColorDarkGreen,GColorWhite);
-    ColorDBox = COLOR_FALLBACK(GColorPastelYellow,GColorWhite);
-    ColorCrown = COLOR_FALLBACK(GColorWindsorTan,GColorWhite);
+    BColor = COLOR_FALLBACK(GColorDarkGreen,GColorWhite);
+    CSphere = COLOR_FALLBACK(GColorYellow, GColorBlack);
+    CQMarks = COLOR_FALLBACK(GColorBulgarianRose,GColorWhite); 
+    CHMarks = COLOR_FALLBACK(GColorDarkGreen,GColorWhite); 
+    CMMarks = COLOR_FALLBACK(GColorBlue,GColorWhite);
+    CHours = COLOR_FALLBACK(GColorMagenta,GColorWhite);
+    CMinutes = COLOR_FALLBACK(GColorBlue,GColorWhite);
+    CSeconds = COLOR_FALLBACK(GColorRed,GColorWhite);
+    CShadow = COLOR_FALLBACK(GColorDarkGray,GColorBlack);  
+    CFont = COLOR_FALLBACK(GColorDarkGreen,GColorWhite);
+    CBattery = COLOR_FALLBACK(GColorOrange,GColorWhite);
+    CSNumbers = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorWhite);
+    CBNumbers = COLOR_FALLBACK(GColorDarkGreen,GColorWhite);
+    CDBox = COLOR_FALLBACK(GColorPastelYellow,GColorWhite);
+    CCrown = COLOR_FALLBACK(GColorWindsorTan,GColorWhite);
     break;
     case 10: //Papyrus
-    BackColor = COLOR_FALLBACK(GColorBlack,GColorWhite);
-    ColorSphere = COLOR_FALLBACK(GColorPastelYellow,GColorWhite);
-    ColorQMarks = COLOR_FALLBACK(GColorOxfordBlue,GColorBlack); 
-    ColorHMarks = COLOR_FALLBACK(GColorDarkGray,GColorBlack); 
-    ColorMMarks = COLOR_FALLBACK(GColorDarkGray,GColorBlack);
-    ColorHours = COLOR_FALLBACK(GColorIndigo,GColorBlack);
-    ColorMinutes = COLOR_FALLBACK(GColorRed,GColorBlack);
-    ColorSeconds = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);
-    ColorShadow = COLOR_FALLBACK(GColorLightGray,GColorWhite);  
-    ColorFont = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);
-    ColorBattery = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);
-    ColorSNumbers = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);
-    ColorBNumbers = COLOR_FALLBACK(GColorOxfordBlue,GColorBlack);
-    ColorDBox = COLOR_FALLBACK(GColorWhite,GColorWhite);
-    ColorCrown = COLOR_FALLBACK(GColorWindsorTan,GColorBlack);
+    BColor = COLOR_FALLBACK(GColorBlack,GColorWhite);
+    CSphere = COLOR_FALLBACK(GColorPastelYellow,GColorWhite);
+    CQMarks = COLOR_FALLBACK(GColorOxfordBlue,GColorBlack); 
+    CHMarks = COLOR_FALLBACK(GColorDarkGray,GColorBlack); 
+    CMMarks = COLOR_FALLBACK(GColorDarkGray,GColorBlack);
+    CHours = COLOR_FALLBACK(GColorIndigo,GColorBlack);
+    CMinutes = COLOR_FALLBACK(GColorRed,GColorBlack);
+    CSeconds = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);
+    CShadow = COLOR_FALLBACK(GColorLightGray,GColorWhite);  
+    CFont = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);
+    CBattery = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);
+    CSNumbers = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);
+    CBNumbers = COLOR_FALLBACK(GColorOxfordBlue,GColorBlack);
+    CDBox = COLOR_FALLBACK(GColorWhite,GColorWhite);
+    CCrown = COLOR_FALLBACK(GColorWindsorTan,GColorBlack);
     break;
     case 11: //Classic Taste
-    BackColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
-    ColorSphere = COLOR_FALLBACK(GColorWhite, GColorWhite);
-    ColorQMarks = COLOR_FALLBACK(GColorDarkGray,GColorBlack); 
-    ColorHMarks = COLOR_FALLBACK(GColorWindsorTan,GColorBlack); 
-    ColorMMarks = COLOR_FALLBACK(GColorWindsorTan,GColorBlack);
-    ColorHours = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);
-    ColorMinutes = COLOR_FALLBACK(GColorWindsorTan,GColorBlack);
-    ColorSeconds = COLOR_FALLBACK(GColorFolly,GColorBlack);
-    ColorShadow = COLOR_FALLBACK(GColorArmyGreen,GColorWhite);  
-    ColorFont = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);
-    ColorBattery = COLOR_FALLBACK(GColorWindsorTan,GColorBlack);
-    ColorSNumbers = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
-    ColorBNumbers = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
-    ColorDBox = COLOR_FALLBACK(GColorPastelYellow,GColorBlack);
-    ColorCrown = COLOR_FALLBACK(GColorWindsorTan,GColorWhite);
+    BColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CSphere = COLOR_FALLBACK(GColorWhite, GColorWhite);
+    CQMarks = COLOR_FALLBACK(GColorDarkGray,GColorBlack); 
+    CHMarks = COLOR_FALLBACK(GColorWindsorTan,GColorBlack); 
+    CMMarks = COLOR_FALLBACK(GColorWindsorTan,GColorBlack);
+    CHours = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);
+    CMinutes = COLOR_FALLBACK(GColorWindsorTan,GColorBlack);
+    CSeconds = COLOR_FALLBACK(GColorFolly,GColorBlack);
+    CShadow = COLOR_FALLBACK(GColorArmyGreen,GColorWhite);  
+    CFont = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);
+    CBattery = COLOR_FALLBACK(GColorWindsorTan,GColorBlack);
+    CSNumbers = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
+    CBNumbers = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
+    CDBox = COLOR_FALLBACK(GColorPastelYellow,GColorBlack);
+    CCrown = COLOR_FALLBACK(GColorWindsorTan,GColorWhite);
     break;
     case 12: //Orange Obsesion
-    BackColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
-    ColorSphere = COLOR_FALLBACK(GColorOrange, GColorWhite);
-    ColorQMarks = COLOR_FALLBACK(GColorYellow,GColorBlack); 
-    ColorHMarks = COLOR_FALLBACK(GColorYellow,GColorBlack); 
-    ColorMMarks = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorHours = COLOR_FALLBACK(GColorYellow,GColorBlack);
-    ColorMinutes = COLOR_FALLBACK( GColorGreen,GColorBlack);
-    ColorSeconds = COLOR_FALLBACK(GColorCyan,GColorBlack);
-    ColorShadow = COLOR_FALLBACK(GColorArmyGreen,GColorWhite);  
-    ColorFont = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorBattery = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorSNumbers = COLOR_FALLBACK(GColorYellow,GColorBlack);
-    ColorBNumbers = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorDBox = COLOR_FALLBACK(GColorArmyGreen,GColorBlack);
-    ColorCrown = COLOR_FALLBACK(GColorWindsorTan,GColorWhite);
+    BColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CSphere = COLOR_FALLBACK(GColorOrange, GColorWhite);
+    CQMarks = COLOR_FALLBACK(GColorYellow,GColorBlack); 
+    CHMarks = COLOR_FALLBACK(GColorYellow,GColorBlack); 
+    CMMarks = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CHours = COLOR_FALLBACK(GColorYellow,GColorBlack);
+    CMinutes = COLOR_FALLBACK( GColorGreen,GColorBlack);
+    CSeconds = COLOR_FALLBACK(GColorCyan,GColorBlack);
+    CShadow = COLOR_FALLBACK(GColorArmyGreen,GColorWhite);  
+    CFont = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CBattery = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CSNumbers = COLOR_FALLBACK(GColorYellow,GColorBlack);
+    CBNumbers = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CDBox = COLOR_FALLBACK(GColorArmyGreen,GColorBlack);
+    CCrown = COLOR_FALLBACK(GColorWindsorTan,GColorWhite);
     break;
     case 13: //Simply Red
-    BackColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
-    ColorSphere = COLOR_FALLBACK(GColorWhite, GColorWhite);
-    ColorQMarks = COLOR_FALLBACK(GColorRed,GColorBlack); 
-    ColorHMarks = COLOR_FALLBACK(GColorRed,GColorBlack); 
-    ColorMMarks = COLOR_FALLBACK(GColorBlack,GColorBlack);
-    ColorHours = COLOR_FALLBACK(GColorRed,GColorBlack);
-    ColorMinutes = COLOR_FALLBACK( GColorRed,GColorBlack);
-    ColorSeconds = COLOR_FALLBACK(GColorBlack,GColorBlack);
-    ColorShadow = COLOR_FALLBACK(GColorLightGray,GColorWhite);  
-    ColorFont = COLOR_FALLBACK(GColorBlack,GColorBlack);
-    ColorBattery = COLOR_FALLBACK(GColorRed,GColorBlack);
-    ColorSNumbers = COLOR_FALLBACK(GColorBlack,GColorBlack);
-    ColorBNumbers = COLOR_FALLBACK(GColorRed,GColorBlack);
-    ColorDBox = COLOR_FALLBACK(GColorMelon,GColorBlack);
-    ColorCrown = COLOR_FALLBACK(GColorRed,GColorWhite);
+    BColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CSphere = COLOR_FALLBACK(GColorWhite, GColorWhite);
+    CQMarks = COLOR_FALLBACK(GColorRed,GColorBlack); 
+    CHMarks = COLOR_FALLBACK(GColorRed,GColorBlack); 
+    CMMarks = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CHours = COLOR_FALLBACK(GColorRed,GColorBlack);
+    CMinutes = COLOR_FALLBACK( GColorRed,GColorBlack);
+    CSeconds = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CShadow = COLOR_FALLBACK(GColorLightGray,GColorWhite);  
+    CFont = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CBattery = COLOR_FALLBACK(GColorRed,GColorBlack);
+    CSNumbers = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CBNumbers = COLOR_FALLBACK(GColorRed,GColorBlack);
+    CDBox = COLOR_FALLBACK(GColorMelon,GColorBlack);
+    CCrown = COLOR_FALLBACK(GColorRed,GColorWhite);
     break;
     case 14: //Basic Green
-    BackColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
-    ColorSphere = COLOR_FALLBACK(GColorWhite, GColorWhite);
-    ColorQMarks = COLOR_FALLBACK(GColorIslamicGreen,GColorBlack); 
-    ColorHMarks = COLOR_FALLBACK(GColorIslamicGreen,GColorBlack); 
-    ColorMMarks = COLOR_FALLBACK(GColorBlack,GColorBlack);
-    ColorHours = COLOR_FALLBACK(GColorIslamicGreen,GColorBlack);
-    ColorMinutes = COLOR_FALLBACK(GColorIslamicGreen,GColorBlack);
-    ColorSeconds = COLOR_FALLBACK(GColorBlack,GColorBlack);
-    ColorShadow = COLOR_FALLBACK(GColorLightGray,GColorWhite);  
-    ColorFont = COLOR_FALLBACK(GColorBlack,GColorBlack);
-    ColorBattery = COLOR_FALLBACK(GColorIslamicGreen,GColorBlack);
-    ColorSNumbers = COLOR_FALLBACK(GColorBlack,GColorBlack);
-    ColorBNumbers = COLOR_FALLBACK(GColorIslamicGreen,GColorBlack);
-    ColorDBox = COLOR_FALLBACK(GColorMintGreen,GColorBlack);
-    ColorCrown = COLOR_FALLBACK(GColorIslamicGreen,GColorWhite);
+    BColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CSphere = COLOR_FALLBACK(GColorWhite, GColorWhite);
+    CQMarks = COLOR_FALLBACK(GColorIslamicGreen,GColorBlack); 
+    CHMarks = COLOR_FALLBACK(GColorIslamicGreen,GColorBlack); 
+    CMMarks = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CHours = COLOR_FALLBACK(GColorIslamicGreen,GColorBlack);
+    CMinutes = COLOR_FALLBACK(GColorIslamicGreen,GColorBlack);
+    CSeconds = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CShadow = COLOR_FALLBACK(GColorLightGray,GColorWhite);  
+    CFont = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CBattery = COLOR_FALLBACK(GColorIslamicGreen,GColorBlack);
+    CSNumbers = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CBNumbers = COLOR_FALLBACK(GColorIslamicGreen,GColorBlack);
+    CDBox = COLOR_FALLBACK(GColorMintGreen,GColorBlack);
+    CCrown = COLOR_FALLBACK(GColorIslamicGreen,GColorWhite);
     break;
     case 15: //Blue Base
-    BackColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
-    ColorSphere = COLOR_FALLBACK(GColorWhite, GColorWhite);
-    ColorQMarks = COLOR_FALLBACK(GColorDukeBlue,GColorBlack); 
-    ColorHMarks = COLOR_FALLBACK(GColorDukeBlue,GColorBlack); 
-    ColorMMarks = COLOR_FALLBACK(GColorBlack,GColorBlack);
-    ColorHours = COLOR_FALLBACK(GColorDukeBlue,GColorBlack);
-    ColorMinutes = COLOR_FALLBACK(GColorDukeBlue,GColorBlack);
-    ColorSeconds = COLOR_FALLBACK(GColorBlack,GColorBlack);
-    ColorShadow = COLOR_FALLBACK(GColorLightGray,GColorWhite);  
-    ColorFont = COLOR_FALLBACK(GColorBlack,GColorBlack);
-    ColorBattery = COLOR_FALLBACK(GColorDukeBlue,GColorBlack);
-    ColorSNumbers = COLOR_FALLBACK(GColorBlack,GColorBlack);
-    ColorBNumbers = COLOR_FALLBACK(GColorDukeBlue,GColorBlack);
-    ColorDBox = COLOR_FALLBACK(GColorBabyBlueEyes,GColorBlack);
-    ColorCrown = COLOR_FALLBACK(GColorDukeBlue,GColorWhite);
+    BColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CSphere = COLOR_FALLBACK(GColorWhite, GColorWhite);
+    CQMarks = COLOR_FALLBACK(GColorDukeBlue,GColorBlack); 
+    CHMarks = COLOR_FALLBACK(GColorDukeBlue,GColorBlack); 
+    CMMarks = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CHours = COLOR_FALLBACK(GColorDukeBlue,GColorBlack);
+    CMinutes = COLOR_FALLBACK(GColorDukeBlue,GColorBlack);
+    CSeconds = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CShadow = COLOR_FALLBACK(GColorLightGray,GColorWhite);  
+    CFont = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CBattery = COLOR_FALLBACK(GColorDukeBlue,GColorBlack);
+    CSNumbers = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CBNumbers = COLOR_FALLBACK(GColorDukeBlue,GColorBlack);
+    CDBox = COLOR_FALLBACK(GColorBabyBlueEyes,GColorBlack);
+    CCrown = COLOR_FALLBACK(GColorDukeBlue,GColorWhite);
     break;
     case 16: //Yellow moon
-    BackColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
-    ColorSphere = COLOR_FALLBACK(GColorDarkGray, GColorWhite);
-    ColorQMarks = COLOR_FALLBACK(GColorYellow,GColorBlack); 
-    ColorHMarks = COLOR_FALLBACK(GColorYellow,GColorBlack); 
-    ColorMMarks = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorHours = COLOR_FALLBACK(GColorYellow,GColorBlack);
-    ColorMinutes = COLOR_FALLBACK(GColorYellow,GColorBlack);
-    ColorSeconds = COLOR_FALLBACK(GColorRed,GColorBlack);
-    ColorShadow = COLOR_FALLBACK(GColorBlack,GColorWhite);  
-    ColorFont = COLOR_FALLBACK(GColorYellow,GColorBlack);
-    ColorBattery = COLOR_FALLBACK(GColorYellow,GColorBlack);
-    ColorSNumbers = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorBNumbers = COLOR_FALLBACK(GColorYellow,GColorBlack);
-    ColorDBox = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
-    ColorCrown = COLOR_FALLBACK(GColorYellow,GColorWhite);
+    BColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CSphere = COLOR_FALLBACK(GColorDarkGray, GColorWhite);
+    CQMarks = COLOR_FALLBACK(GColorYellow,GColorBlack); 
+    CHMarks = COLOR_FALLBACK(GColorYellow,GColorBlack); 
+    CMMarks = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CHours = COLOR_FALLBACK(GColorYellow,GColorBlack);
+    CMinutes = COLOR_FALLBACK(GColorYellow,GColorBlack);
+    CSeconds = COLOR_FALLBACK(GColorRed,GColorBlack);
+    CShadow = COLOR_FALLBACK(GColorBlack,GColorWhite);  
+    CFont = COLOR_FALLBACK(GColorYellow,GColorBlack);
+    CBattery = COLOR_FALLBACK(GColorYellow,GColorBlack);
+    CSNumbers = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CBNumbers = COLOR_FALLBACK(GColorYellow,GColorBlack);
+    CDBox = COLOR_FALLBACK(GColorDarkCandyAppleRed,GColorBlack);
+    CCrown = COLOR_FALLBACK(GColorYellow,GColorWhite);
     break;
     case 17: //Folly day
-    BackColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
-    ColorSphere = COLOR_FALLBACK(GColorPastelYellow, GColorWhite);
-    ColorQMarks = COLOR_FALLBACK(GColorFolly,GColorBlack); 
-    ColorHMarks = COLOR_FALLBACK(GColorFolly,GColorBlack); 
-    ColorMMarks = COLOR_FALLBACK(GColorRed,GColorBlack);
-    ColorHours = COLOR_FALLBACK(GColorFolly,GColorBlack);
-    ColorMinutes = COLOR_FALLBACK(GColorFolly,GColorBlack);
-    ColorSeconds = COLOR_FALLBACK(GColorBlue,GColorBlack);
-    ColorShadow = COLOR_FALLBACK(GColorDarkGray,GColorWhite);  
-    ColorFont = COLOR_FALLBACK(GColorFolly,GColorBlack);
-    ColorBattery = COLOR_FALLBACK(GColorFolly,GColorBlack);
-    ColorSNumbers = COLOR_FALLBACK(GColorRed,GColorBlack);
-    ColorBNumbers = COLOR_FALLBACK(GColorFolly,GColorBlack);
-    ColorDBox = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorCrown = COLOR_FALLBACK(GColorFolly,GColorWhite);
+    BColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CSphere = COLOR_FALLBACK(GColorPastelYellow, GColorWhite);
+    CQMarks = COLOR_FALLBACK(GColorFolly,GColorBlack); 
+    CHMarks = COLOR_FALLBACK(GColorFolly,GColorBlack); 
+    CMMarks = COLOR_FALLBACK(GColorRed,GColorBlack);
+    CHours = COLOR_FALLBACK(GColorFolly,GColorBlack);
+    CMinutes = COLOR_FALLBACK(GColorFolly,GColorBlack);
+    CSeconds = COLOR_FALLBACK(GColorBlue,GColorBlack);
+    CShadow = COLOR_FALLBACK(GColorDarkGray,GColorWhite);  
+    CFont = COLOR_FALLBACK(GColorFolly,GColorBlack);
+    CBattery = COLOR_FALLBACK(GColorFolly,GColorBlack);
+    CSNumbers = COLOR_FALLBACK(GColorRed,GColorBlack);
+    CBNumbers = COLOR_FALLBACK(GColorFolly,GColorBlack);
+    CDBox = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CCrown = COLOR_FALLBACK(GColorFolly,GColorWhite);
     break;
     case 18: //Clear White
-    BackColor = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorSphere = COLOR_FALLBACK(GColorWhite, GColorWhite);
-    ColorQMarks = COLOR_FALLBACK(GColorRed,GColorBlack); 
-    ColorHMarks = COLOR_FALLBACK(GColorIslamicGreen,GColorBlack); 
-    ColorMMarks = COLOR_FALLBACK(GColorBlue,GColorBlack);
-    ColorHours = COLOR_FALLBACK(GColorFolly,GColorBlack);
-    ColorMinutes = COLOR_FALLBACK(GColorIslamicGreen,GColorBlack);
-    ColorSeconds = COLOR_FALLBACK(GColorBlue,GColorBlack);
-    ColorShadow = COLOR_FALLBACK(GColorLightGray,GColorWhite);  
-    ColorFont = COLOR_FALLBACK(GColorBlack,GColorBlack);
-    ColorBattery = COLOR_FALLBACK(GColorFolly,GColorBlack);
-    ColorSNumbers = COLOR_FALLBACK(GColorBlack,GColorBlack);
-    ColorBNumbers = COLOR_FALLBACK(GColorBlack,GColorBlack);
-    ColorDBox = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorCrown = COLOR_FALLBACK(GColorBlue,GColorWhite);
+    BColor = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CSphere = COLOR_FALLBACK(GColorWhite, GColorWhite);
+    CQMarks = COLOR_FALLBACK(GColorRed,GColorBlack); 
+    CHMarks = COLOR_FALLBACK(GColorIslamicGreen,GColorBlack); 
+    CMMarks = COLOR_FALLBACK(GColorBlue,GColorBlack);
+    CHours = COLOR_FALLBACK(GColorFolly,GColorBlack);
+    CMinutes = COLOR_FALLBACK(GColorIslamicGreen,GColorBlack);
+    CSeconds = COLOR_FALLBACK(GColorBlue,GColorBlack);
+    CShadow = COLOR_FALLBACK(GColorLightGray,GColorWhite);  
+    CFont = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CBattery = COLOR_FALLBACK(GColorFolly,GColorBlack);
+    CSNumbers = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CBNumbers = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CDBox = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CCrown = COLOR_FALLBACK(GColorBlue,GColorWhite);
     break;
     case 19: //Platinum Edition
-    BackColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
-    ColorSphere = COLOR_FALLBACK(GColorDarkGray, GColorWhite);
-    ColorQMarks = COLOR_FALLBACK(GColorCeleste,GColorBlack); 
-    ColorHMarks = COLOR_FALLBACK(GColorCeleste,GColorBlack); 
-    ColorMMarks = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorHours = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorMinutes = COLOR_FALLBACK(GColorCyan,GColorBlack);
-    ColorSeconds = COLOR_FALLBACK(GColorLightGray,GColorBlack);
-    ColorShadow = COLOR_FALLBACK(GColorBlack,GColorWhite);  
-    ColorFont = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorBattery = COLOR_FALLBACK(GColorLightGray,GColorBlack);
-    ColorSNumbers = COLOR_FALLBACK(GColorLightGray,GColorBlack);
-    ColorBNumbers = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    ColorDBox = COLOR_FALLBACK(GColorBlack,GColorBlack);
-    ColorCrown = COLOR_FALLBACK(GColorLightGray,GColorWhite);
+    BColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CSphere = COLOR_FALLBACK(GColorDarkGray, GColorWhite);
+    CQMarks = COLOR_FALLBACK(GColorCeleste,GColorBlack); 
+    CHMarks = COLOR_FALLBACK(GColorCeleste,GColorBlack); 
+    CMMarks = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CHours = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CMinutes = COLOR_FALLBACK(GColorCyan,GColorBlack);
+    CSeconds = COLOR_FALLBACK(GColorLightGray,GColorBlack);
+    CShadow = COLOR_FALLBACK(GColorBlack,GColorWhite);  
+    CFont = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CBattery = COLOR_FALLBACK(GColorLightGray,GColorBlack);
+    CSNumbers = COLOR_FALLBACK(GColorLightGray,GColorBlack);
+    CBNumbers = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CDBox = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CCrown = COLOR_FALLBACK(GColorLightGray,GColorWhite);
     break;
+    case 20: //Graphite
+    BColor = COLOR_FALLBACK(GColorDarkGray,GColorBlack);
+    CSphere = COLOR_FALLBACK(GColorBlack, GColorWhite);
+    CQMarks = COLOR_FALLBACK(GColorRed,GColorBlack); 
+    CHMarks = COLOR_FALLBACK(GColorOrange,GColorBlack); 
+    CMMarks = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CHours = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CMinutes = COLOR_FALLBACK(GColorCyan,GColorBlack);
+    CSeconds = COLOR_FALLBACK(GColorYellow,GColorBlack);
+    CShadow = COLOR_FALLBACK(GColorBlack,GColorWhite);  
+    CFont = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CBattery = COLOR_FALLBACK(GColorYellow,GColorBlack);
+    CSNumbers = COLOR_FALLBACK(GColorLightGray,GColorBlack);
+    CBNumbers = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CDBox = COLOR_FALLBACK(GColorDarkGray,GColorBlack);
+    CCrown = COLOR_FALLBACK(GColorRed,GColorWhite);
+    break;
+#endif
   }
 }
 
 static void setImage (int ScreenSaver){
-  #ifdef PBL_COLOR
+   #ifdef PBL_COLOR
+   if (ScreenSvr != NULL) {gbitmap_destroy(ScreenSvr);}
+   if (bitmap_layer != NULL) {bitmap_layer_destroy(bitmap_layer);}
+   if (ScreenSaver == maxSaver) {
+          srand (time (NULL)+rand() % 60);
+          ScreenSaver = 2+rand() % (maxSaver-3);
+   }
+   //APP_LOG(APP_LOG_LEVEL_INFO, "set_image: Setting Screen Saver %d", ScreenSaver); 
+   //APP_LOG(APP_LOG_LEVEL_INFO, "Heap Available Before: %d", heap_bytes_free());  
    switch(ScreenSaver){
     case 2: //SKully
-      if (ScreenSvr != NULL) {gbitmap_destroy(ScreenSvr);}
       ScreenSvr = gbitmap_create_with_resource(RESOURCE_ID_SKULLY);
     break;
     case 3: //Zebra
-      if (ScreenSvr != NULL) {gbitmap_destroy(ScreenSvr);}
       ScreenSvr = gbitmap_create_with_resource(RESOURCE_ID_PIC1);
     break;
-    case 4: //giraffe
-      if (ScreenSvr != NULL) {gbitmap_destroy(ScreenSvr);}
+    case 4: //Picasso1
       ScreenSvr = gbitmap_create_with_resource(RESOURCE_ID_PIC2);
     break;
     case 5: //Picasso 3
-      if (ScreenSvr != NULL) {gbitmap_destroy(ScreenSvr);}
       ScreenSvr = gbitmap_create_with_resource(RESOURCE_ID_PIC3);
     break;
     case 6: //Picasso 4
-      if (ScreenSvr != NULL) {gbitmap_destroy(ScreenSvr);}
       ScreenSvr = gbitmap_create_with_resource(RESOURCE_ID_PIC4);
     break;
     case 7: //Picasso 5
-      if (ScreenSvr != NULL) {gbitmap_destroy(ScreenSvr);}
       ScreenSvr = gbitmap_create_with_resource(RESOURCE_ID_PIC5);
     break;
     case 8: //Picasso 6
-      if (ScreenSvr != NULL) {gbitmap_destroy(ScreenSvr);}
       ScreenSvr = gbitmap_create_with_resource(RESOURCE_ID_PIC6);
     break;
+    case 9: //Vangogh 1
+      ScreenSvr = gbitmap_create_with_resource(RESOURCE_ID_PIC7);
+    break;
+    case 10: //Vangogh 2
+      ScreenSvr = gbitmap_create_with_resource(RESOURCE_ID_PIC8);
+    break;
+    case 11: //Vangogh 3
+      if (ScreenSvr != NULL) {gbitmap_destroy(ScreenSvr);}
+      ScreenSvr = gbitmap_create_with_resource(RESOURCE_ID_PIC9);
+    break;
+    case 12: //Vangogh 4
+      ScreenSvr = gbitmap_create_with_resource(RESOURCE_ID_PIC10);
+    break;
+    case 13: //Modigliani 1
+      ScreenSvr = gbitmap_create_with_resource(RESOURCE_ID_PIC11);
+    break;
+    case 14: //Modigliani 2
+      ScreenSvr = gbitmap_create_with_resource(RESOURCE_ID_PIC12);
+    break;
+    case 15: //Modigliani 3
+      ScreenSvr = gbitmap_create_with_resource(RESOURCE_ID_PIC13);
+    break;
+    case 16: //Modigliani 4
+      ScreenSvr = gbitmap_create_with_resource(RESOURCE_ID_PIC14);
+    break;
+    case 17: //Chagall 1
+      ScreenSvr = gbitmap_create_with_resource(RESOURCE_ID_PIC15);
+    break;
+    case 18: //Chagall 2
+      ScreenSvr = gbitmap_create_with_resource(RESOURCE_ID_PIC16);
+    break;
+    case 19: //Chagall 3
+      ScreenSvr = gbitmap_create_with_resource(RESOURCE_ID_PIC17);
+    break;
+    case 20: //Munch
+      ScreenSvr = gbitmap_create_with_resource(RESOURCE_ID_PIC18);
+    break;
+    case 21: //MonaLisa
+      ScreenSvr = gbitmap_create_with_resource(RESOURCE_ID_PIC19);
+    break;
+    case 22: //Lempika 1
+      ScreenSvr = gbitmap_create_with_resource(RESOURCE_ID_PIC20);
+    break;
+    case 23: //Lempika 2
+      ScreenSvr = gbitmap_create_with_resource(RESOURCE_ID_PIC21);
+    break;
+    case 24: //Dali
+      ScreenSvr = gbitmap_create_with_resource(RESOURCE_ID_PIC22);
+    break;
+   }
+  if (ScreenSvr != NULL) {
+    bitmap_layer = bitmap_layer_create(GRect(0,0,144,168));
+    bitmap_layer_set_bitmap(bitmap_layer, ScreenSvr);
+    bitmap_layer_set_compositing_mode(bitmap_layer, GCompOpAssign);
+    layer_add_child(SrcSaver_layer, bitmap_layer_get_layer(bitmap_layer));
+    //APP_LOG(APP_LOG_LEVEL_INFO, "Heap Available After: %d", heap_bytes_free());
   } 
-  if (bitmap_layer != NULL) {bitmap_layer_destroy(bitmap_layer);}
-  bitmap_layer = bitmap_layer_create(GRect(0,0,144,168));
-  bitmap_layer_set_bitmap(bitmap_layer, ScreenSvr);
-  bitmap_layer_set_compositing_mode(bitmap_layer, GCompOpSet);
-  layer_add_child(SrcSaver_layer, bitmap_layer_get_layer(bitmap_layer));
   #endif
 }
 
@@ -449,23 +515,19 @@ static void handle_battery(BatteryChargeState c_state) {
       layer_mark_dirty(battery);
 }
 
-static void handle_bluetooth(bool connected) {
+void handle_bluetooth(bool connected) {
       layer_mark_dirty(bluetooth);
-}
-
-static void SrcSaver_update (Layer *me, GContext *ctx) {
-
 }
 
 static void battery_update_proc(Layer *layer, GContext *ctx) {
      static BatteryChargeState c_state;
      c_state = battery_state_service_peek();
   
-     graphics_context_set_stroke_color(ctx, c_state.is_charging ? ColorBattery : ColorSphere);
+     graphics_context_set_stroke_color(ctx, c_state.is_charging ? CBattery : CSphere);
      graphics_draw_rect(ctx, GRect(0,0,15,15));
   
-     graphics_context_set_stroke_color(ctx, ColorBattery);
-     graphics_context_set_fill_color(ctx, ColorBattery);
+     graphics_context_set_stroke_color(ctx, CBattery);
+     graphics_context_set_fill_color(ctx, CBattery);
      switch(c_state.charge_percent/10){
        case 10: graphics_draw_rect(ctx, GRect(3,3,12,12)); graphics_draw_rect(ctx, GRect(1,1,12,12)); break;
        case 9: graphics_draw_rect(ctx, GRect(10,2,3,3));
@@ -480,9 +542,9 @@ static void battery_update_proc(Layer *layer, GContext *ctx) {
      }
 }
 
-static void bluetooth_update_proc(Layer *layer, GContext *ctx) {
+void bluetooth_update_proc(Layer *layer, GContext *ctx) {
   if (viewBluetooth == true ) {
-  graphics_context_set_stroke_color(ctx, bluetooth_connection_service_peek() ? ColorSphere : ColorBattery);
+  graphics_context_set_stroke_color(ctx, bluetooth_connection_service_peek() ? CSphere : CBattery);
   GPoint bt;
   bt.x = 15;
   bt.y = 15;
@@ -495,37 +557,39 @@ void dial_layer_update(Layer *me, GContext *ctx) {
     graphics_context_set_antialiased(ctx, true);
   #endif 
     
-  //BackColor
-  graphics_context_set_fill_color(ctx, BackColor);
+  //BColor
+  graphics_context_set_fill_color(ctx, BColor);
   graphics_fill_rect(ctx, layer_get_bounds(me), 0, GCornerNone);
   
   //Clock Sphere
-  graphics_context_set_fill_color(ctx, ColorSphere);
+  graphics_context_set_fill_color(ctx, CSphere);
   graphics_fill_circle(ctx, hc, Radio);
   if (UseCrown==true){
     #ifdef PBL_COLOR
       if (UseShadows==true){
          graphics_context_set_stroke_width(ctx, 4);
-         graphics_context_set_stroke_color(ctx, ColorShadow);
+         graphics_context_set_stroke_color(ctx, CShadow);
          graphics_draw_circle(ctx, hs, Radio); 
-         graphics_context_set_stroke_color(ctx, BackColor);
+         graphics_context_set_stroke_color(ctx, BColor);
          graphics_draw_circle(ctx, hc, Radio+5);
       }
       graphics_context_set_stroke_width(ctx, 5);
-      graphics_context_set_stroke_color(ctx, ColorCrown);
+      graphics_context_set_stroke_color(ctx, CCrown);
     #else
-      graphics_context_set_stroke_color(ctx, ColorCrown);
+      graphics_context_set_stroke_color(ctx, CCrown);
     #endif
     graphics_draw_circle(ctx, hc, Radio);
   }
 
   if (DateBox == true){
+    #ifdef PBL_COLOR
     if (UseShadows == true){
-      graphics_context_set_fill_color(ctx, ColorShadow);
+      graphics_context_set_fill_color(ctx, CShadow);
       graphics_fill_rect(ctx, next, 6, GCornersAll);
     }
+    #endif
     GRect sDBox = GRect(hc.x-28,hc.y+16,58,24);
-    graphics_context_set_fill_color(ctx, ColorDBox);
+    graphics_context_set_fill_color(ctx, CDBox);
     graphics_fill_rect(ctx, sDBox, 6, GCornersAll);
   }
 }
@@ -551,8 +615,8 @@ void marks_layer_update(Layer *me, GContext *ctx) {
     
     if (x % 5 != 0) {
       if (hTicks>2){
-        graphics_context_set_stroke_color(ctx, ColorMMarks);
-        graphics_context_set_fill_color(ctx, ColorMMarks);
+        graphics_context_set_stroke_color(ctx, CMMarks);
+        graphics_context_set_fill_color(ctx, CMMarks);
         gpath_move_to(minute_square, ray);
         gpath_rotate_to(minute_square, angle);
         gpath_draw_filled(ctx, minute_square);
@@ -560,8 +624,8 @@ void marks_layer_update(Layer *me, GContext *ctx) {
       }
     } else if (x % 15 != 0) {
       if (hTicks>1){ 
-        graphics_context_set_stroke_color(ctx, ColorHMarks);
-        graphics_context_set_fill_color(ctx, ColorHMarks);
+        graphics_context_set_stroke_color(ctx, CHMarks);
+        graphics_context_set_fill_color(ctx, CHMarks);
         gpath_move_to(hour_square, ray);
         gpath_rotate_to(hour_square, angle);
         gpath_draw_filled(ctx, hour_square);
@@ -570,13 +634,13 @@ void marks_layer_update(Layer *me, GContext *ctx) {
     }
     else{
       if (hTicks>0){      
-        graphics_context_set_stroke_color(ctx, ColorQMarks);
-        graphics_context_set_fill_color(ctx, ColorQMarks);
+        graphics_context_set_stroke_color(ctx, CQMarks);
+        graphics_context_set_fill_color(ctx, CQMarks);
         gpath_move_to(hour_quarters, ray);
         gpath_rotate_to(hour_quarters, angle);
         gpath_draw_filled(ctx, hour_quarters);
         gpath_draw_outline(ctx, hour_quarters);
-        graphics_context_set_stroke_color(ctx, ColorSphere);
+        graphics_context_set_stroke_color(ctx, CSphere);
         graphics_draw_line(ctx, ray, sEnd);
       }
     }
@@ -604,8 +668,8 @@ void shadow_layer_update(Layer *me, GContext *ctx) {
     
   //center shadow
   if (UseShadows==true){
-    graphics_context_set_fill_color(ctx, ColorShadow);
-    graphics_context_set_stroke_color(ctx, ColorShadow);
+    graphics_context_set_fill_color(ctx, CShadow);
+    graphics_context_set_stroke_color(ctx, CShadow);
     graphics_fill_circle(ctx, hs, 7);
    if (subCtrl ==1){
 	  for(x=start; x <= end; x++) {
@@ -797,7 +861,7 @@ void shadow_second_update(Layer *me, GContext *ctx) {
 		  (int32_t)Radio*-0.2 / TRIG_MAX_RATIO) + hs.y;
       as.x = ((int16_t)(sin_lookup(ss_angle) *
 		  (int32_t)Radio*-0.2 / TRIG_MAX_RATIO) + hs.x);
-      graphics_context_set_stroke_color(ctx, ColorShadow);
+      graphics_context_set_stroke_color(ctx, CShadow);
       graphics_draw_line(ctx, as, ss);
   }
   #endif   
@@ -826,20 +890,16 @@ void time_layer_update(Layer *me, GContext *ctx) {
     subCtrl = 1;
   #endif  
     
- // Draw minute hand
-  graphics_context_set_fill_color(ctx, ColorMinutes);
-  graphics_context_set_stroke_color(ctx, ColorMinutes);
+ //Draw minute hand
+  graphics_context_set_fill_color(ctx, CMinutes);
+  graphics_context_set_stroke_color(ctx, CMinutes);
+  #ifdef PBL_BW
    if (cos_lookup(mi_angle)==0||sin_lookup(mi_angle)==0) {
-    #ifdef PBL_COLOR
-    #else
         end = grosor-1;
-    #endif     
    } else {
-    #ifdef PBL_COLOR
-    #else
         end = grosor;
-    #endif     
    }
+  #endif 
   if (subCtrl == 1) {
 	 for(x=start; x <= end; x++) {
          if (hType <= 3) {
@@ -953,12 +1013,17 @@ void time_layer_update(Layer *me, GContext *ctx) {
               if (hType == 1 || hType == 3 ) {
                      graphics_context_set_stroke_width(ctx, grosor*2);
                      graphics_draw_line  (ctx, p1, p2);
+                     if (cType==20){
+                         graphics_context_set_stroke_width(ctx, 3);
+                         graphics_context_set_stroke_color(ctx, CCrown);
+                         graphics_draw_line  (ctx, p1, p2);
+                     }
               }
   #endif
   
   // Draw hour hand
-  graphics_context_set_fill_color(ctx, ColorHours);
-  graphics_context_set_stroke_color(ctx, ColorHours);
+  graphics_context_set_fill_color(ctx, CHours);
+  graphics_context_set_stroke_color(ctx, CHours);
  if (subCtrl == 1){
 	for(x=start; x <= end; x++) {
             hHb.x = ((int32_t)( sin_lookup(hh_angle) * (int32_t)(-1*Radio*0.15+h_offset) / TRIG_MAX_RATIO) + hc.x 
@@ -1057,22 +1122,27 @@ void time_layer_update(Layer *me, GContext *ctx) {
       if (hType == 1 || hType == 3 ) {
            graphics_context_set_stroke_width(ctx, grosor*2);
            graphics_draw_line  (ctx, h1, h2);
+           if (cType==20){
+                  graphics_context_set_stroke_width(ctx, 3);
+                  graphics_context_set_stroke_color(ctx, CCrown);
+                  graphics_draw_line  (ctx, h1, h2);
+           }
       }
    #endif                  
   //draw centre circles
-  graphics_context_set_fill_color(ctx, ColorHours);
+  graphics_context_set_fill_color(ctx, CHours);
   graphics_fill_circle(ctx, hc, 7);
   #ifdef PBL_COLOR
-    if (gcolor_equal(ColorHours, ColorMinutes)){
-      graphics_context_set_fill_color(ctx, ColorSeconds);
+    if (gcolor_equal(CHours, CMinutes)){
+      graphics_context_set_fill_color(ctx, CSeconds);
     } else {
-      graphics_context_set_fill_color(ctx, ColorMinutes);
+      graphics_context_set_fill_color(ctx, CMinutes);
     }
     graphics_context_set_stroke_width(ctx, 1);
   #else
-    graphics_context_set_fill_color(ctx, ColorSphere);
+    graphics_context_set_fill_color(ctx, CSphere);
   #endif
-  graphics_fill_circle(ctx, hc, 4);
+  graphics_fill_circle(ctx, hc, 3);
 }
 
 void time_second_update(Layer *me, GContext *ctx) {
@@ -1091,8 +1161,8 @@ void time_second_update(Layer *me, GContext *ctx) {
 		  (int32_t)Radio*-0.2 / TRIG_MAX_RATIO) + hc.y;
       ac.x = ((int16_t)(sin_lookup(ss_angle) *
 		  (int32_t)Radio*-0.2 / TRIG_MAX_RATIO) + hc.x);
-      graphics_context_set_stroke_color(ctx, ColorSeconds);
-      graphics_context_set_fill_color(ctx, ColorSeconds);
+      graphics_context_set_stroke_color(ctx, CSeconds);
+      graphics_context_set_fill_color(ctx, CSeconds);
       graphics_draw_line(ctx, ac, sc);
       graphics_fill_circle(ctx, hc, 2);
   }
@@ -1100,6 +1170,7 @@ void time_second_update(Layer *me, GContext *ctx) {
 
 void handle_tick(struct tm *now, TimeUnits units_changed) {
   setlocale(LC_TIME, ""); 
+  //APP_LOG(APP_LOG_LEVEL_INFO, "handle_tick: Setting Screen Saver %d", SrcSaver); 
   if (SrcSaver>0 && current== 0){
           iTimer= iTimer+1;
           if (iTimer > sTime){
@@ -1108,12 +1179,19 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
                   if (UseSeconds == true) { 
                           UseSeconds = false;
                           current = 1; 
-                          sTime = sTime/60;
+                          sTime = (sTime-1)/60;
                           tick_timer_service_subscribe(MINUTE_UNIT, handle_tick); }
              } else {
-                          window_stack_push(s, true);
-                          current = 1; 
+                     #ifdef PBL_COLOR
                           tick_timer_service_subscribe(DAY_UNIT, handle_tick);
+                          current = 1; 
+                          if (SrcSaver==maxSaver) {setImage(SrcSaver);}
+                          layer_mark_dirty(shadow_layer);
+                          layer_mark_dirty(time_layer);
+                          layer_mark_dirty(shadow_second);
+                          layer_mark_dirty(time_second);
+                          window_stack_push(s, true);
+                     #endif
               }
           }
   }
@@ -1192,7 +1270,7 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
       next = GRect(hc.x-30,hc.y+15,60,25);
       nextBattery = GRect(hc.x-7,hc.y-33,15,15);
       nextBluetooth = GRect(hc.x-15,hc.y-41,30,30);
-      text_layer_set_text_color(date, ColorFont);
+      text_layer_set_text_color(date, CFont);
       layer_set_frame(text_layer_get_layer(date), next);
       layer_set_frame(battery, nextBattery);
       layer_set_update_proc(battery, battery_update_proc);
@@ -1200,23 +1278,23 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
       layer_set_update_proc(bluetooth, bluetooth_update_proc);
     
       if (numbType != 1) {
-        text_layer_set_text_color(BN3, ColorBNumbers);
-        text_layer_set_text_color(BN6, ColorBNumbers);
-        text_layer_set_text_color(BN9, ColorBNumbers);
-        text_layer_set_text_color(BN12, ColorBNumbers);
+        text_layer_set_text_color(BN3, CBNumbers);
+        text_layer_set_text_color(BN6, CBNumbers);
+        text_layer_set_text_color(BN9, CBNumbers);
+        text_layer_set_text_color(BN12, CBNumbers);
         nextBN3 = GRect(hc.x-13+Radio*0.65,hc.y-18,28,28);
         nextBN6 = GRect(hc.x-13,hc.y-18+Radio*0.65,28,28);
         nextBN9 = GRect(hc.x-13-Radio*0.65,hc.y-18,28,28);
         nextBN12 = GRect(hc.x-13,hc.y-18-Radio*0.65,28,28);
         if (numbType == 4 || numbType ==5) {
-          text_layer_set_text_color(SN1, ColorBNumbers);
-          text_layer_set_text_color(SN2, ColorBNumbers);
-          text_layer_set_text_color(SN4, ColorBNumbers);
-          text_layer_set_text_color(SN5, ColorBNumbers);
-          text_layer_set_text_color(SN7, ColorBNumbers);
-          text_layer_set_text_color(SN8, ColorBNumbers);
-          text_layer_set_text_color(SN10, ColorBNumbers);
-          text_layer_set_text_color(SN11, ColorBNumbers);
+          text_layer_set_text_color(SN1, CSNumbers);
+          text_layer_set_text_color(SN2, CSNumbers);
+          text_layer_set_text_color(SN4, CSNumbers);
+          text_layer_set_text_color(SN5, CSNumbers);
+          text_layer_set_text_color(SN7, CSNumbers);
+          text_layer_set_text_color(SN8, CSNumbers);
+          text_layer_set_text_color(SN10, CSNumbers);
+          text_layer_set_text_color(SN11, CSNumbers);
           nextSN1 = GRect((hc.x-12)+Radio*0.62*( sin_lookup( 5*TRIG_MAX_ANGLE / 60))/ TRIG_MAX_RATIO,
                           (hc.y-12)+Radio*0.62*(-cos_lookup( 5*TRIG_MAX_ANGLE / 60))/ TRIG_MAX_RATIO,
                           28,28);
@@ -1300,114 +1378,105 @@ static void in_recv_handler(DictionaryIterator *iterator, void *context)
   a = 1;
   //Process all pairs present
   while(t != NULL) {
-    APP_LOG(APP_LOG_LEVEL_INFO, "Iterator %d", (int)t->key);
-    APP_LOG(APP_LOG_LEVEL_INFO, "Iterator received with value %s", t->value->cstring);
+    //APP_LOG(APP_LOG_LEVEL_INFO, "Iterator %d received with value %s", (int)t->key, t->value->cstring);
     // Process this pair's key
     switch(t->key)
     {
-    case Key_UseSeconds:
+    case K_UseSeconds:
       if(strcmp(t->value->cstring, "0") == 0)
       {
         UseSeconds = true;
-        persist_write_bool(Key_UseSeconds, true);
+        persist_write_bool(K_UseSeconds, true);
       }
       else if(strcmp(t->value->cstring, "1") == 0)
       {
         UseSeconds = false;
-        persist_write_bool(Key_UseSeconds, false);
+        persist_write_bool(K_UseSeconds, false);
       };
       break;
-    case Key_UseShadows:
+    case K_UseShadows:
       if(strcmp(t->value->cstring, "0") == 0)
       {
         UseShadows = true;
-        persist_write_bool(Key_UseShadows, true);
+        persist_write_bool(K_UseShadows, true);
       }
       else if(strcmp(t->value->cstring, "1") == 0)
       {
         UseShadows = false;
-        persist_write_bool(Key_UseShadows, false);
+        persist_write_bool(K_UseShadows, false);
       };
       break;
-    case Key_Radio:
+    case K_Radio:
        Radio = atoi(t->value->cstring);
-       persist_write_int(Key_Radio, Radio);
-       //APP_LOG(APP_LOG_LEVEL_INFO, "Radio %d", Radio);
+       persist_write_int(K_Radio, Radio);
        break;
-    case Key_ClockType:
+    case K_ClockType:
        cType = atoi(t->value->cstring);
-       //seteo colores
-       setColors (cType);
-       persist_write_int(Key_ClockType, cType);
-       //APP_LOG(APP_LOG_LEVEL_INFO, "ClockType %d", cType);
+       persist_write_int(K_ClockType, cType);
        break;
-    case Key_HandType:
+    case K_HandType:
        hType = atoi(t->value->cstring);
-       persist_write_int(Key_HandType, hType);
-       //APP_LOG(APP_LOG_LEVEL_INFO, "HandType %d", hType);
+       persist_write_int(K_HandType, hType);
        break;
-    case Key_Bluetooth:
+    case K_Bluetooth:
       if(strcmp(t->value->cstring, "0") == 0)
       {
         viewBluetooth = true;
-        persist_write_bool(Key_Bluetooth, true);
+        persist_write_bool(K_Bluetooth, true);
       }
       else if(strcmp(t->value->cstring, "1") == 0)
       {
         viewBluetooth = false;
-        persist_write_bool(Key_Bluetooth, false);
+        persist_write_bool(K_Bluetooth, false);
       };
       break;
-    case Key_Numbers:
+    case K_Numbers:
        numbType = atoi(t->value->cstring);
-       persist_write_int(Key_Numbers, numbType);
+       persist_write_int(K_Numbers, numbType);
        break;
-    case Key_DateBox:
+    case K_DateBox:
       if(strcmp(t->value->cstring, "0") == 0)
       {
         DateBox = true;
-        persist_write_bool(Key_DateBox, true);
+        persist_write_bool(K_DateBox, true);
       }
       else if(strcmp(t->value->cstring, "1") == 0)
       {
         DateBox = false;
-        persist_write_bool(Key_DateBox, false);
+        persist_write_bool(K_DateBox, false);
       };
       break;
-    case Key_Crown:
+    case K_Crown:
       if(strcmp(t->value->cstring, "0") == 0)
       {
         UseCrown = true;
-        persist_write_bool(Key_Crown, true);
+        persist_write_bool(K_Crown, true);
       }
       else if(strcmp(t->value->cstring, "1") == 0)
       {
         UseCrown = false;
-        persist_write_bool(Key_Crown, false);
+        persist_write_bool(K_Crown, false);
       };
       break;      
-    case Key_Ticks:
+    case K_Ticks:
        hTicks = atoi(t->value->cstring);
-       persist_write_int(Key_Ticks, hTicks);
+       persist_write_int(K_Ticks, hTicks);
        break;
-    case Key_SrcSaver:
+    case K_SrcSaver:
        SrcSaver = atoi(t->value->cstring);
-       current = 0;
-       if (SrcSaver>1){
-         setImage (SrcSaver);
-       }
-       persist_write_int(Key_SrcSaver, SrcSaver);
+       persist_write_int(K_SrcSaver, SrcSaver);
        break;
-    case Key_Time:
+    case K_Time:
        sTime = atoi(t->value->cstring);
        iTimer=0;
-       persist_write_int(Key_Time, sTime);
+       persist_write_int(K_Time, sTime);
        break;
     }
    // Get next pair, if any
    t = dict_read_next(iterator);
  }
-  APP_LOG(APP_LOG_LEVEL_INFO, "Exit loop message received");
+  //APP_LOG(APP_LOG_LEVEL_INFO, "Exit loop message received");
+  setColors (cType);
   //Empty sphere numbers to recalculate
   text_layer_set_text(BN3, "");
   text_layer_set_text(BN6, "");
@@ -1423,11 +1492,14 @@ static void in_recv_handler(DictionaryIterator *iterator, void *context)
   text_layer_set_text(SN11, ""); 
   if (UseSeconds == true) {sTime = sTime * 60;
                            tick_timer_service_subscribe(SECOND_UNIT, handle_tick); }
-                   else  { tick_timer_service_subscribe(MINUTE_UNIT, handle_tick); }
+                   else  { sTime = (sTime+1);
+                           tick_timer_service_subscribe(MINUTE_UNIT, handle_tick); }
   if (SrcSaver>1){
-      if(w != NULL) {
-        window_stack_push(w, true);
-      }
+       current = 0;
+       if (SrcSaver!=maxSaver){
+         setImage (SrcSaver);
+       }
+      if(w != NULL) {window_stack_push(w, true);}
   }
 }
 
@@ -1437,7 +1509,7 @@ static void setSrcSaver (int ScreenSaver)
   if (SrcSaver==1){
       if (UseSeconds == false) { 
               iTimer=0;
-              sTime = sTime * 60;
+              sTime = (sTime-1) * 60;
               a = 1;
               current = 0; 
               UseSeconds = true;
@@ -1446,16 +1518,16 @@ static void setSrcSaver (int ScreenSaver)
   if (SrcSaver>1){ 
     layer_mark_dirty(SrcSaver_layer);
     if (current == 1){
-      a = 1;
       iTimer=0;
+      current = 0; 
+      a = 1;
       if (UseSeconds == true) { 
               tick_timer_service_subscribe(SECOND_UNIT, handle_tick); }
-      else  { tick_timer_service_subscribe(MINUTE_UNIT, handle_tick); }     
+      else  { tick_timer_service_subscribe(MINUTE_UNIT, handle_tick); } 
       window_stack_push(w, true);
-      current = 0; 
     }
   }
-  APP_LOG(APP_LOG_LEVEL_INFO, "YOU SHAKE IT ¡¡¡");
+  //APP_LOG(APP_LOG_LEVEL_INFO, "YOU SHAKE IT ¡¡¡");
 }
 
 static void handle_tap(AccelAxisType axis, int32_t direction) {
@@ -1463,56 +1535,48 @@ static void handle_tap(AccelAxisType axis, int32_t direction) {
 }
 
 void handle_init(void) {
-/*
-  //load B&W resources
-   #ifdef PBL_COLOR 
-   #else
-    Skully=gbitmap_create_with_resource(RESOURCE_ID_SKULLY);
-   #endif
-*/
-  
  //Check for saved KEY options
   app_message_register_inbox_received((AppMessageInboxReceived) in_recv_handler);
   app_message_open(app_message_inbox_size_maximum(), app_message_outbox_size_maximum());
-  if (persist_exists(Key_UseSeconds)) {
-    UseSeconds = persist_read_bool(Key_UseSeconds);
+  if (persist_exists(K_UseSeconds)) {
+    UseSeconds = persist_read_bool(K_UseSeconds);
   }
   #ifdef PBL_COLOR //shadows only on Pebble Time
-  if (persist_exists(Key_UseShadows)) {
-    UseShadows = persist_read_bool(Key_UseShadows);
+  if (persist_exists(K_UseShadows)) {
+    UseShadows = persist_read_bool(K_UseShadows);
   }
   #else
     UseShadows = false;
   #endif
-  if (persist_exists(Key_Radio)) {
-    Radio = persist_read_int(Key_Radio);
+  if (persist_exists(K_Radio)) {
+    Radio = persist_read_int(K_Radio);
   }
-  if (persist_exists(Key_ClockType)) {
-    cType = persist_read_int(Key_ClockType);
+  if (persist_exists(K_ClockType)) {
+    cType = persist_read_int(K_ClockType);
   }
-  if (persist_exists(Key_HandType)) {
-    hType = persist_read_int(Key_HandType);
+  if (persist_exists(K_HandType)) {
+    hType = persist_read_int(K_HandType);
   }
-  if (persist_exists(Key_Bluetooth)) {
-    viewBluetooth = persist_read_bool(Key_Bluetooth);
+  if (persist_exists(K_Bluetooth)) {
+    viewBluetooth = persist_read_bool(K_Bluetooth);
   }  
-  if (persist_exists(Key_Numbers)) {
-    numbType = persist_read_int(Key_Numbers );
+  if (persist_exists(K_Numbers)) {
+    numbType = persist_read_int(K_Numbers );
   }
-  if (persist_exists(Key_DateBox)) {
-    DateBox = persist_read_bool(Key_DateBox);
+  if (persist_exists(K_DateBox)) {
+    DateBox = persist_read_bool(K_DateBox);
   }  
-  if (persist_exists(Key_Crown)) {
-    UseCrown = persist_read_bool(Key_Crown);
+  if (persist_exists(K_Crown)) {
+    UseCrown = persist_read_bool(K_Crown);
   }  
-  if (persist_exists(Key_Ticks)) {
-    hTicks = persist_read_int(Key_Ticks);
+  if (persist_exists(K_Ticks)) {
+    hTicks = persist_read_int(K_Ticks);
   }
-  if (persist_exists(Key_SrcSaver)) {
-    SrcSaver = persist_read_int(Key_SrcSaver);
+  if (persist_exists(K_SrcSaver)) {
+    SrcSaver = persist_read_int(K_SrcSaver);
   }
-  if (persist_exists(Key_Time)) {
-    sTime = persist_read_int(Key_Time);
+  if (persist_exists(K_Time)) {
+    sTime = persist_read_int(K_Time);
   }
 
   //set colors
@@ -1522,7 +1586,8 @@ void handle_init(void) {
   battery_state_service_subscribe(&handle_battery);
   bluetooth_connection_service_subscribe(&handle_bluetooth);
   accel_tap_service_subscribe(&handle_tap);
-  
+
+#ifdef PBL_COLOR
   //set ScreenSaver
   if (SrcSaver>1){
     s = window_create();
@@ -1531,11 +1596,13 @@ void handle_init(void) {
     #endif
     GRect sbounds = GRect(0,0,144,168);
     SrcSaver_layer = layer_create(sbounds);
-    layer_set_update_proc(SrcSaver_layer, SrcSaver_update);
+    //layer_set_update_proc(SrcSaver_layer, SrcSaver_update);
     layer_add_child((Layer *)s, SrcSaver_layer);
-    bitmap_layer_set_bitmap(bitmap_layer, NULL);
+    //bitmap_layer_set_bitmap(bitmap_layer, NULL);
+    iTimer = 0;
     setImage (SrcSaver);
   }
+#endif  
   
   //set window
   w = window_create();
@@ -1563,35 +1630,35 @@ void handle_init(void) {
   rDate = GRect(hc.x-30,hc.y+15,60,25);
   date = text_layer_create(rDate);
   text_layer_set_background_color(date, GColorClear);
-  text_layer_set_text_color(date, ColorFont);
+  text_layer_set_text_color(date, CFont);
   text_layer_set_text(date, "");
   text_layer_set_text_alignment(date, GTextAlignmentCenter);
   text_layer_set_font(date, dBFont); 
 
-  //building dial numbers layers
+   //building dial numbers layers
    //bigNumbers (Quarters)
    rBNumbers = GRect(hc.x,hc.y,28,28);
    BN3 = text_layer_create(rBNumbers);
    text_layer_set_background_color(BN3, GColorClear);
-   text_layer_set_text_color(BN3, ColorBNumbers);
+   text_layer_set_text_color(BN3, CBNumbers);
    text_layer_set_text(BN3, "");
    text_layer_set_text_alignment(BN3, GTextAlignmentCenter);
    text_layer_set_font(BN3, nBFont);
    BN6 = text_layer_create(rBNumbers);
    text_layer_set_background_color(BN6, GColorClear);
-   text_layer_set_text_color(BN6, ColorBNumbers);
+   text_layer_set_text_color(BN6, CBNumbers);
    text_layer_set_text(BN6, "");
    text_layer_set_text_alignment(BN6, GTextAlignmentCenter);
    text_layer_set_font(BN6, nBFont);
    BN9 = text_layer_create(rBNumbers);
    text_layer_set_background_color(BN9, GColorClear);
-   text_layer_set_text_color(BN9, ColorBNumbers);
+   text_layer_set_text_color(BN9, CBNumbers);
    text_layer_set_text(BN9, "");
    text_layer_set_text_alignment(BN9, GTextAlignmentCenter);
    text_layer_set_font(BN9, nBFont);
    BN12 = text_layer_create(rBNumbers);
    text_layer_set_background_color(BN12, GColorClear);
-   text_layer_set_text_color(BN12, ColorBNumbers);
+   text_layer_set_text_color(BN12, CBNumbers);
    text_layer_set_text(BN12, "");
    text_layer_set_text_alignment(BN12, GTextAlignmentCenter);
    text_layer_set_font(BN12, nBFont);
@@ -1600,49 +1667,49 @@ void handle_init(void) {
    rSNumbers = GRect(hc.x,hc.y,28,28);
    SN1 = text_layer_create(rSNumbers);
    text_layer_set_background_color(SN1, GColorClear);
-   text_layer_set_text_color(SN1, ColorSNumbers);
+   text_layer_set_text_color(SN1, CSNumbers);
    text_layer_set_text(SN1, "");
    text_layer_set_text_alignment(SN1, GTextAlignmentCenter);
    text_layer_set_font(SN1, nSFont);
    SN2 = text_layer_create(rSNumbers);
    text_layer_set_background_color(SN2, GColorClear);
-   text_layer_set_text_color(SN2, ColorSNumbers);
+   text_layer_set_text_color(SN2, CSNumbers);
    text_layer_set_text(SN2, "");
    text_layer_set_text_alignment(SN2, GTextAlignmentCenter);
    text_layer_set_font(SN2, nSFont);
    SN4 = text_layer_create(rSNumbers);
    text_layer_set_background_color(SN4, GColorClear);
-   text_layer_set_text_color(SN4, ColorSNumbers);
+   text_layer_set_text_color(SN4, CSNumbers);
    text_layer_set_text(SN4, "");
    text_layer_set_text_alignment(SN4, GTextAlignmentCenter);
    text_layer_set_font(SN4, nSFont);
    SN5 = text_layer_create(rSNumbers);
    text_layer_set_background_color(SN5, GColorClear);
-   text_layer_set_text_color(SN5, ColorSNumbers);
+   text_layer_set_text_color(SN5, CSNumbers);
    text_layer_set_text(SN5, "");
    text_layer_set_text_alignment(SN5, GTextAlignmentCenter);
    text_layer_set_font(SN5, nSFont);
    SN7 = text_layer_create(rSNumbers);
    text_layer_set_background_color(SN7, GColorClear);
-   text_layer_set_text_color(SN7, ColorSNumbers);
+   text_layer_set_text_color(SN7, CSNumbers);
    text_layer_set_text(SN7, "");
    text_layer_set_text_alignment(SN7, GTextAlignmentCenter);
    text_layer_set_font(SN7, nSFont);
    SN8 = text_layer_create(rSNumbers);
    text_layer_set_background_color(SN8, GColorClear);
-   text_layer_set_text_color(SN8, ColorSNumbers);
+   text_layer_set_text_color(SN8, CSNumbers);
    text_layer_set_text(SN8, "");
    text_layer_set_text_alignment(SN8, GTextAlignmentCenter);
    text_layer_set_font(SN8, nSFont);
    SN10 = text_layer_create(rSNumbers);
    text_layer_set_background_color(SN10, GColorClear);
-   text_layer_set_text_color(SN10, ColorSNumbers);
+   text_layer_set_text_color(SN10, CSNumbers);
    text_layer_set_text(SN10, "");
    text_layer_set_text_alignment(SN10, GTextAlignmentCenter);
    text_layer_set_font(SN10, nSFont);
    SN11 = text_layer_create(rSNumbers);
    text_layer_set_background_color(SN11, GColorClear);
-   text_layer_set_text_color(SN11, ColorSNumbers);
+   text_layer_set_text_color(SN11, CSNumbers);
    text_layer_set_text(SN11, "");
    text_layer_set_text_alignment(SN11, GTextAlignmentCenter);
    text_layer_set_font(SN11, nSFont);
@@ -1693,8 +1760,8 @@ void handle_init(void) {
   
   if (UseSeconds == true) { sTime = sTime * 60;
           tick_timer_service_subscribe(SECOND_UNIT, handle_tick); }
-  else  { tick_timer_service_subscribe(MINUTE_UNIT, handle_tick); }
-  
+  else  { sTime = (sTime+1);
+          tick_timer_service_subscribe(MINUTE_UNIT, handle_tick); }
 }
 
 void handle_deinit(void) {
@@ -1729,13 +1796,11 @@ void handle_deinit(void) {
   bluetooth_connection_service_unsubscribe();
   tick_timer_service_unsubscribe();
   accel_tap_service_unsubscribe();
-  gbitmap_destroy(ScreenSvr);
-/*
-  #ifdef PBL_COLOR
-  #else
-    gbitmap_destroy(Skully);
+
+  #ifdef PBL_COLOR  
+    if (ScreenSvr != NULL) {gbitmap_destroy(ScreenSvr);}
   #endif
-*/
+    
   if(w != NULL) {window_destroy(w);}
   if(s != NULL) {window_destroy(s);}
 }

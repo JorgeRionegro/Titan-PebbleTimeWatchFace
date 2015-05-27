@@ -22,6 +22,47 @@
     "resources": {
         "media": [
             {
+                "file": "images/titan_icon-picsay.png",
+                "menuIcon": true,
+                "name": "ICON",
+                "type": "png"
+            },
+            {
+                "file": "images/bw8.png",
+                "name": "PIC22",
+                "type": "png"
+            },
+            {
+                "file": "images/bw6.png",
+                "name": "PIC20",
+                "type": "png"
+            },
+            {
+                "file": "images/bw2.png",
+                "name": "PIC16",
+                "type": "png"
+            },
+            {
+                "file": "images/picasso3bw.png",
+                "name": "PIC3",
+                "type": "png"
+            },
+            {
+                "file": "images/maligno.png",
+                "name": "PIC2",
+                "type": "png"
+            },
+            {
+                "file": "images/bw7.png",
+                "name": "PIC21",
+                "type": "png"
+            },
+            {
+                "file": "images/bw3.png",
+                "name": "PIC17",
+                "type": "png"
+            },
+            {
                 "file": "images/pebblesbw.png",
                 "name": "PIC5",
                 "type": "png"
@@ -32,28 +73,73 @@
                 "type": "png"
             },
             {
-                "file": "images/picasso_bw.png",
-                "name": "PIC4",
+                "file": "images/bw5.png",
+                "name": "PIC19",
                 "type": "png"
             },
             {
-                "file": "images/picasso3bw.png",
-                "name": "PIC3",
+                "file": "images/bw4.png",
+                "name": "PIC18",
+                "type": "png"
+            },
+            {
+                "file": "images/bw1.png",
+                "name": "PIC15",
+                "type": "png"
+            },
+            {
+                "file": "images/scary.png",
+                "name": "PIC9",
                 "type": "png"
             },
             {
                 "file": "images/jirafa.png",
-                "name": "PIC2",
+                "name": "PIC10",
                 "type": "png"
             },
             {
-                "file": "images/zebra.png",
-                "name": "PIC1",
+                "file": "images/smily2.png",
+                "name": "PIC8",
+                "type": "png"
+            },
+            {
+                "file": "images/joker.png",
+                "name": "PIC7",
+                "type": "png"
+            },
+            {
+                "file": "images/womanbw.png",
+                "name": "PIC14",
+                "type": "png"
+            },
+            {
+                "file": "images/smilybw.png",
+                "name": "PIC13",
+                "type": "png"
+            },
+            {
+                "file": "images/picasso3bwinv.png",
+                "name": "PIC12",
+                "type": "png"
+            },
+            {
+                "file": "images/applepirates.png",
+                "name": "PIC11",
                 "type": "png"
             },
             {
                 "file": "images/skully_bw.png",
                 "name": "SKULLY",
+                "type": "png"
+            },
+            {
+                "file": "images/picasso_bw.png",
+                "name": "PIC4",
+                "type": "png"
+            },
+            {
+                "file": "images/zebra.png",
+                "name": "PIC1",
                 "type": "png"
             }
         ]
