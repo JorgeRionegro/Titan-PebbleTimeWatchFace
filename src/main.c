@@ -1,7 +1,7 @@
 #include <pebble.h>
 
 //Fonts
-#define dBFont fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD)
+#define sSFont fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD) 
 #define nSFont fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD) 
 #define nBFont fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD) 
   
@@ -17,23 +17,25 @@
 #define K_Ticks 9
 #define K_SrcSaver 10
 #define K_Time 11
+#define K_Light 12
 
-static int mTicks = 60, Radio = 94, a = 1, cType = 0, hType = 1, numbType = 5, grosor = 4, hTicks = 3, control = 1;
-static int SrcSaver = 0, sTime=1, iTimer=0, current = 0, maxSaver = 25;
-
-bool UseSeconds = false, UseShadows = true, viewBluetooth = true, DateBox = true, UseCrown = true;
+static int mTicks = 60, Radio = 98, a = 1, cType = 0, hType = 1, numbType = 5, uBluetooth = 1, grosor = 4, hTicks = 3, control = 1;
+static int bType=1, SrcSaver = 0, sTime=1, iTimer=0, current = 0, maxSaver = 25;
+static int lTime =7, iLight=0;
+  
+bool UseSeconds = false, UseShadows = true, DateBox = true, UseCrown = true;
 int32_t hh_angle, mi_angle, ss_angle, a_angle;
 
 Window *w, *s;
 Layer *dial_layer, *SrcSaver_layer, *marks_layer, *time_layer, *time_second, *shadow_layer, *shadow_second, *battery, *bluetooth;
-TextLayer *date, *SN1, *SN2, *BN3, *SN4, *SN5, *BN6, *SN7, *SN8, *BN9, *SN10, *SN11, *BN12;
+TextLayer *date, *Batt, *SN1, *SN2, *BN3, *SN4, *SN5, *BN6, *SN7, *SN8, *BN9, *SN10, *SN11, *BN12;
 GPoint hc, hs, mHb, mHt, hHb, hHt;
 #ifdef PBL_COLOR
   GPoint smHb,smHt,slmH,srmH,sp1,sp2,sp3,sp4,sp5,sp6,slH,srH,sh1,sh2,sh3,sh4,sh5;
   GPoint shHb,shHt,lmH,rmH,p1,p2,p3,p4,p5,p6,lH,rH,h1,h2,h3,h4,h5;
 #endif
 
-static GRect rDate, next, rBattery, nextBattery, rBluetooth, nextBluetooth, rBNumbers, rSNumbers;
+static GRect rDate, rBatt, next, rBattery, nextBattery, rBluetooth, nextBluetooth, rBNumbers, rSNumbers;
 static GRect nextSN1, nextSN2, nextBN3, nextSN4, nextSN5, nextBN6, nextSN7, nextSN8, nextBN9, nextSN10, nextSN11, nextBN12;
 static BatteryChargeState c_state;
 #ifdef PBL_COLOR
@@ -44,8 +46,8 @@ static BatteryChargeState c_state;
   static GColor CFont,CBattery,CBNumbers,CSNumbers,CDBox,CCrown;
 #endif
   
-GPathInfo HOUR_POINTS = { 4, (GPoint []) { { -1, 1 }, { 1, 1}, { 1, -14}, { -1, -14} } };
 GPathInfo MINUTE_POINTS = { 4, (GPoint []) { { -1, 1 }, { 1, 1}, { 1, -6}, { -1, -6} } };
+GPathInfo HOUR_POINTS = { 4, (GPoint []) { { -1, 3 }, { 1, 3}, { 1, -12}, { -1, -12} } };
 GPathInfo HOUR_QUARTERS = { 4, (GPoint []) { { -3, 3 }, { 3, 3}, { 3, -17}, { -3, -17} } };
 
 static GPath *minute_square, *hour_square, *hour_quarters;
@@ -517,6 +519,10 @@ static void handle_battery(BatteryChargeState c_state) {
 
 void handle_bluetooth(bool connected) {
       layer_mark_dirty(bluetooth);
+      if (uBluetooth ==2 && connected == false) {
+              vibes_double_pulse();
+              vibes_double_pulse();
+      }
 }
 
 static void battery_update_proc(Layer *layer, GContext *ctx) {
@@ -528,22 +534,24 @@ static void battery_update_proc(Layer *layer, GContext *ctx) {
   
      graphics_context_set_stroke_color(ctx, CBattery);
      graphics_context_set_fill_color(ctx, CBattery);
-     switch(c_state.charge_percent/10){
-       case 10: graphics_draw_rect(ctx, GRect(3,3,12,12)); graphics_draw_rect(ctx, GRect(1,1,12,12)); break;
-       case 9: graphics_draw_rect(ctx, GRect(10,2,3,3));
-       case 8: graphics_draw_rect(ctx, GRect(2,2,3,3));
-       case 7: graphics_draw_rect(ctx, GRect(10,6,3,3));
-       case 6: graphics_draw_rect(ctx, GRect(2,6,3,3));
-       case 5: graphics_draw_rect(ctx, GRect(6,2,3,3));
-       case 4: graphics_draw_rect(ctx, GRect(6,6,3,3));
-       case 3: graphics_draw_rect(ctx, GRect(10,10,3,3));
-       case 2: graphics_draw_rect(ctx, GRect(2,10,3,3));
-       case 1: graphics_draw_rect(ctx, GRect(6,10,3,3));
-     }
+     if (bType == 0){
+        switch(c_state.charge_percent/10){
+         case 10: graphics_draw_rect(ctx, GRect(3,3,12,12)); graphics_draw_rect(ctx, GRect(1,1,12,12)); break;
+         case 9: graphics_draw_rect(ctx, GRect(10,2,3,3));
+         case 8: graphics_draw_rect(ctx, GRect(2,2,3,3));
+         case 7: graphics_draw_rect(ctx, GRect(10,6,3,3));
+         case 6: graphics_draw_rect(ctx, GRect(2,6,3,3));
+         case 5: graphics_draw_rect(ctx, GRect(6,2,3,3));
+         case 4: graphics_draw_rect(ctx, GRect(6,6,3,3));
+         case 3: graphics_draw_rect(ctx, GRect(10,10,3,3));
+         case 2: graphics_draw_rect(ctx, GRect(2,10,3,3));
+         case 1: graphics_draw_rect(ctx, GRect(6,10,3,3));
+       }
+     } 
 }
 
 void bluetooth_update_proc(Layer *layer, GContext *ctx) {
-  if (viewBluetooth == true ) {
+  if (uBluetooth > 0 ) {
   graphics_context_set_stroke_color(ctx, bluetooth_connection_service_peek() ? CSphere : CBattery);
   GPoint bt;
   bt.x = 15;
@@ -586,11 +594,15 @@ void dial_layer_update(Layer *me, GContext *ctx) {
     if (UseShadows == true){
       graphics_context_set_fill_color(ctx, CShadow);
       graphics_fill_rect(ctx, next, 6, GCornersAll);
+      if (bType ==1) {graphics_fill_rect(ctx, nextBattery, 6, GCornersAll);}
     }
     #endif
     GRect sDBox = GRect(hc.x-28,hc.y+16,58,24);
     graphics_context_set_fill_color(ctx, CDBox);
     graphics_fill_rect(ctx, sDBox, 6, GCornersAll);
+    if (bType ==1) {
+      GRect sDBat = GRect(hc.x-9,hc.y-33,19,20);
+      graphics_fill_rect(ctx, sDBat, 6, GCornersAll);}
   }
 }
 
@@ -609,9 +621,9 @@ void marks_layer_update(Layer *me, GContext *ctx) {
       ray.x = (int16_t)(sin_lookup(angle) *
 	      (int32_t)Radio*0.81 / TRIG_MAX_RATIO) + hc.x;
       sEnd.y = (int16_t)(-cos_lookup(angle) *
-	      (int32_t)(Radio-10) / TRIG_MAX_RATIO) + hc.y;
+	      (int32_t)(Radio-12) / TRIG_MAX_RATIO) + hc.y;
       sEnd.x = (int16_t)(sin_lookup(angle) *
-	      (int32_t)(Radio-10) / TRIG_MAX_RATIO) + hc.x;
+	      (int32_t)(Radio-12) / TRIG_MAX_RATIO) + hc.x;
     
     if (x % 5 != 0) {
       if (hTicks>2){
@@ -657,13 +669,13 @@ void shadow_layer_update(Layer *me, GContext *ctx) {
   if (hType == 2) {
      h_offset = Radio*0.4;
   }
-  if (hType == 3) {
+  if (hType == 3 || hType == 6) {
      h_offset = Radio*0.15;
   }
     graphics_context_set_antialiased(ctx, true);
     if (hType == 1||hType == 3){
        start = 0;
-      end = 0;
+       end = 0;
     }
     
   //center shadow
@@ -698,7 +710,7 @@ void shadow_layer_update(Layer *me, GContext *ctx) {
               srmH.y = ((int32_t)(-cos_lookup(mi_angle+a_angle) * (int32_t)(-1*Radio*0.3) / TRIG_MAX_RATIO) + smHt.y 
                   + (int16_t)(sin_lookup(mi_angle+a_angle)*x/TRIG_MAX_RATIO));
             }
-           if (hType <= 3) {
+           if (hType != 4) {
              if (hType == 2) {
                 if (x == start){
                  sp1 = smHb;
@@ -715,7 +727,6 @@ void shadow_layer_update(Layer *me, GContext *ctx) {
                 }
             }
            } else {
-                graphics_context_set_stroke_width(ctx, 2);
                 if (x == start ){
                    sp1 = slmH;
                    sp3 = smHt;
@@ -759,7 +770,7 @@ void shadow_layer_update(Layer *me, GContext *ctx) {
                      sp5.y = (sp2.y+sp4.y)/2;
                      graphics_fill_circle(ctx, sp5, grosor/2+2);
               }
-              if (hType == 1 || hType == 3 ) {
+              if (hType == 1 || hType == 3 || hType > 4) {
                      graphics_context_set_stroke_width(ctx, grosor*2);
                      graphics_draw_line  (ctx, sp1, sp2);
               }
@@ -774,7 +785,7 @@ void shadow_layer_update(Layer *me, GContext *ctx) {
                   + (int16_t)(cos_lookup(hh_angle)*x/TRIG_MAX_RATIO));
             shHt.y = ((int32_t)(-cos_lookup(hh_angle) * (int32_t)(Radio*0.5) / TRIG_MAX_RATIO) + hs.y 
                   + (int16_t)(sin_lookup(hh_angle)*x/TRIG_MAX_RATIO));
-            if (hType > 3) {
+            if (hType == 4) {
              shHt.x = ((int32_t)( sin_lookup(hh_angle) * (int32_t)(Radio*0.6) / TRIG_MAX_RATIO) + hs.x 
                   + (int16_t)(cos_lookup(hh_angle)*x/TRIG_MAX_RATIO));
              shHt.y = ((int32_t)(-cos_lookup(hh_angle) * (int32_t)(Radio*0.6) / TRIG_MAX_RATIO) + hs.y 
@@ -788,7 +799,7 @@ void shadow_layer_update(Layer *me, GContext *ctx) {
              srH.y = ((int32_t)(-cos_lookup(hh_angle-a_angle/3) * (int32_t)(-1*Radio*0.3) / TRIG_MAX_RATIO) + shHt.y 
                   + (int16_t)(sin_lookup(hh_angle-a_angle/3)*x/TRIG_MAX_RATIO));
             }
-          if (hType <= 3) {
+          if (hType != 4) {
              if (hType == 2) {
               if (x == start){
                  sh1 = shHb;
@@ -837,7 +848,7 @@ void shadow_layer_update(Layer *me, GContext *ctx) {
            sh5.y = (sh2.y+sh4.y)/2;
            graphics_fill_circle(ctx, sh5, grosor/2+2);
       }
-      if (hType == 1 || hType == 3 ) {
+      if (hType == 1 || hType == 3 || hType > 4) {
            graphics_context_set_stroke_width(ctx, grosor*2);
            graphics_draw_line  (ctx, sh1, sh2);
       }
@@ -876,15 +887,15 @@ void time_layer_update(Layer *me, GContext *ctx) {
   if (hType == 2) {
      h_offset = Radio*0.4;
   }
-  if (hType == 3) {
+  if (hType == 3 || hType == 6) {
      h_offset = Radio*0.15;
   }
   
   #ifdef PBL_COLOR
     graphics_context_set_antialiased(ctx, true);
-    if (hType == 1||hType == 3){
+    if (hType == 1||hType == 3||hType > 4){
        start = 0;
-      end = 0;
+       end = 0;
     }
   #else
     subCtrl = 1;
@@ -902,7 +913,7 @@ void time_layer_update(Layer *me, GContext *ctx) {
   #endif 
   if (subCtrl == 1) {
 	 for(x=start; x <= end; x++) {
-         if (hType <= 3) {
+         if (hType != 4) {
             mHb.x = ((int32_t)( sin_lookup(mi_angle) * (int32_t)(-1*Radio*0.15+h_offset) / TRIG_MAX_RATIO) + hc.x 
                   + (int16_t)(cos_lookup(mi_angle)*x/TRIG_MAX_RATIO));
             mHb.y = ((int32_t)(-cos_lookup(mi_angle) * (int32_t)(-1*Radio*0.15+h_offset) / TRIG_MAX_RATIO) + hc.y 
@@ -918,7 +929,7 @@ void time_layer_update(Layer *me, GContext *ctx) {
             mHt.y = ((int32_t)(-cos_lookup(mi_angle) * (int32_t)(Radio*0.8) / TRIG_MAX_RATIO) + hc.y 
                   + (int16_t)(sin_lookup(mi_angle)*x/TRIG_MAX_RATIO));
        #ifdef PBL_COLOR
-         if (hType > 3) {
+         if (hType == 4) {
             lmH.x = ((int32_t)( sin_lookup(mi_angle-a_angle) * (int32_t)(-1*Radio*0.3) / TRIG_MAX_RATIO) + mHt.x 
                   + (int16_t)(cos_lookup(mi_angle-a_angle)*x/TRIG_MAX_RATIO));
             lmH.y = ((int32_t)(-cos_lookup(mi_angle-a_angle) * (int32_t)(-1*Radio*0.3) / TRIG_MAX_RATIO) + mHt.y 
@@ -929,7 +940,7 @@ void time_layer_update(Layer *me, GContext *ctx) {
                   + (int16_t)(sin_lookup(mi_angle+a_angle)*x/TRIG_MAX_RATIO));
          }
        #endif
-       if (hType <= 3) {
+       if (hType != 4) {
              if (hType == 2) {
               #ifdef PBL_COLOR
                 if (x == start){
@@ -952,19 +963,17 @@ void time_layer_update(Layer *me, GContext *ctx) {
                  p1 = mHb;
                  p2 = mHt;
                 }
-               #else
+              #else
                  graphics_draw_line  (ctx, mHb, mHt);
-               #endif
+              #endif
             }
             if (x==0){
-              #ifdef PBL_COLOR
-              #else
+              #ifdef PBL_BW
                  graphics_fill_circle(ctx, mHt, grosor/2+2);
               #endif
             }
            } else {
               #ifdef PBL_COLOR
-                graphics_context_set_stroke_width(ctx, 2);
                 if (x == start ){
                    p1 = lmH;
                    p3 = mHt;
@@ -1010,14 +1019,19 @@ void time_layer_update(Layer *me, GContext *ctx) {
                      p5.y = (p2.y+p4.y)/2;
                      graphics_fill_circle(ctx, p5, grosor/2+2);
               }
-              if (hType == 1 || hType == 3 ) {
+              if (hType == 1 || hType == 3 || hType == 5 || hType == 6) {
                      graphics_context_set_stroke_width(ctx, grosor*2);
                      graphics_draw_line  (ctx, p1, p2);
-                     if (cType==20){
-                         graphics_context_set_stroke_width(ctx, 3);
-                         graphics_context_set_stroke_color(ctx, CCrown);
-                         graphics_draw_line  (ctx, p1, p2);
-                     }
+                   if (hType == 5 || hType == 6){
+                      graphics_context_set_stroke_width(ctx, 3);
+                      if (cType==20 || cType==5 || cType==8|| cType==19){
+                                  graphics_context_set_stroke_color(ctx, CCrown);
+                       } else { if (cType==13 || cType==14 || cType==15 || cType==16|| cType==17){
+                                  graphics_context_set_stroke_color(ctx, CSphere);
+                                } else {graphics_context_set_stroke_color(ctx, CHours);}
+                              }
+                      graphics_draw_line  (ctx, p1, p2);     
+                   } 
               }
   #endif
   
@@ -1035,7 +1049,7 @@ void time_layer_update(Layer *me, GContext *ctx) {
             hHt.y = ((int32_t)(-cos_lookup(hh_angle) * (int32_t)(Radio*0.5) / TRIG_MAX_RATIO) + hc.y 
                   + (int16_t)(sin_lookup(hh_angle)*x/TRIG_MAX_RATIO));
   #ifdef PBL_COLOR 
-     if (hType > 3) {
+     if (hType ==4 ) {
             hHt.x = ((int32_t)( sin_lookup(hh_angle) * (int32_t)(Radio*0.6) / TRIG_MAX_RATIO) + hc.x 
                   + (int16_t)(cos_lookup(hh_angle)*x/TRIG_MAX_RATIO));
             hHt.y = ((int32_t)(-cos_lookup(hh_angle) * (int32_t)(Radio*0.6) / TRIG_MAX_RATIO) + hc.y 
@@ -1050,7 +1064,7 @@ void time_layer_update(Layer *me, GContext *ctx) {
                   + (int16_t)(sin_lookup(hh_angle-a_angle/3)*x/TRIG_MAX_RATIO));
          }
     #endif
-    if (hType <= 3) {
+    if (hType != 4) {
              if (hType == 2) {
               #ifdef PBL_COLOR
               if (x == start){
@@ -1119,14 +1133,20 @@ void time_layer_update(Layer *me, GContext *ctx) {
            h5.y = (h2.y+h4.y)/2;
            graphics_fill_circle(ctx, h5, grosor/2+2);
       }
-      if (hType == 1 || hType == 3 ) {
+      if (hType == 1 || hType == 3 || hType > 4) {
            graphics_context_set_stroke_width(ctx, grosor*2);
            graphics_draw_line  (ctx, h1, h2);
-           if (cType==20){
-                  graphics_context_set_stroke_width(ctx, 3);
+           if (hType == 5 || hType == 6){
+                graphics_context_set_stroke_width(ctx, 3);
+                if (cType==20 || cType==5 || cType==8|| cType==19){
                   graphics_context_set_stroke_color(ctx, CCrown);
-                  graphics_draw_line  (ctx, h1, h2);
-           }
+                } else { if (cType==13 || cType==14 || cType==15|| cType==16|| cType==17){
+                         graphics_context_set_stroke_color(ctx, CSphere);
+                        } else {graphics_context_set_stroke_color(ctx, CMinutes);}
+                       }
+                  
+             graphics_draw_line  (ctx, h1, h2);     
+             }  
       }
    #endif                  
   //draw centre circles
@@ -1169,8 +1189,24 @@ void time_second_update(Layer *me, GContext *ctx) {
 }
 
 void handle_tick(struct tm *now, TimeUnits units_changed) {
-  setlocale(LC_TIME, ""); 
+  setlocale(LC_TIME, "");
+  if (lTime>0){
+      iLight= iLight+1;
+      if (iLight >= lTime){
+        light_enable(false);
+        iLight = 0;
+        if (UseSeconds == false){
+          iTimer=0;
+          sTime = sTime/60+1;
+          tick_timer_service_subscribe(MINUTE_UNIT, handle_tick);
+        }
+      } 
+    }
+
   //APP_LOG(APP_LOG_LEVEL_INFO, "handle_tick: Setting Screen Saver %d", SrcSaver); 
+  hh_angle = (TRIG_MAX_ANGLE*(((now->tm_hour%12)*6)+(now->tm_min/10)))/(12*6);
+  mi_angle = TRIG_MAX_ANGLE * (now->tm_min) / 60;
+  a_angle =  TRIG_MAX_ANGLE * 1 / 60;
   if (SrcSaver>0 && current== 0){
           iTimer= iTimer+1;
           if (iTimer > sTime){
@@ -1179,7 +1215,7 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
                   if (UseSeconds == true) { 
                           UseSeconds = false;
                           current = 1; 
-                          sTime = (sTime-1)/60;
+                          sTime = sTime/60+1;
                           tick_timer_service_subscribe(MINUTE_UNIT, handle_tick); }
              } else {
                      #ifdef PBL_COLOR
@@ -1195,15 +1231,13 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
               }
           }
   }
-  hh_angle = (TRIG_MAX_ANGLE*(((now->tm_hour%12)*6)+(now->tm_min/10)))/(12*6);
-  mi_angle = TRIG_MAX_ANGLE * (now->tm_min) / 60;
-  a_angle =  TRIG_MAX_ANGLE * 1 / 60;
   if (UseSeconds == true){
       ss_angle = TRIG_MAX_ANGLE / 60 * (now->tm_sec);
       if((now->tm_sec)==0||a==1){control = 1;} else {control=0;}
   }
   
   static char date_buf[] = "Mon.  1";
+  static char battery_buf[16];
   int key = 0;
   int sector;
   if ((now->tm_min)==7||(now->tm_min)==23||(now->tm_min)==37||(now->tm_min)==53) {
@@ -1256,6 +1290,10 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
       c_state = battery_state_service_peek();
       strftime(date_buf, sizeof("Mon.  1"), "%a. %e", now);
       text_layer_set_text(date, date_buf);
+      if (bType == 1){
+         snprintf(battery_buf, sizeof(battery_buf), "%d", c_state.charge_percent);
+      }
+    
     if (Radio<=72){
            hc = GPoint(71,84);
     } else {
@@ -1268,14 +1306,28 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
       hs.y=hc.y+4;
       
       next = GRect(hc.x-30,hc.y+15,60,25);
-      nextBattery = GRect(hc.x-7,hc.y-33,15,15);
+      if (bType ==0){
+         nextBattery = GRect(hc.x-7,hc.y-33,15,15);
+      } else {
+         nextBattery = GRect(hc.x-10,hc.y-35,20,20);
+      }
       nextBluetooth = GRect(hc.x-15,hc.y-41,30,30);
       text_layer_set_text_color(date, CFont);
       layer_set_frame(text_layer_get_layer(date), next);
-      layer_set_frame(battery, nextBattery);
-      layer_set_update_proc(battery, battery_update_proc);
-      layer_set_frame(bluetooth, nextBluetooth);
-      layer_set_update_proc(bluetooth, bluetooth_update_proc);
+      if (bType == 1){
+        if (c_state.is_charging==true){text_layer_set_text(Batt, "§");}
+        else {
+                if (c_state.charge_percent==100){text_layer_set_text(Batt, "%");}
+                    else {text_layer_set_text(Batt, battery_buf);}
+        }
+        text_layer_set_text_color(Batt, CFont);
+        layer_set_frame(text_layer_get_layer(Batt), nextBattery);
+      } else {
+        layer_set_frame(battery, nextBattery);
+        layer_set_update_proc(battery, battery_update_proc);
+        layer_set_frame(bluetooth, nextBluetooth);
+        layer_set_update_proc(bluetooth, bluetooth_update_proc);
+      }
     
       if (numbType != 1) {
         text_layer_set_text_color(BN3, CBNumbers);
@@ -1283,10 +1335,10 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
         text_layer_set_text_color(BN9, CBNumbers);
         text_layer_set_text_color(BN12, CBNumbers);
         nextBN3 = GRect(hc.x-13+Radio*0.65,hc.y-18,28,28);
-        nextBN6 = GRect(hc.x-13,hc.y-18+Radio*0.65,28,28);
+        nextBN6 = GRect(hc.x-13,hc.y-18+Radio*0.6,28,28);
         nextBN9 = GRect(hc.x-13-Radio*0.65,hc.y-18,28,28);
-        nextBN12 = GRect(hc.x-13,hc.y-18-Radio*0.65,28,28);
-        if (numbType == 4 || numbType ==5) {
+        nextBN12 = GRect(hc.x-13,hc.y-18-Radio*0.6,28,28);
+        if (numbType == 4 || numbType ==5 || numbType ==6) {
           text_layer_set_text_color(SN1, CSNumbers);
           text_layer_set_text_color(SN2, CSNumbers);
           text_layer_set_text_color(SN4, CSNumbers);
@@ -1336,6 +1388,22 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
             text_layer_set_text(SN11, "11");         
           }
         }
+        if (numbType == 6 || numbType == 7) {
+          if (numbType == 6) {
+            text_layer_set_text(SN1, "5");
+            text_layer_set_text(SN2, "10");
+            text_layer_set_text(SN4, "20");
+            text_layer_set_text(SN5, "25");            
+            text_layer_set_text(SN7, "35");
+            text_layer_set_text(SN8, "40");
+            text_layer_set_text(SN10, "50");
+            text_layer_set_text(SN11, "55");         
+          }
+          text_layer_set_text(BN3, "15");
+          text_layer_set_text(BN6, "30");
+          text_layer_set_text(BN9, "45");
+          text_layer_set_text(BN12, "60");
+        }
         if (numbType == 2 || numbType == 4) {
           text_layer_set_text(BN3, "III");
           text_layer_set_text(BN6, "VI");
@@ -1356,7 +1424,7 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
         layer_set_frame(text_layer_get_layer(BN6), nextBN6);
         layer_set_frame(text_layer_get_layer(BN9), nextBN9);
         layer_set_frame(text_layer_get_layer(BN12), nextBN12);
-        if (numbType == 4 || numbType == 5 ) {
+        if (numbType == 4 || numbType == 5 || numbType == 6) {
           layer_set_frame(text_layer_get_layer(SN1), nextSN1);
           layer_set_frame(text_layer_get_layer(SN2), nextSN2);
           layer_set_frame(text_layer_get_layer(SN4), nextSN4);
@@ -1419,17 +1487,9 @@ static void in_recv_handler(DictionaryIterator *iterator, void *context)
        persist_write_int(K_HandType, hType);
        break;
     case K_Bluetooth:
-      if(strcmp(t->value->cstring, "0") == 0)
-      {
-        viewBluetooth = true;
-        persist_write_bool(K_Bluetooth, true);
-      }
-      else if(strcmp(t->value->cstring, "1") == 0)
-      {
-        viewBluetooth = false;
-        persist_write_bool(K_Bluetooth, false);
-      };
-      break;
+       uBluetooth = atoi(t->value->cstring);
+       persist_write_int(K_Bluetooth, uBluetooth);
+       break;
     case K_Numbers:
        numbType = atoi(t->value->cstring);
        persist_write_int(K_Numbers, numbType);
@@ -1471,6 +1531,11 @@ static void in_recv_handler(DictionaryIterator *iterator, void *context)
        iTimer=0;
        persist_write_int(K_Time, sTime);
        break;
+    case K_Light:
+       lTime = atoi(t->value->cstring);
+       iLight=0;
+       persist_write_int(K_Light, lTime);
+       break;
     }
    // Get next pair, if any
    t = dict_read_next(iterator);
@@ -1490,6 +1555,7 @@ static void in_recv_handler(DictionaryIterator *iterator, void *context)
   text_layer_set_text(SN8, "");
   text_layer_set_text(SN10, "");
   text_layer_set_text(SN11, ""); 
+  if (SrcSaver == 1){UseSeconds = false;}
   if (UseSeconds == true) {sTime = sTime * 60;
                            tick_timer_service_subscribe(SECOND_UNIT, handle_tick); }
                    else  { sTime = (sTime+1);
@@ -1504,10 +1570,10 @@ static void in_recv_handler(DictionaryIterator *iterator, void *context)
 }
 
 static void setSrcSaver (int ScreenSaver)
-{
+{ 
   //Screen Saver Seconds ON/OFF
   if (SrcSaver==1){
-      if (UseSeconds == false) { 
+    if (UseSeconds == false) { 
               iTimer=0;
               sTime = (sTime-1) * 60;
               a = 1;
@@ -1519,8 +1585,8 @@ static void setSrcSaver (int ScreenSaver)
     layer_mark_dirty(SrcSaver_layer);
     if (current == 1){
       iTimer=0;
-      current = 0; 
       a = 1;
+      current = 0;
       if (UseSeconds == true) { 
               tick_timer_service_subscribe(SECOND_UNIT, handle_tick); }
       else  { tick_timer_service_subscribe(MINUTE_UNIT, handle_tick); } 
@@ -1532,53 +1598,37 @@ static void setSrcSaver (int ScreenSaver)
 
 static void handle_tap(AccelAxisType axis, int32_t direction) {
   setSrcSaver(SrcSaver);
+  if (lTime>0){
+      light_enable(true);
+      iLight = 0;
+    if (UseSeconds == false){sTime = (sTime) * 60;}
+      tick_timer_service_subscribe(SECOND_UNIT, handle_tick);
+    }
 }
 
 void handle_init(void) {
  //Check for saved KEY options
   app_message_register_inbox_received((AppMessageInboxReceived) in_recv_handler);
   app_message_open(app_message_inbox_size_maximum(), app_message_outbox_size_maximum());
-  if (persist_exists(K_UseSeconds)) {
-    UseSeconds = persist_read_bool(K_UseSeconds);
-  }
+  
   #ifdef PBL_COLOR //shadows only on Pebble Time
-  if (persist_exists(K_UseShadows)) {
-    UseShadows = persist_read_bool(K_UseShadows);
-  }
+  if (persist_exists(K_UseShadows)) {UseShadows = persist_read_bool(K_UseShadows); }
   #else
-    UseShadows = false;
+  UseShadows = false;
   #endif
-  if (persist_exists(K_Radio)) {
-    Radio = persist_read_int(K_Radio);
-  }
-  if (persist_exists(K_ClockType)) {
-    cType = persist_read_int(K_ClockType);
-  }
-  if (persist_exists(K_HandType)) {
-    hType = persist_read_int(K_HandType);
-  }
-  if (persist_exists(K_Bluetooth)) {
-    viewBluetooth = persist_read_bool(K_Bluetooth);
-  }  
-  if (persist_exists(K_Numbers)) {
-    numbType = persist_read_int(K_Numbers );
-  }
-  if (persist_exists(K_DateBox)) {
-    DateBox = persist_read_bool(K_DateBox);
-  }  
-  if (persist_exists(K_Crown)) {
-    UseCrown = persist_read_bool(K_Crown);
-  }  
-  if (persist_exists(K_Ticks)) {
-    hTicks = persist_read_int(K_Ticks);
-  }
-  if (persist_exists(K_SrcSaver)) {
-    SrcSaver = persist_read_int(K_SrcSaver);
-  }
-  if (persist_exists(K_Time)) {
-    sTime = persist_read_int(K_Time);
-  }
-
+  if (persist_exists(K_UseSeconds)) {UseSeconds = persist_read_bool(K_UseSeconds); }
+  if (persist_exists(K_Radio)) {Radio = persist_read_int(K_Radio); }
+  if (persist_exists(K_ClockType)) {cType = persist_read_int(K_ClockType); }
+  if (persist_exists(K_HandType)) {hType = persist_read_int(K_HandType); }
+  if (persist_exists(K_Bluetooth)) {uBluetooth = persist_read_int(K_Bluetooth); }  
+  if (persist_exists(K_Numbers)) {numbType = persist_read_int(K_Numbers); }
+  if (persist_exists(K_DateBox)) {DateBox = persist_read_bool(K_DateBox); }  
+  if (persist_exists(K_Crown)) {UseCrown = persist_read_bool(K_Crown); }  
+  if (persist_exists(K_Ticks)) {hTicks = persist_read_int(K_Ticks); }
+  if (persist_exists(K_SrcSaver)) {SrcSaver = persist_read_int(K_SrcSaver); }
+  if (persist_exists(K_Time)) {sTime = persist_read_int(K_Time); }
+  if (persist_exists(K_Light)) {lTime = persist_read_int(K_Light); }
+  if (SrcSaver==1){UseSeconds = false;}
   //set colors
   setColors (cType);
   
@@ -1591,14 +1641,10 @@ void handle_init(void) {
   //set ScreenSaver
   if (SrcSaver>1){
     s = window_create();
-    #ifdef PBL_SDK_2
-       window_set_fullscreen(s, true);
-    #endif
     GRect sbounds = GRect(0,0,144,168);
     SrcSaver_layer = layer_create(sbounds);
     //layer_set_update_proc(SrcSaver_layer, SrcSaver_update);
     layer_add_child((Layer *)s, SrcSaver_layer);
-    //bitmap_layer_set_bitmap(bitmap_layer, NULL);
     iTimer = 0;
     setImage (SrcSaver);
   }
@@ -1625,41 +1671,41 @@ void handle_init(void) {
   //Layer for battery
   rBattery = GRect(hc.x-7,hc.y-33,15,15);
   battery = layer_create(rBattery);
+  if (bType == 1){
+      //rBatt = GRect(hc.x-10,hc.y-33,20,20);
+      rBatt = GRect(0,0,20,20);
+      Batt  = text_layer_create(rBatt);
+      text_layer_set_background_color(Batt, GColorClear);
+      text_layer_set_text_color(Batt, CFont);
+      text_layer_set_text_alignment(Batt, GTextAlignmentCenter);
+      text_layer_set_font(Batt, nSFont); 
+  }
   
   //building date layer
   rDate = GRect(hc.x-30,hc.y+15,60,25);
   date = text_layer_create(rDate);
   text_layer_set_background_color(date, GColorClear);
   text_layer_set_text_color(date, CFont);
-  text_layer_set_text(date, "");
   text_layer_set_text_alignment(date, GTextAlignmentCenter);
-  text_layer_set_font(date, dBFont); 
+  text_layer_set_font(date, nSFont); 
 
    //building dial numbers layers
    //bigNumbers (Quarters)
    rBNumbers = GRect(hc.x,hc.y,28,28);
    BN3 = text_layer_create(rBNumbers);
    text_layer_set_background_color(BN3, GColorClear);
-   text_layer_set_text_color(BN3, CBNumbers);
-   text_layer_set_text(BN3, "");
    text_layer_set_text_alignment(BN3, GTextAlignmentCenter);
    text_layer_set_font(BN3, nBFont);
    BN6 = text_layer_create(rBNumbers);
    text_layer_set_background_color(BN6, GColorClear);
-   text_layer_set_text_color(BN6, CBNumbers);
-   text_layer_set_text(BN6, "");
    text_layer_set_text_alignment(BN6, GTextAlignmentCenter);
    text_layer_set_font(BN6, nBFont);
    BN9 = text_layer_create(rBNumbers);
    text_layer_set_background_color(BN9, GColorClear);
-   text_layer_set_text_color(BN9, CBNumbers);
-   text_layer_set_text(BN9, "");
    text_layer_set_text_alignment(BN9, GTextAlignmentCenter);
    text_layer_set_font(BN9, nBFont);
    BN12 = text_layer_create(rBNumbers);
    text_layer_set_background_color(BN12, GColorClear);
-   text_layer_set_text_color(BN12, CBNumbers);
-   text_layer_set_text(BN12, "");
    text_layer_set_text_alignment(BN12, GTextAlignmentCenter);
    text_layer_set_font(BN12, nBFont);
   
@@ -1667,50 +1713,34 @@ void handle_init(void) {
    rSNumbers = GRect(hc.x,hc.y,28,28);
    SN1 = text_layer_create(rSNumbers);
    text_layer_set_background_color(SN1, GColorClear);
-   text_layer_set_text_color(SN1, CSNumbers);
-   text_layer_set_text(SN1, "");
    text_layer_set_text_alignment(SN1, GTextAlignmentCenter);
    text_layer_set_font(SN1, nSFont);
    SN2 = text_layer_create(rSNumbers);
    text_layer_set_background_color(SN2, GColorClear);
-   text_layer_set_text_color(SN2, CSNumbers);
-   text_layer_set_text(SN2, "");
    text_layer_set_text_alignment(SN2, GTextAlignmentCenter);
    text_layer_set_font(SN2, nSFont);
    SN4 = text_layer_create(rSNumbers);
    text_layer_set_background_color(SN4, GColorClear);
-   text_layer_set_text_color(SN4, CSNumbers);
-   text_layer_set_text(SN4, "");
    text_layer_set_text_alignment(SN4, GTextAlignmentCenter);
    text_layer_set_font(SN4, nSFont);
    SN5 = text_layer_create(rSNumbers);
    text_layer_set_background_color(SN5, GColorClear);
-   text_layer_set_text_color(SN5, CSNumbers);
-   text_layer_set_text(SN5, "");
    text_layer_set_text_alignment(SN5, GTextAlignmentCenter);
    text_layer_set_font(SN5, nSFont);
    SN7 = text_layer_create(rSNumbers);
    text_layer_set_background_color(SN7, GColorClear);
-   text_layer_set_text_color(SN7, CSNumbers);
-   text_layer_set_text(SN7, "");
    text_layer_set_text_alignment(SN7, GTextAlignmentCenter);
    text_layer_set_font(SN7, nSFont);
    SN8 = text_layer_create(rSNumbers);
    text_layer_set_background_color(SN8, GColorClear);
-   text_layer_set_text_color(SN8, CSNumbers);
-   text_layer_set_text(SN8, "");
    text_layer_set_text_alignment(SN8, GTextAlignmentCenter);
    text_layer_set_font(SN8, nSFont);
    SN10 = text_layer_create(rSNumbers);
    text_layer_set_background_color(SN10, GColorClear);
-   text_layer_set_text_color(SN10, CSNumbers);
-   text_layer_set_text(SN10, "");
    text_layer_set_text_alignment(SN10, GTextAlignmentCenter);
    text_layer_set_font(SN10, nSFont);
    SN11 = text_layer_create(rSNumbers);
    text_layer_set_background_color(SN11, GColorClear);
-   text_layer_set_text_color(SN11, CSNumbers);
-   text_layer_set_text(SN11, "");
    text_layer_set_text_alignment(SN11, GTextAlignmentCenter);
    text_layer_set_font(SN11, nSFont);
   
@@ -1731,11 +1761,12 @@ void handle_init(void) {
   // Adding layers to main window
   layer_add_child(window_get_root_layer(w), dial_layer);
   layer_add_child(window_get_root_layer(w), (Layer *)bluetooth);
-  layer_add_child(window_get_root_layer(w), (Layer *)battery);
   layer_add_child(window_get_root_layer(w), shadow_layer);
   layer_add_child(window_get_root_layer(w), shadow_second);
   layer_add_child(window_get_root_layer(w), marks_layer);
   layer_add_child(window_get_root_layer(w), (Layer *)date);
+  layer_add_child(window_get_root_layer(w), (Layer *)Batt);
+  layer_add_child(window_get_root_layer(w), (Layer *)battery);
   layer_add_child(window_get_root_layer(w), (Layer *)BN3);
   layer_add_child(window_get_root_layer(w), (Layer *)BN6);
   layer_add_child(window_get_root_layer(w), (Layer *)BN9);
@@ -1773,6 +1804,7 @@ void handle_deinit(void) {
   layer_destroy(SrcSaver_layer);
   layer_destroy(marks_layer);
   layer_destroy((Layer *)date);
+  layer_destroy((Layer *)Batt);
   layer_destroy((Layer *)BN3);
   layer_destroy((Layer *)BN6);
   layer_destroy((Layer *)BN9);
@@ -1791,18 +1823,20 @@ void handle_deinit(void) {
   gpath_destroy(hour_square);
   gpath_destroy(minute_square);
   gpath_destroy(hour_quarters);
-
+  
   battery_state_service_unsubscribe();
   bluetooth_connection_service_unsubscribe();
   tick_timer_service_unsubscribe();
   accel_tap_service_unsubscribe();
 
-  #ifdef PBL_COLOR  
-    if (ScreenSvr != NULL) {gbitmap_destroy(ScreenSvr);}
+  #ifdef PBL_COLOR
+    if (SrcSaver>1){
+            gbitmap_destroy(ScreenSvr);
+            window_destroy(s);
+    }
   #endif
     
-  if(w != NULL) {window_destroy(w);}
-  if(s != NULL) {window_destroy(s);}
+  window_destroy(w);
 }
 
 int main(void) {

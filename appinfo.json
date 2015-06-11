@@ -5,6 +5,7 @@
         "Key_Crown": 8,
         "Key_DateBox": 7,
         "Key_HandType": 4,
+        "Key_Light": 12,
         "Key_Numbers": 6,
         "Key_Radio": 2,
         "Key_SrcSaver": 10,
@@ -21,6 +22,16 @@
     "projectType": "native",
     "resources": {
         "media": [
+            {
+                "file": "images/zebra.png",
+                "name": "PIC1",
+                "type": "png"
+            },
+            {
+                "file": "images/picaso1.png",
+                "name": "PIC2",
+                "type": "png"
+            },
             {
                 "file": "images/titan_icon-picsay.png",
                 "menuIcon": true,
@@ -45,11 +56,6 @@
             {
                 "file": "images/picasso3bw.png",
                 "name": "PIC3",
-                "type": "png"
-            },
-            {
-                "file": "images/maligno.png",
-                "name": "PIC2",
                 "type": "png"
             },
             {
@@ -136,11 +142,6 @@
                 "file": "images/picasso_bw.png",
                 "name": "PIC4",
                 "type": "png"
-            },
-            {
-                "file": "images/zebra.png",
-                "name": "PIC1",
-                "type": "png"
             }
         ]
     },
@@ -151,7 +152,7 @@
         "basalt"
     ],
     "uuid": "7d599476-d3c8-4f7d-9fb0-5b56d050b1de",
-    "versionLabel": "6.7",
+    "versionLabel": "7.21",
     "watchapp": {
         "watchface": true
     }

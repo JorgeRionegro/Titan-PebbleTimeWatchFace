@@ -19,17 +19,19 @@ Pebble.addEventListener("showConfiguration",
     var platform;
     if(Pebble.getActiveWatchInfo) {
       // Available for use! aplite or basalt
+      try {
       platform = Pebble.getActiveWatchInfo().platform;
+      } catch(err) {platform = 'basalt';}
     } else {
       // Not available, handle gracefully
       platform = 'aplite';
     }
     
     if (platform=='aplite') {
-            Pebble.openURL("https://dl.dropboxusercontent.com/u/34982193/TitanBW_v6_7.html"+url_args);
+            Pebble.openURL("https://dl.dropboxusercontent.com/u/34982193/TitanBW_v7_2.html"+url_args);
             console.log("Connected to http configuration page!");
     } else {
-            Pebble.openURL("https://dl.dropboxusercontent.com/u/34982193/Titan_v6_7.html"+url_args);
+            Pebble.openURL("https://dl.dropboxusercontent.com/u/34982193/Titan_v7_2.html"+url_args);
             console.log("Connected to http configuration page!");
     }
   }
@@ -41,7 +43,6 @@ Pebble.addEventListener("webviewclosed",
     var configuration = JSON.parse(decodeURIComponent(e.response));
     localStorage.setItem("settings", JSON.stringify(configuration));
     console.log("Configuration window returned: " + JSON.stringify(configuration));
-    //{"Showseconds":"on","Showshadows":"off","Radio":"110","ClockType":"1","HandType":"0","ShowBluetooth":"on","NumbersType":"1","DateBox":"on"}
     //Send to Pebble, persist there
     Pebble.sendAppMessage(
       {"Key_UseSeconds": configuration.Showseconds,
@@ -55,7 +56,8 @@ Pebble.addEventListener("webviewclosed",
        "Key_Crown": configuration.UseCrown,
        "Key_Ticks": configuration.HandleTicks,
        "Key_SrcSaver": configuration.SrcSaver,
-       "Key_Time": configuration.Timer
+       "Key_Time": configuration.Timer,
+       "Key_Light": configuration.Light
        },
       function(e) {console.log("Settings data received..."); },
       function(e) {
