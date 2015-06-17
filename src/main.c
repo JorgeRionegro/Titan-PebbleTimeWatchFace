@@ -20,7 +20,7 @@
 #define K_Light 12
 #define K_Battery 13
 
-static int mTicks = 60, Radio = 112, a = 1, cType = 0, hType = 1, numbType = 5, uBluetooth = 1, grosor = 4, hTicks = 3, control = 1;
+static int mTicks = 60, Radio = 102, a = 1, cType = 0, hType = 1, numbType = 5, uBluetooth = 1, grosor = 4, hTicks = 3, control = 1;
 static int bType=0, SrcSaver = 0, sTime=1, iTimer=0, current = 0, maxSaver = 25;
 static int lTime =7, iLight=0;
   
@@ -1227,6 +1227,7 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
               iTimer = 0;
               if (SrcSaver==1){
                   if (UseSeconds == true) { 
+                          a = 1;
                           UseSeconds = false;
                           current = 1; 
                           sTime = sTime/60+1;
