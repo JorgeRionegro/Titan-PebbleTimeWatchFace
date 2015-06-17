@@ -1,5 +1,6 @@
 {
     "appKeys": {
+        "Key_Battery": 13,
         "Key_Bluetooth": 5,
         "Key_ClockType": 3,
         "Key_Crown": 8,
@@ -152,7 +153,7 @@
         "basalt"
     ],
     "uuid": "7d599476-d3c8-4f7d-9fb0-5b56d050b1de",
-    "versionLabel": "7.21",
+    "versionLabel": "7.3",
     "watchapp": {
         "watchface": true
     }

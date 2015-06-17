@@ -18,9 +18,10 @@
 #define K_SrcSaver 10
 #define K_Time 11
 #define K_Light 12
+#define K_Battery 13
 
-static int mTicks = 60, Radio = 98, a = 1, cType = 0, hType = 1, numbType = 5, uBluetooth = 1, grosor = 4, hTicks = 3, control = 1;
-static int bType=1, SrcSaver = 0, sTime=1, iTimer=0, current = 0, maxSaver = 25;
+static int mTicks = 60, Radio = 112, a = 1, cType = 0, hType = 1, numbType = 5, uBluetooth = 1, grosor = 4, hTicks = 3, control = 1;
+static int bType=0, SrcSaver = 0, sTime=1, iTimer=0, current = 0, maxSaver = 25;
 static int lTime =7, iLight=0;
   
 bool UseSeconds = false, UseShadows = true, DateBox = true, UseCrown = true;
@@ -515,6 +516,7 @@ static void setImage (int ScreenSaver){
 
 static void handle_battery(BatteryChargeState c_state) {
       layer_mark_dirty(battery);
+      layer_mark_dirty((Layer *)Batt);
 }
 
 void handle_bluetooth(bool connected) {
@@ -528,14 +530,13 @@ void handle_bluetooth(bool connected) {
 static void battery_update_proc(Layer *layer, GContext *ctx) {
      static BatteryChargeState c_state;
      c_state = battery_state_service_peek();
-  
-     graphics_context_set_stroke_color(ctx, c_state.is_charging ? CBattery : CSphere);
-     graphics_draw_rect(ctx, GRect(0,0,15,15));
-  
-     graphics_context_set_stroke_color(ctx, CBattery);
-     graphics_context_set_fill_color(ctx, CBattery);
-     if (bType == 0){
-        switch(c_state.charge_percent/10){
+     if (bType == 0){  
+       graphics_context_set_stroke_color(ctx, c_state.is_charging ? CBattery : CSphere);
+       graphics_draw_rect(ctx, GRect(0,0,15,15));
+       graphics_context_set_stroke_color(ctx, CBattery);
+       graphics_context_set_fill_color(ctx, CBattery);
+
+       switch(c_state.charge_percent/10){
          case 10: graphics_draw_rect(ctx, GRect(3,3,12,12)); graphics_draw_rect(ctx, GRect(1,1,12,12)); break;
          case 9: graphics_draw_rect(ctx, GRect(10,2,3,3));
          case 8: graphics_draw_rect(ctx, GRect(2,2,3,3));
@@ -552,11 +553,25 @@ static void battery_update_proc(Layer *layer, GContext *ctx) {
 
 void bluetooth_update_proc(Layer *layer, GContext *ctx) {
   if (uBluetooth > 0 ) {
-  graphics_context_set_stroke_color(ctx, bluetooth_connection_service_peek() ? CSphere : CBattery);
-  GPoint bt;
-  bt.x = 15;
-  bt.y = 15;
-  graphics_draw_circle(ctx, bt, 10);
+    //graphics_context_set_stroke_color(ctx, bluetooth_connection_service_peek() ? CSphere : CBattery);
+    graphics_context_set_stroke_color(ctx, CBattery);
+    if (bluetooth_connection_service_peek()==false){
+      GPoint bt;
+      if (bType==0){
+        bt.x = 20;
+        bt.y = 15;
+        graphics_draw_circle(ctx, bt, 10);
+      } else {
+        bt.x = 20;
+        bt.y = 20;
+        #ifdef PBL_COLOR
+          graphics_context_set_antialiased(ctx, true);
+          graphics_context_set_stroke_width(ctx, 3);
+        #endif 
+        GRect sDBth = GRect(bt.x-17,bt.y-18,35,25);
+        graphics_draw_rect(ctx, sDBth);
+      }    
+    }
   }
 }
 
@@ -601,7 +616,7 @@ void dial_layer_update(Layer *me, GContext *ctx) {
     graphics_context_set_fill_color(ctx, CDBox);
     graphics_fill_rect(ctx, sDBox, 6, GCornersAll);
     if (bType ==1) {
-      GRect sDBat = GRect(hc.x-9,hc.y-33,19,20);
+      GRect sDBat = GRect(hc.x-13,hc.y-37,28,22);
       graphics_fill_rect(ctx, sDBat, 6, GCornersAll);}
   }
 }
@@ -809,8 +824,7 @@ void shadow_layer_update(Layer *me, GContext *ctx) {
                  sh3 = shHb;
                  sh4 = shHt;
               }
-
-            } else {
+        } else {
                 sh1 = shHb;
                 sh2 = shHt;
             }
@@ -1190,24 +1204,24 @@ void time_second_update(Layer *me, GContext *ctx) {
 
 void handle_tick(struct tm *now, TimeUnits units_changed) {
   setlocale(LC_TIME, "");
-  if (lTime>0){
+  if (lTime>0&&iLight>-1){
       iLight= iLight+1;
       if (iLight >= lTime){
         light_enable(false);
-        iLight = 0;
+        iLight = -1;
         if (UseSeconds == false){
-          iTimer=0;
-          sTime = sTime/60+1;
           tick_timer_service_subscribe(MINUTE_UNIT, handle_tick);
         }
-      } 
+      } else {
+         tick_timer_service_subscribe(SECOND_UNIT, handle_tick);
+      }
     }
 
   //APP_LOG(APP_LOG_LEVEL_INFO, "handle_tick: Setting Screen Saver %d", SrcSaver); 
   hh_angle = (TRIG_MAX_ANGLE*(((now->tm_hour%12)*6)+(now->tm_min/10)))/(12*6);
   mi_angle = TRIG_MAX_ANGLE * (now->tm_min) / 60;
   a_angle =  TRIG_MAX_ANGLE * 1 / 60;
-  if (SrcSaver>0 && current== 0){
+  if (SrcSaver>0 && current== 0 && iLight == -1){
           iTimer= iTimer+1;
           if (iTimer > sTime){
               iTimer = 0;
@@ -1226,6 +1240,7 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
                           layer_mark_dirty(time_layer);
                           layer_mark_dirty(shadow_second);
                           layer_mark_dirty(time_second);
+                          //light_enable(false);
                           window_stack_push(s, true);
                      #endif
               }
@@ -1251,23 +1266,6 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
           a=0; 
           control = 1;
   }
-  if ((UseSeconds == true && control == 1)||(UseSeconds == false)) {
-     layer_mark_dirty(marks_layer);
-     layer_mark_dirty(dial_layer);
-     layer_mark_dirty((Layer *)date);
-     layer_mark_dirty((Layer *)SN1);
-     layer_mark_dirty((Layer *)SN2);
-     layer_mark_dirty((Layer *)BN3);
-     layer_mark_dirty((Layer *)SN4);
-     layer_mark_dirty((Layer *)SN5);
-     layer_mark_dirty((Layer *)BN6);
-     layer_mark_dirty((Layer *)SN7);
-     layer_mark_dirty((Layer *)SN8);
-     layer_mark_dirty((Layer *)BN9);
-     layer_mark_dirty((Layer *)SN10);
-     layer_mark_dirty((Layer *)SN11);
-     layer_mark_dirty((Layer *)BN12);
-  }
      layer_mark_dirty(shadow_layer);
      layer_mark_dirty(time_layer);
      layer_mark_dirty(shadow_second);
@@ -1287,21 +1285,35 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
     
   // Set Centre, date and Battery
   if (key == 1) {
-      c_state = battery_state_service_peek();
-      strftime(date_buf, sizeof("Mon.  1"), "%a. %e", now);
-      text_layer_set_text(date, date_buf);
-      if (bType == 1){
-         snprintf(battery_buf, sizeof(battery_buf), "%d", c_state.charge_percent);
-      }
-    
-    if (Radio<=72){
+     layer_mark_dirty(marks_layer);
+     layer_mark_dirty(dial_layer);
+     layer_mark_dirty((Layer *)date);
+     layer_mark_dirty((Layer *)SN1);
+     layer_mark_dirty((Layer *)SN2);
+     layer_mark_dirty((Layer *)BN3);
+     layer_mark_dirty((Layer *)SN4);
+     layer_mark_dirty((Layer *)SN5);
+     layer_mark_dirty((Layer *)BN6);
+     layer_mark_dirty((Layer *)SN7);
+     layer_mark_dirty((Layer *)SN8);
+     layer_mark_dirty((Layer *)BN9);
+     layer_mark_dirty((Layer *)SN10);
+     layer_mark_dirty((Layer *)SN11);
+     layer_mark_dirty((Layer *)BN12);
+ 
+     c_state = battery_state_service_peek();
+     strftime(date_buf, sizeof("Mon.  1"), "%a. %e", now);
+     text_layer_set_text(date, date_buf);
+     snprintf(battery_buf, sizeof(battery_buf), "%d", c_state.charge_percent);
+   
+      if (Radio<=72){
            hc = GPoint(71,84);
-    } else {
+      } else {
            hc = GPoint((int16_t)(-sin_lookup(TRIG_MAX_ANGLE / 60 * sector) *
   		     (int32_t)(Radio-68) / TRIG_MAX_RATIO) + 144 / 2, 
            (int16_t)(cos_lookup(TRIG_MAX_ANGLE / 60 * sector) *
   		     (int32_t)(Radio-80) / TRIG_MAX_RATIO) +  168 / 2);
-    }
+      }
       hs.x=hc.x+1;
       hs.y=hc.y+4;
       
@@ -1309,25 +1321,26 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
       if (bType ==0){
          nextBattery = GRect(hc.x-7,hc.y-33,15,15);
       } else {
-         nextBattery = GRect(hc.x-10,hc.y-35,20,20);
+         nextBattery = GRect(hc.x-15,hc.y-38,30,22);
       }
-      nextBluetooth = GRect(hc.x-15,hc.y-41,30,30);
+      nextBluetooth = GRect(hc.x-20,hc.y-41,40,40);
       text_layer_set_text_color(date, CFont);
       layer_set_frame(text_layer_get_layer(date), next);
       if (bType == 1){
-        if (c_state.is_charging==true){text_layer_set_text(Batt, "§");}
-        else {
-                if (c_state.charge_percent==100){text_layer_set_text(Batt, "%");}
-                    else {text_layer_set_text(Batt, battery_buf);}
+        if (c_state.is_charging==true){
+          text_layer_set_text(Batt, "§");
+        } else {
+          text_layer_set_text(Batt, battery_buf);
         }
         text_layer_set_text_color(Batt, CFont);
         layer_set_frame(text_layer_get_layer(Batt), nextBattery);
       } else {
+        text_layer_set_text(Batt, "");
         layer_set_frame(battery, nextBattery);
         layer_set_update_proc(battery, battery_update_proc);
+      }
         layer_set_frame(bluetooth, nextBluetooth);
         layer_set_update_proc(bluetooth, bluetooth_update_proc);
-      }
     
       if (numbType != 1) {
         text_layer_set_text_color(BN3, CBNumbers);
@@ -1536,6 +1549,10 @@ static void in_recv_handler(DictionaryIterator *iterator, void *context)
        iLight=0;
        persist_write_int(K_Light, lTime);
        break;
+    case K_Battery:
+       bType = atoi(t->value->cstring);
+       persist_write_int(K_Battery, bType);
+       break;
     }
    // Get next pair, if any
    t = dict_read_next(iterator);
@@ -1575,6 +1592,7 @@ static void setSrcSaver (int ScreenSaver)
   if (SrcSaver==1){
     if (UseSeconds == false) { 
               iTimer=0;
+              //APP_LOG(APP_LOG_LEVEL_INFO, "sTime %d", sTime);
               sTime = (sTime-1) * 60;
               a = 1;
               current = 0; 
@@ -1583,6 +1601,7 @@ static void setSrcSaver (int ScreenSaver)
   }
   if (SrcSaver>1){ 
     layer_mark_dirty(SrcSaver_layer);
+    //APP_LOG(APP_LOG_LEVEL_INFO, "sTime %d", sTime);
     if (current == 1){
       iTimer=0;
       a = 1;
@@ -1601,7 +1620,7 @@ static void handle_tap(AccelAxisType axis, int32_t direction) {
   if (lTime>0){
       light_enable(true);
       iLight = 0;
-    if (UseSeconds == false){sTime = (sTime) * 60;}
+      //if (UseSeconds == false){sTime = (sTime) * 60;}
       tick_timer_service_subscribe(SECOND_UNIT, handle_tick);
     }
 }
@@ -1628,7 +1647,9 @@ void handle_init(void) {
   if (persist_exists(K_SrcSaver)) {SrcSaver = persist_read_int(K_SrcSaver); }
   if (persist_exists(K_Time)) {sTime = persist_read_int(K_Time); }
   if (persist_exists(K_Light)) {lTime = persist_read_int(K_Light); }
+  if (persist_exists(K_Battery)) {bType = persist_read_int(K_Battery); }
   if (SrcSaver==1){UseSeconds = false;}
+  if (UseSeconds == false){sTime = sTime +1;} else {sTime = sTime * 60;}
   //set colors
   setColors (cType);
   
@@ -1655,7 +1676,7 @@ void handle_init(void) {
   #ifdef PBL_SDK_2
    window_set_fullscreen(w, true);
   #endif
-  GRect bounds = GRect(0,0,144,168); //layer_get_bounds(window_layer);
+  GRect bounds = GRect(0,0,144,168);
   dial_layer = layer_create(bounds);
   marks_layer = layer_create(bounds);
   shadow_layer = layer_create(bounds);
@@ -1669,17 +1690,14 @@ void handle_init(void) {
   hour_quarters = gpath_create(&HOUR_QUARTERS);
 
   //Layer for battery
+  rBatt = GRect(0,0,30,22);
+  Batt  = text_layer_create(rBatt);
+  text_layer_set_background_color(Batt, GColorClear);
+  text_layer_set_text_color(Batt, CFont);
+  text_layer_set_text_alignment(Batt, GTextAlignmentCenter);
+  text_layer_set_font(Batt, nSFont); 
   rBattery = GRect(hc.x-7,hc.y-33,15,15);
-  battery = layer_create(rBattery);
-  if (bType == 1){
-      //rBatt = GRect(hc.x-10,hc.y-33,20,20);
-      rBatt = GRect(0,0,20,20);
-      Batt  = text_layer_create(rBatt);
-      text_layer_set_background_color(Batt, GColorClear);
-      text_layer_set_text_color(Batt, CFont);
-      text_layer_set_text_alignment(Batt, GTextAlignmentCenter);
-      text_layer_set_font(Batt, nSFont); 
-  }
+  battery = layer_create(rBattery);   
   
   //building date layer
   rDate = GRect(hc.x-30,hc.y+15,60,25);
@@ -1765,8 +1783,11 @@ void handle_init(void) {
   layer_add_child(window_get_root_layer(w), shadow_second);
   layer_add_child(window_get_root_layer(w), marks_layer);
   layer_add_child(window_get_root_layer(w), (Layer *)date);
-  layer_add_child(window_get_root_layer(w), (Layer *)Batt);
-  layer_add_child(window_get_root_layer(w), (Layer *)battery);
+  //if (bType == 1){
+    layer_add_child(window_get_root_layer(w), (Layer *)Batt);    
+  //} else {
+    layer_add_child(window_get_root_layer(w), (Layer *)battery);
+  //}
   layer_add_child(window_get_root_layer(w), (Layer *)BN3);
   layer_add_child(window_get_root_layer(w), (Layer *)BN6);
   layer_add_child(window_get_root_layer(w), (Layer *)BN9);
@@ -1789,10 +1810,9 @@ void handle_init(void) {
   window_stack_push(w, true);
   current = 0;
   
-  if (UseSeconds == true) { sTime = sTime * 60;
+  if (UseSeconds == true) { 
           tick_timer_service_subscribe(SECOND_UNIT, handle_tick); }
-  else  { sTime = (sTime+1);
-          tick_timer_service_subscribe(MINUTE_UNIT, handle_tick); }
+  else  { tick_timer_service_subscribe(MINUTE_UNIT, handle_tick); }
 }
 
 void handle_deinit(void) {
@@ -1804,7 +1824,6 @@ void handle_deinit(void) {
   layer_destroy(SrcSaver_layer);
   layer_destroy(marks_layer);
   layer_destroy((Layer *)date);
-  layer_destroy((Layer *)Batt);
   layer_destroy((Layer *)BN3);
   layer_destroy((Layer *)BN6);
   layer_destroy((Layer *)BN9);
@@ -1817,7 +1836,8 @@ void handle_deinit(void) {
   layer_destroy((Layer *)SN8);
   layer_destroy((Layer *)SN10);
   layer_destroy((Layer *)SN11);
-  layer_destroy(battery);
+  layer_destroy(battery);    
+  layer_destroy((Layer *)Batt);   
   layer_destroy(bluetooth);
   
   gpath_destroy(hour_square);
