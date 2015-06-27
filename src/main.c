@@ -20,9 +20,10 @@
 #define K_Light 12
 #define K_Battery 13
 
-static int mTicks = 60, Radio = 102, a = 1, cType = 0, hType = 1, numbType = 5, uBluetooth = 1, grosor = 4, hTicks = 3, control = 1;
+static int mTicks = 60, Radio = 100, a = 1, cType = 1, hType = 1, numbType = 5, uBluetooth = 1, grosor = 4, hTicks = 3, control = 1;
 static int bType=0, SrcSaver = 0, sTime=1, iTimer=0, current = 0, maxSaver = 25;
 static int lTime =7, iLight=0;
+static int debug = 0;//to activate debug messages set 1
   
 bool UseSeconds = false, UseShadows = true, DateBox = true, UseCrown = true;
 int32_t hh_angle, mi_angle, ss_angle, a_angle;
@@ -100,8 +101,8 @@ static void setColors (int clockType){
     CQMarks = COLOR_FALLBACK(GColorWhite,GColorWhite); 
     CHMarks = COLOR_FALLBACK(GColorWhite,GColorWhite); 
     CMMarks = COLOR_FALLBACK(GColorYellow,GColorWhite);
-    CHours = COLOR_FALLBACK(GColorGreen,GColorWhite);
-    CMinutes = COLOR_FALLBACK(GColorYellow,GColorWhite);
+    CHours = COLOR_FALLBACK(GColorCyan,GColorWhite);
+    CMinutes = COLOR_FALLBACK(GColorDukeBlue,GColorWhite);
     CSeconds = COLOR_FALLBACK(GColorWhite,GColorWhite);
     CShadow = COLOR_FALLBACK(GColorDarkGray,GColorBlack);  
     CFont = COLOR_FALLBACK(GColorWhite,GColorBlack);
@@ -117,7 +118,7 @@ static void setColors (int clockType){
     CQMarks = COLOR_FALLBACK(GColorWhite,GColorWhite); 
     CHMarks = COLOR_FALLBACK(GColorWhite,GColorWhite); 
     CMMarks = COLOR_FALLBACK(GColorYellow,GColorWhite);
-    CHours = COLOR_FALLBACK(GColorShockingPink,GColorWhite);
+    CHours = COLOR_FALLBACK(GColorKellyGreen,GColorWhite);
     CMinutes = COLOR_FALLBACK(GColorCyan,GColorWhite);
     CSeconds = COLOR_FALLBACK(GColorWhite,GColorWhite);
     CShadow = COLOR_FALLBACK(GColorBlack,GColorWhite);  
@@ -206,7 +207,7 @@ static void setColors (int clockType){
     CHours = COLOR_FALLBACK(GColorIslamicGreen,GColorWhite);
     CMinutes = COLOR_FALLBACK(GColorBlue,GColorWhite);
     CSeconds = COLOR_FALLBACK(GColorRed,GColorWhite);
-    CShadow = COLOR_FALLBACK(GColorBulgarianRose,GColorBlack);  
+    CShadow = COLOR_FALLBACK(GColorDarkGray,GColorBlack);  
     CFont = COLOR_FALLBACK(GColorWhite,GColorWhite);
     CBattery = COLOR_FALLBACK(GColorDukeBlue,GColorWhite);
     CSNumbers = COLOR_FALLBACK(GColorDukeBlue,GColorWhite);
@@ -272,14 +273,14 @@ static void setColors (int clockType){
     CHMarks = COLOR_FALLBACK(GColorYellow,GColorBlack); 
     CMMarks = COLOR_FALLBACK(GColorWhite,GColorBlack);
     CHours = COLOR_FALLBACK(GColorYellow,GColorBlack);
-    CMinutes = COLOR_FALLBACK( GColorGreen,GColorBlack);
+    CMinutes = COLOR_FALLBACK(GColorDukeBlue,GColorBlack);
     CSeconds = COLOR_FALLBACK(GColorCyan,GColorBlack);
-    CShadow = COLOR_FALLBACK(GColorArmyGreen,GColorWhite);  
+    CShadow = COLOR_FALLBACK(GColorOxfordBlue,GColorWhite);  
     CFont = COLOR_FALLBACK(GColorWhite,GColorBlack);
     CBattery = COLOR_FALLBACK(GColorWhite,GColorBlack);
     CSNumbers = COLOR_FALLBACK(GColorYellow,GColorBlack);
     CBNumbers = COLOR_FALLBACK(GColorWhite,GColorBlack);
-    CDBox = COLOR_FALLBACK(GColorArmyGreen,GColorBlack);
+    CDBox = COLOR_FALLBACK(GColorDarkGray,GColorBlack);
     CCrown = COLOR_FALLBACK(GColorWindsorTan,GColorWhite);
     break;
     case 13: //Simply Red
@@ -418,6 +419,40 @@ static void setColors (int clockType){
     CDBox = COLOR_FALLBACK(GColorDarkGray,GColorBlack);
     CCrown = COLOR_FALLBACK(GColorRed,GColorWhite);
     break;
+    case 21: //Black
+    BColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CSphere = COLOR_FALLBACK(GColorBlack, GColorWhite);
+    CQMarks = COLOR_FALLBACK(GColorLightGray,GColorBlack); 
+    CHMarks = COLOR_FALLBACK(GColorLightGray,GColorBlack); 
+    CMMarks = COLOR_FALLBACK(GColorLightGray,GColorBlack);
+    CHours = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CMinutes = COLOR_FALLBACK(GColorCyan,GColorBlack);
+    CSeconds = COLOR_FALLBACK(GColorRed,GColorBlack);
+    CShadow = COLOR_FALLBACK(GColorBlack,GColorWhite);  
+    CFont = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CBattery = COLOR_FALLBACK(GColorYellow,GColorBlack);
+    CSNumbers = COLOR_FALLBACK(GColorLightGray,GColorBlack);
+    CBNumbers = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CDBox = COLOR_FALLBACK(GColorDarkGray,GColorBlack);
+    CCrown = COLOR_FALLBACK(GColorWhite,GColorWhite);
+    break;
+    case 22: //Pride Day
+    BColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CSphere = COLOR_FALLBACK(GColorPastelYellow, GColorWhite);
+    CQMarks = COLOR_FALLBACK(GColorBlack,GColorBlack); 
+    CHMarks = COLOR_FALLBACK(GColorBlack,GColorBlack); 
+    CMMarks = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CHours = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CMinutes = COLOR_FALLBACK(GColorDarkGray,GColorBlack);
+    CSeconds = COLOR_FALLBACK(GColorCyan,GColorBlack);
+    CShadow = COLOR_FALLBACK(GColorBlack,GColorWhite);  
+    CFont = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CBattery = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CSNumbers = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CBNumbers = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CDBox = COLOR_FALLBACK(GColorLightGray,GColorBlack);
+    CCrown = COLOR_FALLBACK(GColorJazzberryJam,GColorWhite);
+    break;
 #endif
   }
 }
@@ -430,8 +465,8 @@ static void setImage (int ScreenSaver){
           srand (time (NULL)+rand() % 60);
           ScreenSaver = 2+rand() % (maxSaver-3);
    }
-   //APP_LOG(APP_LOG_LEVEL_INFO, "set_image: Setting Screen Saver %d", ScreenSaver); 
-   //APP_LOG(APP_LOG_LEVEL_INFO, "Heap Available Before: %d", heap_bytes_free());  
+  if (debug==1){APP_LOG(APP_LOG_LEVEL_INFO, "set_image: Setting Screen Saver %d", ScreenSaver); }
+  if (debug==1){APP_LOG(APP_LOG_LEVEL_INFO, "Heap Available Before: %d", heap_bytes_free()); } 
    switch(ScreenSaver){
     case 2: //SKully
       ScreenSvr = gbitmap_create_with_resource(RESOURCE_ID_SKULLY);
@@ -509,7 +544,7 @@ static void setImage (int ScreenSaver){
     bitmap_layer_set_bitmap(bitmap_layer, ScreenSvr);
     bitmap_layer_set_compositing_mode(bitmap_layer, GCompOpAssign);
     layer_add_child(SrcSaver_layer, bitmap_layer_get_layer(bitmap_layer));
-    //APP_LOG(APP_LOG_LEVEL_INFO, "Heap Available After: %d", heap_bytes_free());
+    if (debug==1){APP_LOG(APP_LOG_LEVEL_INFO, "Heap Available After: %d", heap_bytes_free());}
   } 
   #endif
 }
@@ -587,6 +622,28 @@ void dial_layer_update(Layer *me, GContext *ctx) {
   //Clock Sphere
   graphics_context_set_fill_color(ctx, CSphere);
   graphics_fill_circle(ctx, hc, Radio);
+  #ifdef PBL_COLOR
+  if (cType==22){
+    graphics_context_set_fill_color(ctx, GColorYellow);
+    graphics_fill_circle(ctx, hc, Radio*0.9);
+    graphics_context_set_fill_color(ctx, GColorChromeYellow);
+    graphics_fill_circle(ctx, hc, Radio*0.8);
+    graphics_context_set_fill_color(ctx, GColorRed);
+    graphics_fill_circle(ctx, hc, Radio*0.7);
+    graphics_context_set_fill_color(ctx, GColorGreen);
+    graphics_fill_circle(ctx, hc, Radio*0.6);
+    graphics_context_set_fill_color(ctx, GColorIslamicGreen);
+    graphics_fill_circle(ctx, hc, Radio*0.5);
+    graphics_context_set_fill_color(ctx, GColorCeleste);
+    graphics_fill_circle(ctx, hc, Radio*0.4);
+    graphics_context_set_fill_color(ctx, GColorBlue);
+    graphics_fill_circle(ctx, hc, Radio*0.3);
+    graphics_context_set_fill_color(ctx, GColorMagenta);
+    graphics_fill_circle(ctx, hc, Radio*0.2);
+    graphics_context_set_fill_color(ctx, GColorJazzberryJam);
+    graphics_fill_circle(ctx, hc, Radio*0.1);
+  }
+  #endif
   if (UseCrown==true){
     #ifdef PBL_COLOR
       if (UseShadows==true){
@@ -700,7 +757,7 @@ void shadow_layer_update(Layer *me, GContext *ctx) {
     graphics_fill_circle(ctx, hs, 7);
    if (subCtrl ==1){
 	  for(x=start; x <= end; x++) {
-          if (hType <= 3) {
+          if (hType != 4) {
                smHb.x = ((int32_t)( sin_lookup(mi_angle) * (int32_t)(-1*Radio*0.15+h_offset) / TRIG_MAX_RATIO) + hs.x 
                   + (int16_t)(cos_lookup(mi_angle)*x/TRIG_MAX_RATIO));
                smHb.y = ((int32_t)(-cos_lookup(mi_angle) * (int32_t)(-1*Radio*0.15+h_offset) / TRIG_MAX_RATIO) + hs.y 
@@ -715,7 +772,7 @@ void shadow_layer_update(Layer *me, GContext *ctx) {
                   + (int16_t)(cos_lookup(mi_angle)*x/TRIG_MAX_RATIO));
           smHt.y = ((int32_t)(-cos_lookup(mi_angle) * (int32_t)(Radio*0.8) / TRIG_MAX_RATIO) + hs.y 
                   + (int16_t)(sin_lookup(mi_angle)*x/TRIG_MAX_RATIO));
-             if (hType > 3) {
+             if (hType == 4) {
               slmH.x = ((int32_t)( sin_lookup(mi_angle-a_angle) * (int32_t)(-1*Radio*0.3) / TRIG_MAX_RATIO) + smHt.x 
                   + (int16_t)(cos_lookup(mi_angle-a_angle)*x/TRIG_MAX_RATIO));
               slmH.y = ((int32_t)(-cos_lookup(mi_angle-a_angle) * (int32_t)(-1*Radio*0.3) / TRIG_MAX_RATIO) + smHt.y 
@@ -1040,7 +1097,7 @@ void time_layer_update(Layer *me, GContext *ctx) {
                       graphics_context_set_stroke_width(ctx, 3);
                       if (cType==20 || cType==5 || cType==8|| cType==19){
                                   graphics_context_set_stroke_color(ctx, CCrown);
-                       } else { if (cType==13 || cType==14 || cType==15 || cType==16|| cType==17){
+                       } else { if (cType==13 || cType==14 || cType==15 || cType==16|| cType==17|| cType==21){
                                   graphics_context_set_stroke_color(ctx, CSphere);
                                 } else {graphics_context_set_stroke_color(ctx, CHours);}
                               }
@@ -1204,7 +1261,7 @@ void time_second_update(Layer *me, GContext *ctx) {
 
 void handle_tick(struct tm *now, TimeUnits units_changed) {
   setlocale(LC_TIME, "");
-  if (lTime>0&&iLight>-1){
+  if (lTime>0 && iLight>-1){
       iLight= iLight+1;
       if (iLight >= lTime){
         light_enable(false);
@@ -1217,7 +1274,6 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
       }
     }
 
-  //APP_LOG(APP_LOG_LEVEL_INFO, "handle_tick: Setting Screen Saver %d", SrcSaver); 
   hh_angle = (TRIG_MAX_ANGLE*(((now->tm_hour%12)*6)+(now->tm_min/10)))/(12*6);
   mi_angle = TRIG_MAX_ANGLE * (now->tm_min) / 60;
   a_angle =  TRIG_MAX_ANGLE * 1 / 60;
@@ -1225,8 +1281,10 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
           iTimer= iTimer+1;
           if (iTimer > sTime){
               iTimer = 0;
+              if (debug==1){APP_LOG(APP_LOG_LEVEL_INFO, "handle_tick: Before Setting Screen Saver %d", SrcSaver);}
               if (SrcSaver==1){
                   if (UseSeconds == true) { 
+                          if (debug==1){APP_LOG(APP_LOG_LEVEL_INFO, "Set seconds off");}
                           a = 1;
                           UseSeconds = false;
                           current = 1; 
@@ -1234,6 +1292,7 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
                           tick_timer_service_subscribe(MINUTE_UNIT, handle_tick); }
              } else {
                      #ifdef PBL_COLOR
+                          if (debug==1){APP_LOG(APP_LOG_LEVEL_INFO, "Set screen saver on");}
                           tick_timer_service_subscribe(DAY_UNIT, handle_tick);
                           current = 1; 
                           if (SrcSaver==maxSaver) {setImage(SrcSaver);}
@@ -1241,7 +1300,6 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
                           layer_mark_dirty(time_layer);
                           layer_mark_dirty(shadow_second);
                           layer_mark_dirty(time_second);
-                          //light_enable(false);
                           window_stack_push(s, true);
                      #endif
               }
@@ -1454,13 +1512,13 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
 
 static void in_recv_handler(DictionaryIterator *iterator, void *context)
 {
-  APP_LOG(APP_LOG_LEVEL_INFO, "Enter in_recv_handler");
+  if (debug==1){APP_LOG(APP_LOG_LEVEL_INFO, "Enter in_recv_handler");}
   //Get Tuple
   Tuple *t = dict_read_first(iterator);
   a = 1;
   //Process all pairs present
   while(t != NULL) {
-    //APP_LOG(APP_LOG_LEVEL_INFO, "Iterator %d received with value %s", (int)t->key, t->value->cstring);
+    if (debug==1){APP_LOG(APP_LOG_LEVEL_INFO, "Iterator %d received with value %s", (int)t->key, t->value->cstring);}
     // Process this pair's key
     switch(t->key)
     {
@@ -1548,6 +1606,7 @@ static void in_recv_handler(DictionaryIterator *iterator, void *context)
     case K_Light:
        lTime = atoi(t->value->cstring);
        iLight=0;
+       if (lTime == 0){iLight = -1;}
        persist_write_int(K_Light, lTime);
        break;
     case K_Battery:
@@ -1558,7 +1617,7 @@ static void in_recv_handler(DictionaryIterator *iterator, void *context)
    // Get next pair, if any
    t = dict_read_next(iterator);
  }
-  //APP_LOG(APP_LOG_LEVEL_INFO, "Exit loop message received");
+  if (debug==1){APP_LOG(APP_LOG_LEVEL_INFO, "Exit loop message received");}
   setColors (cType);
   //Empty sphere numbers to recalculate
   text_layer_set_text(BN3, "");
@@ -1593,7 +1652,7 @@ static void setSrcSaver (int ScreenSaver)
   if (SrcSaver==1){
     if (UseSeconds == false) { 
               iTimer=0;
-              //APP_LOG(APP_LOG_LEVEL_INFO, "sTime %d", sTime);
+              if (debug==1){APP_LOG(APP_LOG_LEVEL_INFO, "sTime seconds while %d", sTime);}
               sTime = (sTime-1) * 60;
               a = 1;
               current = 0; 
@@ -1602,7 +1661,7 @@ static void setSrcSaver (int ScreenSaver)
   }
   if (SrcSaver>1){ 
     layer_mark_dirty(SrcSaver_layer);
-    //APP_LOG(APP_LOG_LEVEL_INFO, "sTime %d", sTime);
+    if (debug==1){APP_LOG(APP_LOG_LEVEL_INFO, "sTime srcsaver %d", sTime);}
     if (current == 1){
       iTimer=0;
       a = 1;
@@ -1613,7 +1672,7 @@ static void setSrcSaver (int ScreenSaver)
       window_stack_push(w, true);
     }
   }
-  //APP_LOG(APP_LOG_LEVEL_INFO, "YOU SHAKE IT ¡¡¡");
+  if (debug==1){APP_LOG(APP_LOG_LEVEL_INFO, "YOU SHAKE IT ¡¡¡");}
 }
 
 static void handle_tap(AccelAxisType axis, int32_t direction) {
@@ -1651,6 +1710,7 @@ void handle_init(void) {
   if (persist_exists(K_Battery)) {bType = persist_read_int(K_Battery); }
   if (SrcSaver==1){UseSeconds = false;}
   if (UseSeconds == false){sTime = sTime +1;} else {sTime = sTime * 60;}
+  if (lTime == 0){iLight = -1;}
   //set colors
   setColors (cType);
   
@@ -1665,7 +1725,6 @@ void handle_init(void) {
     s = window_create();
     GRect sbounds = GRect(0,0,144,168);
     SrcSaver_layer = layer_create(sbounds);
-    //layer_set_update_proc(SrcSaver_layer, SrcSaver_update);
     layer_add_child((Layer *)s, SrcSaver_layer);
     iTimer = 0;
     setImage (SrcSaver);
@@ -1784,11 +1843,8 @@ void handle_init(void) {
   layer_add_child(window_get_root_layer(w), shadow_second);
   layer_add_child(window_get_root_layer(w), marks_layer);
   layer_add_child(window_get_root_layer(w), (Layer *)date);
-  //if (bType == 1){
-    layer_add_child(window_get_root_layer(w), (Layer *)Batt);    
-  //} else {
-    layer_add_child(window_get_root_layer(w), (Layer *)battery);
-  //}
+  layer_add_child(window_get_root_layer(w), (Layer *)Batt);    
+  layer_add_child(window_get_root_layer(w), (Layer *)battery);
   layer_add_child(window_get_root_layer(w), (Layer *)BN3);
   layer_add_child(window_get_root_layer(w), (Layer *)BN6);
   layer_add_child(window_get_root_layer(w), (Layer *)BN9);

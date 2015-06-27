@@ -28,10 +28,10 @@ Pebble.addEventListener("showConfiguration",
     }
     
     if (platform=='aplite') {
-            Pebble.openURL("https://dl.dropboxusercontent.com/u/34982193/TitanBW_v7_3.html"+url_args);
+            Pebble.openURL("https://dl.dropboxusercontent.com/u/34982193/TitanBW_v7_38.html"+url_args);
             console.log("Connected to http configuration page!");
     } else {
-            Pebble.openURL("https://dl.dropboxusercontent.com/u/34982193/Titan_v7_3.html"+url_args);
+            Pebble.openURL("https://dl.dropboxusercontent.com/u/34982193/Titan_v7_38.html"+url_args);
             console.log("Connected to http configuration page!");
     }
   }
