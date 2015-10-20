@@ -1,8 +1,11 @@
 #include <pebble.h>
 
 //Fonts
-#define sSFont fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD) 
+#define sSFont fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD)
+
 #define nSFont fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD) 
+
+#define nSFont2 fonts_get_system_font(FONT_KEY_ROBOTO_CONDENSED_21)
 #define nBFont fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD) 
   
 #define K_UseSeconds 0
@@ -19,8 +22,14 @@
 #define K_Time 11
 #define K_Light 12
 #define K_Battery 13
+  
+#define K_batt_start 90
+#define K_batt_current 91
+#define K_batt_elapsed 92  
+#define K_batt_step 93 
+#define K_batt_perc 94
 
-static int mTicks = 60, Radio = 100, a = 1, cType = 1, hType = 1, numbType = 5, uBluetooth = 1, grosor = 4, hTicks = 3, control = 1;
+static int Radio = 96, mTicks = 60, a = 1, cType = 0, hType = 1, numbType = 5, uBluetooth = 1, grosor = 4, hTicks = 3, control = 1;
 static int bType=0, SrcSaver = 0, sTime=1, iTimer=0, current = 0, maxSaver = 25;
 static int lTime =7, iLight=0;
 static int debug = 0;//to activate debug messages set 1
@@ -29,9 +38,11 @@ bool UseSeconds = false, UseShadows = true, DateBox = true, UseCrown = true;
 int32_t hh_angle, mi_angle, ss_angle, a_angle;
 
 Window *w, *s;
+struct tm *marca;
+
 Layer *dial_layer, *SrcSaver_layer, *marks_layer, *time_layer, *time_second, *shadow_layer, *shadow_second, *battery, *bluetooth;
 TextLayer *date, *Batt, *SN1, *SN2, *BN3, *SN4, *SN5, *BN6, *SN7, *SN8, *BN9, *SN10, *SN11, *BN12;
-GPoint hc, hs, mHb, mHt, hHb, hHt;
+GPoint hc, hs, mHb, mHt, hHb, hHt, centre;
 #ifdef PBL_COLOR
   GPoint smHb,smHt,slmH,srmH,sp1,sp2,sp3,sp4,sp5,sp6,slH,srH,sh1,sh2,sh3,sh4,sh5;
   GPoint shHb,shHt,lmH,rmH,p1,p2,p3,p4,p5,p6,lH,rH,h1,h2,h3,h4,h5;
@@ -51,6 +62,7 @@ static BatteryChargeState c_state;
 GPathInfo MINUTE_POINTS = { 4, (GPoint []) { { -1, 1 }, { 1, 1}, { 1, -6}, { -1, -6} } };
 GPathInfo HOUR_POINTS = { 4, (GPoint []) { { -1, 3 }, { 1, 3}, { 1, -12}, { -1, -12} } };
 GPathInfo HOUR_QUARTERS = { 4, (GPoint []) { { -3, 3 }, { 3, 3}, { 3, -17}, { -3, -17} } };
+GPathInfo START = {10,(GPoint []) {{ 0, -12 }, { 2, -7}, { 6, -6}, { 3, -5}, { 4, 2 }, { 0, -3}, { -3, 2}, { -3, -5}, { -6, -6}, { -3, -7} } };
 
 static GPath *minute_square, *hour_square, *hour_quarters;
 
@@ -453,6 +465,40 @@ static void setColors (int clockType){
     CDBox = COLOR_FALLBACK(GColorLightGray,GColorBlack);
     CCrown = COLOR_FALLBACK(GColorJazzberryJam,GColorWhite);
     break;
+    case 23: //Happy July 4
+    BColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CSphere = COLOR_FALLBACK(GColorDukeBlue, GColorWhite);
+    CQMarks = COLOR_FALLBACK(GColorWhite,GColorBlack); 
+    CHMarks = COLOR_FALLBACK(GColorWhite,GColorBlack); 
+    CMMarks = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CHours = COLOR_FALLBACK(GColorDukeBlue,GColorBlack);
+    CMinutes = COLOR_FALLBACK(GColorYellow,GColorBlack);
+    CSeconds = COLOR_FALLBACK(GColorBrilliantRose,GColorBlack);
+    CShadow = COLOR_FALLBACK(GColorBlack,GColorWhite);  
+    CFont = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CBattery = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CSNumbers = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CBNumbers = COLOR_FALLBACK(GColorWhite,GColorBlack);
+    CDBox = COLOR_FALLBACK(GColorLightGray,GColorBlack);
+    CCrown = COLOR_FALLBACK(GColorWhite,GColorWhite);
+    break;
+    case 24: //Gray Scale
+    BColor = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CSphere = COLOR_FALLBACK(GColorWhite,GColorWhite);
+    CQMarks = COLOR_FALLBACK(GColorBlack,GColorBlack); 
+    CHMarks = COLOR_FALLBACK(GColorBlack,GColorBlack); 
+    CMMarks = COLOR_FALLBACK(GColorLightGray,GColorBlack);
+    CHours = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CMinutes = COLOR_FALLBACK(GColorDarkGray,GColorBlack);
+    CSeconds = COLOR_FALLBACK(GColorLightGray,GColorBlack);
+    CShadow = COLOR_FALLBACK(GColorBlack,GColorWhite);  
+    CFont = COLOR_FALLBACK(GColorLightGray,GColorBlack);
+    CBattery = COLOR_FALLBACK(GColorLightGray,GColorBlack);
+    CSNumbers = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CBNumbers = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CDBox = COLOR_FALLBACK(GColorBlack,GColorBlack);
+    CCrown = COLOR_FALLBACK(GColorDarkGray,GColorWhite);
+    break;
 #endif
   }
 }
@@ -466,7 +512,7 @@ static void setImage (int ScreenSaver){
           ScreenSaver = 2+rand() % (maxSaver-3);
    }
   if (debug==1){APP_LOG(APP_LOG_LEVEL_INFO, "set_image: Setting Screen Saver %d", ScreenSaver); }
-  if (debug==1){APP_LOG(APP_LOG_LEVEL_INFO, "Heap Available Before: %d", heap_bytes_free()); } 
+  if (debug==1){APP_LOG(APP_LOG_LEVEL_INFO, "Heap Available Before: %u", heap_bytes_free()); } 
    switch(ScreenSaver){
     case 2: //SKully
       ScreenSvr = gbitmap_create_with_resource(RESOURCE_ID_SKULLY);
@@ -540,11 +586,15 @@ static void setImage (int ScreenSaver){
     break;
    }
   if (ScreenSvr != NULL) {
-    bitmap_layer = bitmap_layer_create(GRect(0,0,144,168));
+    #ifdef PBL_RECT
+      bitmap_layer = bitmap_layer_create(GRect(0,0,144,168));
+    #elif PBL_ROUND
+      bitmap_layer = bitmap_layer_create(GRect(0,0,180,180));
+    #endif
     bitmap_layer_set_bitmap(bitmap_layer, ScreenSvr);
     bitmap_layer_set_compositing_mode(bitmap_layer, GCompOpAssign);
     layer_add_child(SrcSaver_layer, bitmap_layer_get_layer(bitmap_layer));
-    if (debug==1){APP_LOG(APP_LOG_LEVEL_INFO, "Heap Available After: %d", heap_bytes_free());}
+    if (debug==1){APP_LOG(APP_LOG_LEVEL_INFO, "Heap Available After: %u", heap_bytes_free());}
   } 
   #endif
 }
@@ -552,6 +602,36 @@ static void setImage (int ScreenSaver){
 static void handle_battery(BatteryChargeState c_state) {
       layer_mark_dirty(battery);
       layer_mark_dirty((Layer *)Batt);
+
+  // estimating battery % angle
+   if (c_state.is_charging == false&&c_state.charge_percent<100){
+      int start = 0;
+      int elapsed = 0;
+      int step = 0;
+      int timestamp = time(NULL)-0;
+      int perc = 10;
+      persist_write_int(K_batt_current,timestamp);
+      if (persist_exists(K_batt_perc)) {perc = persist_read_int(K_batt_perc); }
+      if (persist_exists(K_batt_start)) {start = persist_read_int(K_batt_start); }
+      if (persist_exists(K_batt_elapsed)) {elapsed = persist_read_int(K_batt_elapsed); }
+      if (persist_exists(K_batt_step)) {step = persist_read_int(K_batt_step); }
+      if (perc>c_state.charge_percent/10){
+        elapsed = timestamp-start;
+        step = perc-c_state.charge_percent/10;
+        persist_write_int(K_batt_elapsed, elapsed);
+        persist_write_int(K_batt_step, step);
+        persist_write_int(K_batt_perc, c_state.charge_percent/10);
+        if (debug==1){APP_LOG(APP_LOG_LEVEL_INFO, "tiempo %d",  elapsed);}
+      } else {
+        int start = time(NULL)-0;
+        persist_write_int(K_batt_start, start);
+        persist_write_int(K_batt_current,start);
+      }
+   } else
+   { 
+        int start = time(NULL)-0;
+        persist_write_int(K_batt_current,start);
+   }
 }
 
 void handle_bluetooth(bool connected) {
@@ -567,7 +647,7 @@ static void battery_update_proc(Layer *layer, GContext *ctx) {
      c_state = battery_state_service_peek();
      if (bType == 0){  
        graphics_context_set_stroke_color(ctx, c_state.is_charging ? CBattery : CSphere);
-       graphics_draw_rect(ctx, GRect(0,0,15,15));
+       if (c_state.is_charging==true){graphics_draw_rect(ctx, GRect(0,0,15,15));}
        graphics_context_set_stroke_color(ctx, CBattery);
        graphics_context_set_fill_color(ctx, CBattery);
 
@@ -643,6 +723,16 @@ void dial_layer_update(Layer *me, GContext *ctx) {
     graphics_context_set_fill_color(ctx, GColorJazzberryJam);
     graphics_fill_circle(ctx, hc, Radio*0.1);
   }
+  if (cType==23){
+    graphics_context_set_fill_color(ctx, GColorRed);
+    graphics_fill_circle(ctx, hc, Radio*0.7);
+    graphics_context_set_fill_color(ctx, GColorWhite);
+    graphics_fill_circle(ctx, hc, Radio*0.5);
+    graphics_context_set_fill_color(ctx, GColorRed);
+    graphics_fill_circle(ctx, hc, Radio*0.3);
+    graphics_context_set_fill_color(ctx, GColorWhite);
+    graphics_fill_circle(ctx, hc, Radio*0.2);
+  }
   #endif
   if (UseCrown==true){
     #ifdef PBL_COLOR
@@ -669,9 +759,18 @@ void dial_layer_update(Layer *me, GContext *ctx) {
       if (bType ==1) {graphics_fill_rect(ctx, nextBattery, 6, GCornersAll);}
     }
     #endif
-    GRect sDBox = GRect(hc.x-28,hc.y+16,58,24);
-    graphics_context_set_fill_color(ctx, CDBox);
-    graphics_fill_rect(ctx, sDBox, 6, GCornersAll);
+    if (Radio>96){
+      GRect sDBox = GRect(hc.x-40,hc.y+16,80,24);
+      graphics_context_set_fill_color(ctx, CDBox);
+      graphics_fill_rect(ctx, sDBox, 6, GCornersAll);
+    }
+    else
+      {
+      GRect sDBox = GRect(hc.x-28,hc.y+16,58,24);
+      graphics_context_set_fill_color(ctx, CDBox);
+      graphics_fill_rect(ctx, sDBox, 6, GCornersAll);
+    }
+
     if (bType ==1) {
       GRect sDBat = GRect(hc.x-13,hc.y-37,28,22);
       graphics_fill_rect(ctx, sDBat, 6, GCornersAll);}
@@ -724,8 +823,10 @@ void marks_layer_update(Layer *me, GContext *ctx) {
         gpath_rotate_to(hour_quarters, angle);
         gpath_draw_filled(ctx, hour_quarters);
         gpath_draw_outline(ctx, hour_quarters);
-        graphics_context_set_stroke_color(ctx, CSphere);
-        graphics_draw_line(ctx, ray, sEnd);
+        if (cType!=23){
+           graphics_context_set_stroke_color(ctx, CSphere);
+           graphics_draw_line(ctx, ray, sEnd);
+        }
       }
     }
   }
@@ -1261,6 +1362,7 @@ void time_second_update(Layer *me, GContext *ctx) {
 
 void handle_tick(struct tm *now, TimeUnits units_changed) {
   setlocale(LC_TIME, "");
+  marca = now;
   if (lTime>0 && iLight>-1){
       iLight= iLight+1;
       if (iLight >= lTime){
@@ -1363,20 +1465,38 @@ void handle_tick(struct tm *now, TimeUnits units_changed) {
      c_state = battery_state_service_peek();
      strftime(date_buf, sizeof("Mon.  1"), "%a. %e", now);
      text_layer_set_text(date, date_buf);
-     snprintf(battery_buf, sizeof(battery_buf), "%d", c_state.charge_percent);
+    
+     int elapsed = 1;
+     int step = 0;
+     int timestamp = time(NULL)-0;
+     int last = time(NULL)-0;
+     int resto = 0;
+     if (persist_exists(K_batt_current)) {last = persist_read_int(K_batt_current); }
+     if (persist_exists(K_batt_elapsed)) {elapsed = persist_read_int(K_batt_elapsed); }
+     if (persist_exists(K_batt_step)) {step = persist_read_int(K_batt_step); }
+     resto = (timestamp-last)*step*10/elapsed;
+     if (resto>=10){resto=9;}
+     snprintf(battery_buf, sizeof(battery_buf), "%d", c_state.charge_percent-resto);
    
+    #ifdef PBL_RECT
       if (Radio<=72){
-           hc = GPoint(71,84);
+           hc = GPoint(centre.x,centre.y);
       } else {
            hc = GPoint((int16_t)(-sin_lookup(TRIG_MAX_ANGLE / 60 * sector) *
-  		     (int32_t)(Radio-68) / TRIG_MAX_RATIO) + 144 / 2, 
+  		     (int32_t)(Radio-68) / TRIG_MAX_RATIO) + centre.x, 
            (int16_t)(cos_lookup(TRIG_MAX_ANGLE / 60 * sector) *
-  		     (int32_t)(Radio-80) / TRIG_MAX_RATIO) +  168 / 2);
+  		     (int32_t)(Radio-80) / TRIG_MAX_RATIO) +  centre.y);
       }
+    #elif PBL_ROUND
+      hc = GPoint(centre.x+sector*0,centre.y);
+    #endif
       hs.x=hc.x+1;
       hs.y=hc.y+4;
-      
-      next = GRect(hc.x-30,hc.y+15,60,25);
+      if (Radio>96) {
+        next = GRect(hc.x-40,hc.y+15,80,25);
+      } else {
+        next = GRect(hc.x-30,hc.y+15,60,25);
+      }
       if (bType ==0){
          nextBattery = GRect(hc.x-7,hc.y-33,15,15);
       } else {
@@ -1644,6 +1764,17 @@ static void in_recv_handler(DictionaryIterator *iterator, void *context)
        }
       if(w != NULL) {window_stack_push(w, true);}
   }
+  if (cType==23){
+    gpath_destroy(hour_square);
+    gpath_destroy(hour_quarters);
+    hour_square = gpath_create(&START);
+    hour_quarters = gpath_create(&START);    
+  } else {
+    gpath_destroy(hour_square);
+    gpath_destroy(hour_quarters);
+    hour_square = gpath_create(&HOUR_POINTS);
+    hour_quarters = gpath_create(&HOUR_QUARTERS);
+  }
 }
 
 static void setSrcSaver (int ScreenSaver)
@@ -1688,7 +1819,7 @@ static void handle_tap(AccelAxisType axis, int32_t direction) {
 void handle_init(void) {
  //Check for saved KEY options
   app_message_register_inbox_received((AppMessageInboxReceived) in_recv_handler);
-  app_message_open(app_message_inbox_size_maximum(), app_message_outbox_size_maximum());
+  //app_message_open(app_message_inbox_size_maximum(), app_message_outbox_size_maximum());
   
   #ifdef PBL_COLOR //shadows only on Pebble Time
   if (persist_exists(K_UseShadows)) {UseShadows = persist_read_bool(K_UseShadows); }
@@ -1723,20 +1854,29 @@ void handle_init(void) {
   //set ScreenSaver
   if (SrcSaver>1){
     s = window_create();
-    GRect sbounds = GRect(0,0,144,168);
+   #ifdef PBL_SDK_2
+     window_set_fullscreen(s, true);
+    #endif
+    Layer *screen_layer = window_get_root_layer(s);
+    GRect sbounds = layer_get_bounds(screen_layer);
     SrcSaver_layer = layer_create(sbounds);
     layer_add_child((Layer *)s, SrcSaver_layer);
     iTimer = 0;
     setImage (SrcSaver);
   }
-#endif  
-  
+#endif 
+  app_message_open(1024, 1024);
+  //app_message_open(app_message_inbox_size_maximum(), app_message_outbox_size_maximum());  
+   
   //set window
   w = window_create();
   #ifdef PBL_SDK_2
    window_set_fullscreen(w, true);
   #endif
-  GRect bounds = GRect(0,0,144,168);
+  Layer *window_layer = window_get_root_layer(w);
+  GRect bounds = layer_get_bounds(window_layer);
+  centre =  grect_center_point(&bounds);
+  
   dial_layer = layer_create(bounds);
   marks_layer = layer_create(bounds);
   shadow_layer = layer_create(bounds);
@@ -1745,10 +1885,15 @@ void handle_init(void) {
   time_second = layer_create(bounds);
 
   //Clock points
-  hour_square = gpath_create(&HOUR_POINTS);
   minute_square = gpath_create(&MINUTE_POINTS);
-  hour_quarters = gpath_create(&HOUR_QUARTERS);
-
+  if (cType==23){
+    hour_square = gpath_create(&START);
+    hour_quarters = gpath_create(&START);    
+  } else {
+    hour_square = gpath_create(&HOUR_POINTS);
+    hour_quarters = gpath_create(&HOUR_QUARTERS);
+  }
+  
   //Layer for battery
   rBatt = GRect(0,0,30,22);
   Batt  = text_layer_create(rBatt);
@@ -1760,12 +1905,17 @@ void handle_init(void) {
   battery = layer_create(rBattery);   
   
   //building date layer
-  rDate = GRect(hc.x-30,hc.y+15,60,25);
+  rDate = GRect(hc.x-40,hc.y+15,80,25);
   date = text_layer_create(rDate);
   text_layer_set_background_color(date, GColorClear);
   text_layer_set_text_color(date, CFont);
   text_layer_set_text_alignment(date, GTextAlignmentCenter);
-  text_layer_set_font(date, nSFont); 
+  if (Radio>96){
+    text_layer_set_font(date, nSFont2);
+  }
+  else {
+     text_layer_set_font(date, nSFont);
+  }
 
    //building dial numbers layers
    //bigNumbers (Quarters)
